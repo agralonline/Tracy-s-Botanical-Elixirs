@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FAQ — Tracy's Botanical Elixirs</title>
+<meta name="description" content="Answers to common questions about Tracy's Botanical Elixirs — shipping, ingredients, returns, and more." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230a0f1d' stroke='%23D4AF37' stroke-width='4'/%3E%3Ctext x='50' y='63' font-size='46' text-anchor='middle' fill='%23D4AF37' font-family='Georgia,serif'%3ET%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: { navy: { 950:"#050b14",900:"#0a0f1d" }, gold: { DEFAULT:"#D4AF37", soft:"#E8C766" }, cyan:{glow:"#34e8e0"}, emerald:{glow:"#2be8a8"} },
+    fontFamily: { display: ["Cormorant Garamond","serif"], sans: ["Inter","Arial","sans-serif"] },
+  } } };
+</script>
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body class="font-sans">
+
+<header class="site-header sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between gap-4">
+    <a href="/index.html" class="flex items-center gap-2 shrink-0"><span class="heading-serif text-lg sm:text-2xl tracking-wide gold-gradient-text">Tracy's<span class="text-ink-100 font-normal"> Botanical Elixirs</span></span></a>
+    <nav class="hidden lg:flex items-center gap-7">
+      <a href="/index.html" class="nav-link" data-i18n="nav_home">Home</a>
+      <a href="/shop.html" class="nav-link" data-i18n="nav_shop">Shop</a>
+      <a href="/about.html" class="nav-link" data-i18n="nav_about">Our Story</a>
+      <a href="/faq.html" class="nav-link" data-i18n="nav_faq">FAQ</a>
+      <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
+    </nav>
+    <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs hidden sm:block" aria-label="Language"></select>
+  </div>
+</header>
+
+<section class="max-w-3xl mx-auto px-5 md:px-8 py-20">
+  <h1 class="heading-serif text-4xl gold-gradient-text mb-10" data-i18n="faq_page_title">Frequently Asked Questions</h1>
+
+  <div class="space-y-3" id="faq-list">
+    <details class="glass rounded-xl p-5" open>
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">How long does shipping take?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Orders ship from our US fulfillment center within 1–2 business days. Domestic orders typically arrive within 3–7 business days; international delivery times vary by destination and are shown at checkout.</p>
+    </details>
+    <details class="glass rounded-xl p-5">
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">Are your ingredients organic and cruelty-free?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Yes. Every product is formulated with certified organic botanical extracts, is never tested on animals, and is free of synthetic fillers. Look for the Organic, Vegan, and Cruelty-Free badges on each product page.</p>
+    </details>
+    <details class="glass rounded-xl p-5">
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">What is your return policy?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Unopened products can be returned within 30 days of delivery for a full refund. Opened products can only be returned if damaged or defective. See our <a href="/shipping.html" class="text-gold-soft">Shipping &amp; Returns</a> page for full details.</p>
+    </details>
+    <details class="glass rounded-xl p-5">
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">Do I need an account to place an order?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed">No account or login is required. Checkout is handled securely by Stripe as a guest — just your email and shipping address.</p>
+    </details>
+    <details class="glass rounded-xl p-5">
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">Is my payment information secure?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Yes. All payments are processed directly by Stripe, a PCI-compliant payment processor. We never see or store your card details.</p>
+    </details>
+    <details class="glass rounded-xl p-5">
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">Can I use essential oils if I'm pregnant or have a medical condition?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Please consult a physician before use if you are pregnant, nursing, or managing a medical condition. Always perform a patch test before first use.</p>
+    </details>
+    <details class="glass rounded-xl p-5">
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">Do you ship internationally?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Yes, we ship worldwide. Shipping cost and estimated delivery time are calculated at checkout based on your destination; the customer is responsible for any customs duties or import taxes.</p>
+    </details>
+  </div>
+</section>
+
+<footer class="border-t border-white/5 py-12">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 text-center text-ink-700 text-xs">&copy; <span data-current-year>2026</span> Tracy's Botanical Elixirs. <span data-i18n="footer_rights">All rights reserved.</span></div>
+  <div class="flex flex-wrap items-center justify-center gap-2 mt-8">
+    <span class="payment-badge">Visa</span>
+    <span class="payment-badge">Mastercard</span>
+    <span class="payment-badge">Amex</span>
+    <span class="payment-badge">Apple Pay</span>
+    <span class="payment-badge">Stripe</span>
+  </div>
+  <p class="text-center text-ink-700 text-xs mt-2">Created and designed by <span class="text-gold-soft">AgralOnline</span></p>
+</footer>
+
+<script type="module">
+  import { initI18n } from "/assets/js/i18n.js";
+  import { injectCookieConsent } from "/assets/js/cookie-consent.js";
+  document.body.prepend(Object.assign(document.createElement("div"), { className: "ambient-bg", innerHTML: '<div class="glow-gold"></div>' }));
+  await initI18n();
+  injectCookieConsent();
+</script>
+</body>
+</html>

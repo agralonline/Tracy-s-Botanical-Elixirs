@@ -74,6 +74,28 @@ export function formatPrice(amount, currency = "USD") {
   }
 }
 
+/** Convert a Firestore Timestamp, ISO string, or plain Date-ish value to a comparable number. */
+function toMillis(value) {
+  if (!value) return 0;
+  if (typeof value.toMillis === "function") return value.toMillis(); // Firestore Timestamp
+  if (typeof value.seconds === "number") return value.seconds * 1000; // Firestore Timestamp (plain object)
+  const parsed = new Date(value).getTime();
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+/** Sort a product array in place-safe fashion. sortBy: "" | "price-asc" | "price-desc" | "newest". */
+function sortProducts(products, sortBy) {
+  const list = [...products];
+  if (sortBy === "price-asc") {
+    list.sort((a, b) => (a.pricing?.basePrice ?? 0) - (b.pricing?.basePrice ?? 0));
+  } else if (sortBy === "price-desc") {
+    list.sort((a, b) => (b.pricing?.basePrice ?? 0) - (a.pricing?.basePrice ?? 0));
+  } else if (sortBy === "newest") {
+    list.sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+  }
+  return list;
+}
+
 function computeBadge(product) {
   if (product.pricing?.compareAtPrice && product.pricing.compareAtPrice > product.pricing.basePrice) {
     return { key: "badge_sale", cls: "chip" };
@@ -151,7 +173,7 @@ function escapeHtml(str = "") {
  * onLocaleChange() subscription to instantly re-localize every card
  * without a full page refresh.
  */
-export async function renderProductGrid(containerEl, { category = null, featuredOnly = false, searchTerm = "" } = {}) {
+export async function renderProductGrid(containerEl, { category = null, featuredOnly = false, searchTerm = "", sortBy = "" } = {}) {
   if (!containerEl) return;
   containerEl.innerHTML = skeletonGridHTML(8);
 
@@ -168,6 +190,8 @@ export async function renderProductGrid(containerEl, { category = null, featured
       return title.includes(term) || desc.includes(term) || p.sku.toLowerCase().includes(term);
     });
   }
+
+  filtered = sortProducts(filtered, sortBy);
 
   if (!filtered.length) {
     containerEl.innerHTML = `<p class="col-span-full text-center text-ink-500 py-16" data-i18n="search_no_results">${t("search_no_results")}</p>`;

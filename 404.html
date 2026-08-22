@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Page Not Found — Tracy's Botanical Elixirs</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230a0f1d' stroke='%23D4AF37' stroke-width='4'/%3E%3Ctext x='50' y='63' font-size='46' text-anchor='middle' fill='%23D4AF37' font-family='Georgia,serif'%3ET%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: { navy: { 950:"#050b14",900:"#0a0f1d" }, gold: { DEFAULT:"#D4AF37", soft:"#E8C766" }, cyan:{glow:"#34e8e0"}, emerald:{glow:"#2be8a8"} },
+    fontFamily: { display: ["Cormorant Garamond","serif"], sans: ["Inter","Arial","sans-serif"] },
+  } } };
+</script>
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body class="font-sans">
+<div class="ambient-bg"><div class="glow-gold"></div></div>
+
+<header class="site-header sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between gap-4">
+    <a href="/index.html" class="flex items-center gap-2 shrink-0"><span class="heading-serif text-lg sm:text-2xl tracking-wide gold-gradient-text">Tracy's<span class="text-ink-100 font-normal"> Botanical Elixirs</span></span></a>
+    <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs hidden sm:block" aria-label="Language"></select>
+  </div>
+</header>
+
+<section class="max-w-2xl mx-auto px-5 md:px-8 py-32 text-center">
+  <p class="heading-serif text-7xl gold-gradient-text mb-4">404</p>
+  <h1 class="heading-serif text-2xl mb-3" data-i18n="notfound_title">This page has wandered off</h1>
+  <p class="text-ink-500 text-sm mb-10" data-i18n="notfound_desc">The page you're looking for doesn't exist or may have moved.</p>
+  <a href="/index.html" class="btn-gold" data-i18n="notfound_cta">Back to Home</a>
+</section>
+
+<footer class="border-t border-white/5 py-12">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 text-center text-ink-700 text-xs">&copy; <span data-current-year>2026</span> Tracy's Botanical Elixirs. <span data-i18n="footer_rights">All rights reserved.</span></div>
+</footer>
+
+<script type="module">
+  import { initI18n } from "/assets/js/i18n.js";
+  import { injectCookieConsent } from "/assets/js/cookie-consent.js";
+  await initI18n();
+  injectCookieConsent();
+</script>
+</body>
+</html>

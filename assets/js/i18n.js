@@ -201,6 +201,9 @@ export async function initI18n() {
   await setLocale(initial);
   const selector = document.getElementById("languageSelector");
   if (selector) initLanguageSelector(selector);
+  document.querySelectorAll("[data-current-year]").forEach((el) => {
+    el.textContent = new Date().getFullYear();
+  });
   return initial;
 }
 

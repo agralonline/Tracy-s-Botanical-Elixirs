@@ -50,7 +50,6 @@ export const SEED_PRODUCTS = [
       organic: true,
     },
     inventory: { trackInventory: true, quantity: 240, allowBackorder: false },
-    rating: { average: 4.9, count: 214 },
     translations: {
       en: { title: "Lavender Serenity Essential Oil", shortDescription: "Pure calming lavender in a violet glass dropper bottle.", description: "A 100% pure, steam-distilled French lavender oil that eases tension and restores calm. Hand-poured into a violet glass bottle with a precision dropper for nightly rituals." },
       es: { title: "Aceite Esencial de Lavanda Serenity", shortDescription: "Lavanda pura y calmante en un frasco de vidrio violeta.", description: "Un aceite de lavanda francesa 100% puro, destilado al vapor, que alivia la tensión y restaura la calma. Envasado a mano en un frasco de vidrio violeta con gotero de precisión para tus rituales nocturnos." },
@@ -102,7 +101,6 @@ export const SEED_PRODUCTS = [
       organic: false,
     },
     inventory: { trackInventory: true, quantity: 180, allowBackorder: false },
-    rating: { average: 4.8, count: 176 },
     translations: {
       en: { title: "Radiant Renewal Face Serum", shortDescription: "Amber-glass vitamin C serum for luminous, even-toned skin.", description: "A lightweight, fast-absorbing serum blending vitamin C, hyaluronic acid, and botanical extracts to brighten, firm, and visibly renew skin overnight." },
       es: { title: "Sérum Facial Radiant Renewal", shortDescription: "Sérum de vitamina C en frasco ámbar para una piel luminosa y uniforme.", description: "Un sérum ligero y de rápida absorción que combina vitamina C, ácido hialurónico y extractos botánicos para iluminar, reafirmar y renovar visiblemente la piel durante la noche." },
@@ -154,7 +152,6 @@ export const SEED_PRODUCTS = [
       organic: true,
     },
     inventory: { trackInventory: true, quantity: 150, allowBackorder: false },
-    rating: { average: 4.9, count: 98 },
     translations: {
       en: { title: "Velvet Nourish Night Cream", shortDescription: "Rich frosted-glass night cream with shea and jojoba.", description: "A luxuriously rich night cream in a heavy frosted glass jar, deeply nourishing skin with organic shea butter, jojoba, and botanical oils while you sleep." },
       es: { title: "Crema de Noche Velvet Nourish", shortDescription: "Crema de noche rica en un frasco de vidrio esmerilado con karité y jojoba.", description: "Una crema de noche lujosamente rica en un pesado frasco de vidrio esmerilado, que nutre profundamente la piel con manteca de karité orgánica, jojoba y aceites botánicos mientras duermes." },
@@ -206,7 +203,6 @@ export const SEED_PRODUCTS = [
       organic: true,
     },
     inventory: { trackInventory: true, quantity: 200, allowBackorder: false },
-    rating: { average: 4.7, count: 143 },
     translations: {
       en: { title: "Argan & Rosemary Hair Oil Duo", shortDescription: "Two-bottle set to strengthen, shine, and revive hair.", description: "A premium duo of cold-pressed argan and rosemary-infused oils that strengthen strands, calm frizz, and restore natural shine from root to tip." },
       es: { title: "Dúo de Aceite Capilar de Argán y Romero", shortDescription: "Set de dos frascos para fortalecer, dar brillo y revitalizar el cabello.", description: "Un dúo premium de aceites de argán prensado en frío e infusionado con romero que fortalece el cabello, controla el frizz y restaura el brillo natural de raíz a puntas." },

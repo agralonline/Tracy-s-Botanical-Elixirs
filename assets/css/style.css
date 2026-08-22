@@ -220,6 +220,28 @@ h1, h2, h3, .heading-serif {
   transform: scale(1.045) translateY(-2px);
 }
 
+/* Category tiles (homepage "Shop by Category") — same auto-fit-no-crop
+   treatment as product cards: any image size/shape fits the box fully,
+   nothing gets clipped, regardless of who supplied the photo. */
+.category-tile-media {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 0.75rem;
+  background: radial-gradient(circle at 30% 20%, rgba(52,232,224,0.10), transparent 55%),
+              radial-gradient(circle at 80% 80%, rgba(43,232,168,0.10), transparent 55%),
+              var(--navy-850);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  overflow: hidden;
+}
+.category-tile-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 /* ---------------------------------------------------------------------
    Buttons
    --------------------------------------------------------------------- */
@@ -408,11 +430,23 @@ select.input-glass {
    Cart drawer
    --------------------------------------------------------------------- */
 #cart-drawer {
+  right: 0;
+  border-left: 1px solid var(--glass-border);
   transform: translateX(100%);
   transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
 }
 #cart-drawer.open { transform: translateX(0); }
-[dir="rtl"] #cart-drawer { transform: translateX(-100%); }
+/* RTL: anchor the drawer to the LEFT edge instead of the right, and slide it
+   off-screen to the left when closed. Simply flipping the transform sign
+   while leaving `right:0` in place (the old bug) only moves the drawer by
+   its own width, landing it mid-viewport instead of fully off-screen. */
+[dir="rtl"] #cart-drawer {
+  right: auto;
+  left: 0;
+  border-left: none;
+  border-right: 1px solid var(--glass-border);
+  transform: translateX(-100%);
+}
 [dir="rtl"] #cart-drawer.open { transform: translateX(0); }
 
 #cart-overlay {
@@ -468,8 +502,68 @@ select.input-glass {
   animation: fade-up 0.35s ease both;
 }
 
+.cookie-consent-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: rgba(10, 15, 29, 0.96);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--glass-border);
+  font-size: 0.8rem;
+  color: var(--ink-300, #c7cfdd);
+}
+[dir="rtl"] .cookie-consent-banner { direction: rtl; }
+.cookie-consent-banner p { max-width: 46rem; margin: 0; }
+.cookie-consent-banner .btn-gold { padding: 0.45rem 1.25rem; font-size: 0.75rem; white-space: nowrap; }
+
+.payment-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-500, #9aa5b8);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border);
+}
+
 /* Focus visibility for accessibility */
 a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------
+   Mobile product grids: horizontal swipe instead of a long vertical stack.
+   As the catalog grows past a handful of items this keeps the page short
+   on phones — one row per section, swipe right for more, instead of
+   scrolling forever. Reverts to the normal responsive grid at sm/lg.
+   `!important` guards against Tailwind's CDN-injected utility stylesheet
+   (whose `.grid{display:grid}` rule can land later in source order).
+   --------------------------------------------------------------------- */
+@media (max-width: 639px) {
+  .product-grid-mobile-scroll {
+    display: flex !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1rem !important;
+    margin: 0 -1.25rem;
+    padding: 0.25rem 1.25rem 0.75rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .product-grid-mobile-scroll::-webkit-scrollbar { display: none; }
+  .product-grid-mobile-scroll > * {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+  }
 }

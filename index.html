@@ -92,7 +92,7 @@
     </div>
 
     <div class="glass p-4">
-      <img src="/assets/img/hero/hero-model.jpg" alt="Tracy's Botanical Elixirs — radiant, botanical-infused skin" class="w-full rounded-lg object-cover" style="width:100%;border-radius:0.5rem;aspect-ratio:4/5;object-fit:cover;object-position:center;" />
+      <img src="/assets/img/hero/hero-model.jpg" alt="Tracy's Botanical Elixirs — radiant, botanical-infused skin" class="w-full rounded-lg object-cover" style="width:100%;border-radius:0.5rem;aspect-ratio:4/3;max-height:60vh;object-fit:cover;object-position:center;" />
     </div>
   </div>
 </section>
@@ -124,21 +124,21 @@
 <section class="max-w-7xl mx-auto px-5 md:px-8 pb-20">
   <h2 class="text-center eyebrow mb-10" data-i18n="section_categories">Shop by Category</h2>
   <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-    <a href="/shop.html?category=essential-oils" class="glass p-6 flex flex-col items-center gap-3 text-center">
-      <img src="/assets/img/products/product-1-lavender.jpg" class="w-20 h-20 object-cover rounded-full" alt="" />
-      <span class="heading-serif" data-i18n="category_essential_oils">Essential Oils</span>
+    <a href="/shop.html?category=essential-oils" class="glass p-3 flex flex-col items-center gap-3 text-center overflow-hidden">
+      <div class="category-tile-media"><img src="/assets/img/products/product-1-lavender.jpg" alt="" /></div>
+      <span class="heading-serif pb-2" data-i18n="category_essential_oils">Essential Oils</span>
     </a>
-    <a href="/shop.html?category=serums" class="glass p-6 flex flex-col items-center gap-3 text-center">
-      <img src="/assets/img/products/product-2-serum.jpg" class="w-20 h-20 object-cover rounded-full" alt="" />
-      <span class="heading-serif" data-i18n="category_serums">Serums</span>
+    <a href="/shop.html?category=serums" class="glass p-3 flex flex-col items-center gap-3 text-center overflow-hidden">
+      <div class="category-tile-media"><img src="/assets/img/products/product-2-serum.jpg" alt="" /></div>
+      <span class="heading-serif pb-2" data-i18n="category_serums">Serums</span>
     </a>
-    <a href="/shop.html?category=skincare" class="glass p-6 flex flex-col items-center gap-3 text-center">
-      <img src="/assets/img/products/product-3-cream-jar.jpg" class="w-20 h-20 object-cover rounded-full" alt="" />
-      <span class="heading-serif" data-i18n="category_skincare">Skincare</span>
+    <a href="/shop.html?category=skincare" class="glass p-3 flex flex-col items-center gap-3 text-center overflow-hidden">
+      <div class="category-tile-media"><img src="/assets/img/products/product-3-cream-jar.jpg" alt="" /></div>
+      <span class="heading-serif pb-2" data-i18n="category_skincare">Skincare</span>
     </a>
-    <a href="/shop.html?category=hair-care" class="glass p-6 flex flex-col items-center gap-3 text-center">
-      <img src="/assets/img/products/product-4-hair-oil-set.jpg" class="w-20 h-20 object-cover rounded-full" alt="" />
-      <span class="heading-serif" data-i18n="category_hair_care">Hair Care</span>
+    <a href="/shop.html?category=hair-care" class="glass p-3 flex flex-col items-center gap-3 text-center overflow-hidden">
+      <div class="category-tile-media"><img src="/assets/img/products/product-4-hair-oil-set.jpg" alt="" /></div>
+      <span class="heading-serif pb-2" data-i18n="category_hair_care">Hair Care</span>
     </a>
   </div>
 </section>
@@ -149,7 +149,7 @@
     <h2 class="heading-serif text-3xl" data-i18n="section_bestsellers">Bestsellers</h2>
     <a href="/shop.html" class="btn-outline-gold text-xs" data-i18n="hero_cta_shop">Shop Collection</a>
   </div>
-  <div id="product-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+  <div id="product-grid" class="product-grid-mobile-scroll grid sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
 </section>
 
 <!-- ================= NEWSLETTER ================= -->
@@ -176,6 +176,7 @@
       <a href="/shop.html" class="nav-link" data-i18n="nav_shop">Shop</a>
       <a href="/about.html" class="nav-link" data-i18n="nav_about">Our Story</a>
       <a href="/blog.html" class="nav-link" data-i18n="nav_blog">Journal</a>
+      <a href="/faq.html" class="nav-link" data-i18n="nav_faq">FAQ</a>
       <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
     </div>
     <div class="flex flex-col gap-2">
@@ -188,12 +189,20 @@
       <select id="languageSelectorFooter" class="input-glass !py-2 !px-3 text-xs" aria-label="Language"></select>
     </div>
   </div>
-  <p class="text-center text-ink-700 text-xs mt-10">&copy; <span data-current-year>2026</span> Tracy's Botanical Elixirs. <span data-i18n="footer_rights">All rights reserved.</span></p>
+  <div class="flex flex-wrap items-center justify-center gap-2 mt-8">
+    <span class="payment-badge">Visa</span>
+    <span class="payment-badge">Mastercard</span>
+    <span class="payment-badge">Amex</span>
+    <span class="payment-badge">Apple Pay</span>
+    <span class="payment-badge">Stripe</span>
+  </div>
+  <p class="text-center text-ink-700 text-xs mt-6">&copy; <span data-current-year>2026</span> Tracy's Botanical Elixirs. <span data-i18n="footer_rights">All rights reserved.</span></p>
+  <p class="text-center text-ink-700 text-xs mt-2">Created and designed by <span class="text-gold-soft">AgralOnline</span></p>
 </footer>
 
 <!-- ================= CART DRAWER ================= -->
 <div id="cart-overlay" class="fixed inset-0 bg-black/60 z-40"></div>
-<aside id="cart-drawer" class="fixed top-0 bottom-0 right-0 w-full max-w-md glass-panel z-50 flex flex-col" style="border-left:1px solid var(--glass-border);">
+<aside id="cart-drawer" class="fixed top-0 bottom-0 right-0 w-full max-w-md glass-panel z-50 flex flex-col">
   <div class="flex items-center justify-between p-5 border-b border-white/5">
     <h2 class="heading-serif text-xl" data-i18n="cart_title">Your Cart</h2>
     <button id="cart-close-btn" type="button" class="btn-ghost p-1" aria-label="Close">

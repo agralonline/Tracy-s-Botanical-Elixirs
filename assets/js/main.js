@@ -10,6 +10,7 @@
 
 import { initI18n, onLocaleChange, t } from "/assets/js/i18n.js";
 import { initCartUI } from "/assets/js/cart.js";
+import { injectCookieConsent } from "/assets/js/cookie-consent.js";
 
 export async function bootstrapPage() {
   injectAmbientBackground();
@@ -18,6 +19,7 @@ export async function bootstrapPage() {
   wireMobileNav();
   wireNewsletterForm();
   wireYear();
+  injectCookieConsent();
 }
 
 function injectAmbientBackground() {

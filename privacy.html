@@ -19,13 +19,17 @@
 </head>
 <body class="font-sans">
 <header class="site-header sticky top-0 z-40">
-  <div class="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between">
-    <a href="/index.html" class="heading-serif text-lg sm:text-2xl gold-gradient-text">Tracy's<span class="text-ink-100 font-normal"> Botanical Elixirs</span></a>
-    <a href="/shop.html" class="btn-outline-gold text-xs">Shop</a>
+  <div class="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between gap-4">
+    <a href="/index.html" class="heading-serif text-lg sm:text-2xl gold-gradient-text shrink-0">Tracy's<span class="text-ink-100 font-normal"> Botanical Elixirs</span></a>
+    <div class="flex items-center gap-3">
+      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs hidden sm:block" aria-label="Language"></select>
+      <a href="/shop.html" class="btn-outline-gold text-xs" data-i18n="nav_shop">Shop</a>
+    </div>
   </div>
 </header>
 <section class="max-w-3xl mx-auto px-5 md:px-8 py-20 space-y-6 text-ink-300 leading-relaxed text-sm">
-  <h1 class="heading-serif text-4xl gold-gradient-text mb-6">Privacy Policy</h1>
+  <h1 class="heading-serif text-4xl gold-gradient-text mb-2" data-i18n="privacy_page_title">Privacy Policy</h1>
+  <p class="text-xs text-ink-700" data-i18n="legal_english_note">This policy is provided in English. The English version governs.</p>
   <p>This Privacy Policy explains what information Tracy's Botanical Elixirs collects, how it is used, and the choices you have. Replace this template with counsel-reviewed language before launch — it is provided as a functional starting point, not legal advice.</p>
   <h2 class="heading-serif text-lg text-gold-soft">Information We Collect</h2>
   <p>Account and order details you provide (name, email, shipping address); payment information, which is transmitted directly to and processed by Stripe and never stored on our servers; your selected storefront language, stored locally in your browser; and standard technical data (IP address, browser type, pages visited) collected via server logs and analytics.</p>
@@ -36,6 +40,21 @@
   <h2 class="heading-serif text-lg text-gold-soft">Your Rights</h2>
   <p>Depending on your location, you may have the right to access, correct, or delete your personal data. Contact <a href="mailto:privacy@tracyusa.com" class="text-gold-soft">privacy@tracyusa.com</a> to make a request.</p>
 </section>
-<footer class="border-t border-white/5 py-12"><div class="max-w-7xl mx-auto px-5 text-center text-ink-700 text-xs">&copy; 2026 Tracy's Botanical Elixirs. All rights reserved.</div></footer>
+<footer class="border-t border-white/5 py-12"><div class="max-w-7xl mx-auto px-5 text-center text-ink-700 text-xs">&copy; <span data-current-year>2026</span> Tracy's Botanical Elixirs. <span data-i18n="footer_rights">All rights reserved.</span></div>  <div class="flex flex-wrap items-center justify-center gap-2 mt-8">
+    <span class="payment-badge">Visa</span>
+    <span class="payment-badge">Mastercard</span>
+    <span class="payment-badge">Amex</span>
+    <span class="payment-badge">Apple Pay</span>
+    <span class="payment-badge">Stripe</span>
+  </div>
+  <p class="text-center text-ink-700 text-xs mt-2">Created and designed by <span class="text-gold-soft">AgralOnline</span></p>
+</footer>
+<script type="module">
+  import { initI18n } from "/assets/js/i18n.js";
+  import { injectCookieConsent } from "/assets/js/cookie-consent.js";
+  document.body.prepend(Object.assign(document.createElement("div"), { className: "ambient-bg", innerHTML: '<div class="glow-gold"></div>' }));
+  await initI18n();
+  injectCookieConsent();
+</script>
 </body>
 </html>
