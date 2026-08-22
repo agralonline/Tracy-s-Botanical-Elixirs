@@ -1,4 +1,4 @@
-# Firestore Data Model — Tracy USA
+# Firestore Data Model — Tracy's Botanical Elixirs
 
 Project: Cloud Firestore (Native mode). All collections below live at the
 root of the default database unless noted.
@@ -120,7 +120,7 @@ translation-API quota, since long-form articles would consume it fast.
   "excerpt": "Simple, luxurious rituals for winding down...",
   "bodyHtml": "<p>...</p>",
   "coverImage": "https://.../blog/lavender-routine.jpg",
-  "author": "Tracy USA Editorial",
+  "author": "Tracy's Botanical Elixirs Editorial",
   "tags": ["lavender", "self-care", "rituals"],
   "status": "published",
   "publishedAt": "2026-07-01T09:00:00.000Z",

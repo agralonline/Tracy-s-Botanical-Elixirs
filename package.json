@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Tracy USA — luxury essential oils & organic skincare storefront. Static frontend + Firebase Firestore + Stripe Checkout, deployable to Vercel or Netlify.",
+  "description": "Tracy's Botanical Elixirs — luxury essential oils & organic skincare storefront. Static frontend + Firebase Firestore + Stripe Checkout, deployable to Vercel or Netlify.",
   "scripts": {
     "dev": "npx serve . -l 5173",
     "seed": "node scripts/seed-firestore.js"
