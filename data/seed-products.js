@@ -38,7 +38,7 @@ export const SEED_PRODUCTS = [
     stripePriceId: "",
     stripeProductId: "",
     images: [
-      { url: "/assets/img/products/product-1-lavender.svg", isPrimary: true },
+      { url: "/assets/img/products/product-1-lavender.jpg", isPrimary: true },
     ],
     attributes: {
       volumeMl: 30,
@@ -90,7 +90,7 @@ export const SEED_PRODUCTS = [
     stripePriceId: "",
     stripeProductId: "",
     images: [
-      { url: "/assets/img/products/product-2-serum.svg", isPrimary: true },
+      { url: "/assets/img/products/product-2-serum.jpg", isPrimary: true },
     ],
     attributes: {
       volumeMl: 30,
@@ -142,7 +142,7 @@ export const SEED_PRODUCTS = [
     stripePriceId: "",
     stripeProductId: "",
     images: [
-      { url: "/assets/img/products/product-3-cream-jar.svg", isPrimary: true },
+      { url: "/assets/img/products/product-3-cream-jar.jpg", isPrimary: true },
     ],
     attributes: {
       volumeMl: 50,
@@ -194,7 +194,7 @@ export const SEED_PRODUCTS = [
     stripePriceId: "",
     stripeProductId: "",
     images: [
-      { url: "/assets/img/products/product-4-hair-oil-set.svg", isPrimary: true },
+      { url: "/assets/img/products/product-4-hair-oil-set.jpg", isPrimary: true },
     ],
     attributes: {
       volumeMl: 100,
