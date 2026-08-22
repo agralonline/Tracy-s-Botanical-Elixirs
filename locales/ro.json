@@ -1,5 +1,9 @@
 {
-  "meta": { "code": "ro", "name": "Română", "dir": "ltr" },
+  "meta": {
+    "code": "ro",
+    "name": "Română",
+    "dir": "ltr"
+  },
   "brand_name": "Tracy's Botanical Elixirs",
   "nav_home": "Acasă",
   "nav_shop": "Magazin",
@@ -31,6 +35,7 @@
   "product_add_to_cart": "Adaugă în Coș",
   "product_view_details": "Vezi Detalii",
   "product_out_of_stock": "Stoc Epuizat",
+  "product_low_stock": "Mai sunt doar {count} în stoc!",
   "product_from": "De la",
   "product_description_title": "Descriere",
   "product_ingredients_title": "Ingrediente",

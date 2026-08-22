@@ -1,5 +1,9 @@
 {
-  "meta": { "code": "uk", "name": "Українська", "dir": "ltr" },
+  "meta": {
+    "code": "uk",
+    "name": "Українська",
+    "dir": "ltr"
+  },
   "brand_name": "Tracy's Botanical Elixirs",
   "nav_home": "Головна",
   "nav_shop": "Магазин",
@@ -31,6 +35,7 @@
   "product_add_to_cart": "Додати до Кошика",
   "product_view_details": "Переглянути Деталі",
   "product_out_of_stock": "Немає в Наявності",
+  "product_low_stock": "Залишилося лише {count} на складі!",
   "product_from": "Від",
   "product_description_title": "Опис",
   "product_ingredients_title": "Склад",

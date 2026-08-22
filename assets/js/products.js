@@ -24,6 +24,15 @@ import { getCartQuantityFor } from "/assets/js/cart.js";
 
 let productCache = null; // Array<Product> | null until first fetch resolves
 
+/** Inventory count at or below which the storefront shows an urgency message. */
+const LOW_STOCK_THRESHOLD = 5;
+
+/** True when a product is tracked, in stock, and at/under the low-stock threshold. */
+function isLowStock(product) {
+  const inv = product.inventory;
+  return !!(inv?.trackInventory && inv.quantity > 0 && inv.quantity <= LOW_STOCK_THRESHOLD);
+}
+
 /** Fetch all active products, preferring Firestore and falling back to seed data. */
 export async function fetchProducts({ forceRefresh = false } = {}) {
   if (productCache && !forceRefresh) return productCache;
@@ -83,6 +92,7 @@ export function productCardHTML(product) {
   const primaryImage = (product.images && product.images.find((i) => i.isPrimary)) || product.images?.[0];
   const qtyInCart = getCartQuantityFor(product.id);
   const outOfStock = product.inventory?.trackInventory && product.inventory.quantity <= 0 && !product.inventory.allowBackorder;
+  const lowStock = !outOfStock && isLowStock(product);
 
   return `
     <article class="product-card animate-fade-up" data-product-id="${product.id}" data-category="${product.category}">
@@ -103,6 +113,7 @@ export function productCardHTML(product) {
           </div>
           ${product.rating ? `<span class="text-xs text-ink-500">★ ${product.rating.average.toFixed(1)} (${product.rating.count})</span>` : ""}
         </div>
+        ${lowStock ? `<p class="text-xs text-amber-400" data-i18n-count>${escapeHtml(t("product_low_stock", { count: product.inventory.quantity }))}</p>` : ""}
         <button
           type="button"
           class="btn-gold w-full mt-3 add-to-cart-btn"
@@ -210,6 +221,7 @@ export async function renderProductDetail(containerEl, slug) {
   const desc = getProductText(product, "description");
   const primaryImage = (product.images && product.images.find((i) => i.isPrimary)) || product.images?.[0];
   const outOfStock = product.inventory?.trackInventory && product.inventory.quantity <= 0 && !product.inventory.allowBackorder;
+  const lowStock = !outOfStock && isLowStock(product);
 
   containerEl.innerHTML = `
     <div class="grid md:grid-cols-2 gap-10 items-start">
@@ -226,6 +238,7 @@ export async function renderProductDetail(containerEl, slug) {
           <span class="text-3xl text-gold font-semibold">${formatPrice(product.pricing.basePrice, product.pricing.currency)}</span>
           ${product.pricing.compareAtPrice ? `<span class="text-base text-ink-700 line-through">${formatPrice(product.pricing.compareAtPrice, product.pricing.currency)}</span>` : ""}
         </div>
+        ${lowStock ? `<p class="text-sm text-amber-400" data-i18n-count>${escapeHtml(t("product_low_stock", { count: product.inventory.quantity }))}</p>` : ""}
         <hr class="hairline-gold" />
         <div>
           <h2 class="text-sm eyebrow mb-2" data-i18n="product_description_title">${t("product_description_title")}</h2>

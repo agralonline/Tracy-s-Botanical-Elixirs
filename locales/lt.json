@@ -1,5 +1,9 @@
 {
-  "meta": { "code": "lt", "name": "Lietuvių", "dir": "ltr" },
+  "meta": {
+    "code": "lt",
+    "name": "Lietuvių",
+    "dir": "ltr"
+  },
   "brand_name": "Tracy's Botanical Elixirs",
   "nav_home": "Pagrindinis",
   "nav_shop": "Parduotuvė",
@@ -31,6 +35,7 @@
   "product_add_to_cart": "Į Krepšelį",
   "product_view_details": "Žiūrėti Detales",
   "product_out_of_stock": "Nėra Sandėlyje",
+  "product_low_stock": "Liko tik {count} vnt.!",
   "product_from": "Nuo",
   "product_description_title": "Aprašymas",
   "product_ingredients_title": "Sudėtis",

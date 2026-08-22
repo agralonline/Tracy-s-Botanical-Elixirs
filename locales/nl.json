@@ -1,5 +1,9 @@
 {
-  "meta": { "code": "nl", "name": "Nederlands", "dir": "ltr" },
+  "meta": {
+    "code": "nl",
+    "name": "Nederlands",
+    "dir": "ltr"
+  },
   "brand_name": "Tracy's Botanical Elixirs",
   "nav_home": "Home",
   "nav_shop": "Winkel",
@@ -31,6 +35,7 @@
   "product_add_to_cart": "In Winkelwagen",
   "product_view_details": "Bekijk Details",
   "product_out_of_stock": "Niet op Voorraad",
+  "product_low_stock": "Nog maar {count} op voorraad!",
   "product_from": "Vanaf",
   "product_description_title": "Beschrijving",
   "product_ingredients_title": "Ingrediënten",
