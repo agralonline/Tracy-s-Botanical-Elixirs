@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Cart — Tracy USA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230a0f1d' stroke='%23D4AF37' stroke-width='4'/%3E%3Ctext x='50' y='63' font-size='46' text-anchor='middle' fill='%23D4AF37' font-family='Georgia,serif'%3ET%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: { navy: { 950:"#050b14",900:"#0a0f1d",850:"#0d1424",800:"#111a2e",700:"#16233c" }, gold: { DEFAULT:"#D4AF37", soft:"#E8C766", dim:"#8a7128" }, cyan:{glow:"#34e8e0"}, emerald:{glow:"#2be8a8"} },
+    fontFamily: { display: ["Cormorant Garamond","serif"], sans: ["Inter","Arial","sans-serif"] },
+  } } };
+</script>
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body class="font-sans">
+
+<header class="site-header sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between gap-4">
+    <a href="/index.html" class="flex items-center gap-2 shrink-0">
+      <span class="heading-serif text-2xl tracking-wide gold-gradient-text">Tracy<span class="text-ink-100 font-normal"> USA</span></span>
+    </a>
+    <div class="flex items-center gap-3 md:gap-4">
+      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs hidden sm:block" aria-label="Language"></select>
+      <a href="/shop.html" class="btn-outline-gold text-xs" data-i18n="cart_continue_shopping">Continue Shopping</a>
+    </div>
+  </div>
+</header>
+
+<section class="max-w-4xl mx-auto px-5 md:px-8 py-14">
+  <h1 class="heading-serif text-4xl gold-gradient-text mb-10" data-i18n="cart_title">Your Cart</h1>
+
+  <div id="cart-page-empty" class="hidden glass-panel p-16 text-center rounded-2xl">
+    <p class="text-ink-500 mb-6" data-i18n="cart_empty">Your cart is empty.</p>
+    <a href="/shop.html" class="btn-gold" data-i18n="empty_state_shop_cta">Browse the Collection</a>
+  </div>
+
+  <div id="cart-page-content" class="hidden">
+    <div id="cart-page-lines" class="glass-static rounded-2xl divide-y divide-white/5 mb-8"></div>
+
+    <div class="glass-panel rounded-2xl p-6 mb-8">
+      <div class="flex items-center justify-between text-lg mb-1">
+        <span class="text-ink-300" data-i18n="cart_subtotal">Subtotal</span>
+        <span id="cart-page-subtotal" class="text-gold font-semibold"></span>
+      </div>
+      <p class="text-xs text-ink-500" data-i18n="checkout_secure_note">Payments are securely processed by Stripe.</p>
+    </div>
+
+    <form id="checkout-form" class="glass-static rounded-2xl p-6 flex flex-col gap-4">
+      <h2 class="heading-serif text-xl mb-1" data-i18n="checkout_title">Checkout</h2>
+      <label class="text-xs eyebrow" data-i18n="checkout_email">Email</label>
+      <input type="email" id="checkout-email" required class="input-glass" placeholder="you@example.com" />
+      <p class="text-xs text-ink-500 -mt-2" data-i18n="checkout_shipping_address">Shipping Address</p>
+      <p class="text-xs text-ink-700 -mt-3">— collected securely on the next step —</p>
+      <button type="submit" id="checkout-submit-btn" class="btn-gold w-full mt-2" data-i18n="checkout_pay_now">Pay Securely</button>
+      <p id="checkout-error" class="hidden text-xs text-red-400"></p>
+    </form>
+  </div>
+</section>
+
+<footer class="border-t border-white/5 py-12">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 text-center text-ink-700 text-xs">
+    &copy; <span data-current-year>2026</span> Tracy USA. <span data-i18n="footer_rights">All rights reserved.</span>
+  </div>
+</footer>
+
+<script type="module">
+  import { bootstrapPage } from "/assets/js/main.js";
+  import { getEnrichedCart, getCartTotals, setQuantity, removeItem, startCheckout, onCartChange } from "/assets/js/cart.js";
+  import { formatPrice } from "/assets/js/products.js";
+  import { getProductText, onLocaleChange, getCurrentLocale, t } from "/assets/js/i18n.js";
+
+  await bootstrapPage();
+
+  function escapeHtml(str = "") {
+    return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  }
+
+  async function renderPage() {
+    const enriched = await getEnrichedCart();
+    const emptyEl = document.getElementById("cart-page-empty");
+    const contentEl = document.getElementById("cart-page-content");
+
+    if (!enriched.length) {
+      emptyEl.classList.remove("hidden");
+      contentEl.classList.add("hidden");
+      return;
+    }
+    emptyEl.classList.add("hidden");
+    contentEl.classList.remove("hidden");
+
+    const linesEl = document.getElementById("cart-page-lines");
+    linesEl.innerHTML = enriched.map(({ product, quantity }) => {
+      const title = getProductText(product, "title");
+      const img = (product.images && (product.images.find(i => i.isPrimary) || product.images[0])) || {};
+      return `
+      <div class="flex gap-4 p-5 items-center" data-line="${product.id}">
+        <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0" style="background:var(--navy-850)">
+          <img src="${img.url || ""}" alt="${escapeHtml(title)}" class="w-full h-full object-contain p-2" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium truncate">${escapeHtml(title)}</p>
+          <p class="text-gold text-sm">${formatPrice(product.pricing.basePrice, product.pricing.currency)}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" class="cart-qty-btn" data-action="dec" data-id="${product.id}">−</button>
+          <span class="w-6 text-center text-sm">${quantity}</span>
+          <button type="button" class="cart-qty-btn" data-action="inc" data-id="${product.id}">+</button>
+        </div>
+        <button type="button" class="text-xs text-ink-500 hover:text-gold-soft cart-remove-btn" data-id="${product.id}" data-i18n="cart_remove">${t("cart_remove")}</button>
+      </div>`;
+    }).join("");
+
+    linesEl.querySelectorAll(".cart-qty-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-id");
+        const line = enriched.find((l) => l.product.id === id);
+        const next = btn.getAttribute("data-action") === "inc" ? line.quantity + 1 : line.quantity - 1;
+        setQuantity(id, next);
+      });
+    });
+    linesEl.querySelectorAll(".cart-remove-btn").forEach((btn) => {
+      btn.addEventListener("click", () => removeItem(btn.getAttribute("data-id")));
+    });
+
+    const totals = await getCartTotals();
+    document.getElementById("cart-page-subtotal").textContent = formatPrice(totals.subtotal, totals.currency);
+  }
+
+  await renderPage();
+  onCartChange(renderPage);
+  onLocaleChange(renderPage);
+
+  document.getElementById("checkout-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("checkout-submit-btn");
+    const errorEl = document.getElementById("checkout-error");
+    errorEl.classList.add("hidden");
+    btn.disabled = true;
+    btn.style.opacity = ".6";
+    try {
+      await startCheckout({
+        email: document.getElementById("checkout-email").value,
+        locale: getCurrentLocale(),
+      });
+    } catch (err) {
+      errorEl.textContent = err.message || "Something went wrong. Please try again.";
+      errorEl.classList.remove("hidden");
+      btn.disabled = false;
+      btn.style.opacity = "";
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Journal — Tracy USA</title>
+<meta name="description" content="Tracy USA Journal — always published in English." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230a0f1d' stroke='%23D4AF37' stroke-width='4'/%3E%3Ctext x='50' y='63' font-size='46' text-anchor='middle' fill='%23D4AF37' font-family='Georgia,serif'%3ET%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: { navy: { 950:"#050b14",900:"#0a0f1d" }, gold: { DEFAULT:"#D4AF37", soft:"#E8C766" }, cyan:{glow:"#34e8e0"}, emerald:{glow:"#2be8a8"} },
+    fontFamily: { display: ["Cormorant Garamond","serif"], sans: ["Inter","Arial","sans-serif"] },
+  } } };
+</script>
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body class="font-sans">
+
+<header class="site-header sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between gap-4">
+    <a href="/index.html" class="flex items-center gap-2 shrink-0"><span class="heading-serif text-2xl tracking-wide gold-gradient-text">Tracy<span class="text-ink-100 font-normal"> USA</span></span></a>
+    <nav class="hidden lg:flex items-center gap-7">
+      <a href="/index.html" class="nav-link">Home</a>
+      <a href="/shop.html" class="nav-link">Shop</a>
+      <a href="/about.html" class="nav-link">Our Story</a>
+      <a href="/blog.html" class="nav-link">Journal</a>
+      <a href="/contact.html" class="nav-link">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="max-w-4xl mx-auto px-5 md:px-8 py-20">
+  <p class="eyebrow mb-4">The Journal</p>
+  <h1 class="heading-serif text-4xl gold-gradient-text mb-3">Rituals, Ingredients &amp; Craft</h1>
+  <p class="text-ink-500 text-sm mb-12">Published in English only — our Journal is intentionally excluded from the site's translation system to keep translation-API usage reserved for product listings.</p>
+
+  <article class="glass p-8 mb-8">
+    <p class="eyebrow mb-2">Rituals</p>
+    <h2 class="heading-serif text-2xl mb-3">5 Ways to Use Lavender Oil in Your Evening Routine</h2>
+    <p class="text-ink-300 leading-relaxed mb-4">Lavender has been used as a calming agent for centuries, and a few drops go a long way in an evening wind-down routine. Here are five simple rituals to try tonight with our Lavender Serenity Essential Oil.</p>
+    <p class="text-ink-300 leading-relaxed mb-4"><strong class="text-gold-soft">1. Pillow mist.</strong> Add two to three drops to a cotton ball and tuck it inside your pillowcase for a subtly scented night's sleep.</p>
+    <p class="text-ink-300 leading-relaxed mb-4"><strong class="text-gold-soft">2. Warm bath soak.</strong> Combine five drops with a tablespoon of unscented carrier oil and swirl into a warm bath just before stepping in.</p>
+    <p class="text-ink-300 leading-relaxed mb-4"><strong class="text-gold-soft">3. Temple massage.</strong> Dilute one drop into a fingertip of your Velvet Nourish Night Cream and gently massage into temples and the back of the neck.</p>
+    <p class="text-ink-300 leading-relaxed mb-4"><strong class="text-gold-soft">4. Diffuser blend.</strong> Pair four drops of lavender with two drops of a citrus oil in a diffuser an hour before bed.</p>
+    <p class="text-ink-300 leading-relaxed"><strong class="text-gold-soft">5. Linen spray.</strong> Mix 10 drops with two ounces of distilled water in a small glass spray bottle and mist your sheets before you turn them down.</p>
+    <p class="text-xs text-ink-700 mt-6">Tracy USA Editorial · Published August 1, 2026</p>
+  </article>
+
+  <article class="glass p-8">
+    <p class="eyebrow mb-2">Ingredients</p>
+    <h2 class="heading-serif text-2xl mb-3">What "Cold-Pressed" Actually Means for Your Hair Oil</h2>
+    <p class="text-ink-300 leading-relaxed mb-4">Not all argan oil is created equal. Cold-pressing extracts oil from argan kernels using only mechanical pressure and low, controlled temperatures — no heat, no chemical solvents. The result preserves more of the naturally occurring vitamin E and fatty acids that give hair its shine and strength, which is why every bottle in our Argan &amp; Rosemary Hair Oil Duo is cold-pressed in small batches.</p>
+    <p class="text-ink-300 leading-relaxed">Heat- or solvent-extracted oils are cheaper to produce at scale, but they strip out much of what makes argan oil worth using in the first place. When you're shopping for hair oil, "cold-pressed" on the label is worth looking for.</p>
+    <p class="text-xs text-ink-700 mt-6">Tracy USA Editorial · Published July 18, 2026</p>
+  </article>
+</section>
+
+<footer class="border-t border-white/5 py-12">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 text-center text-ink-700 text-xs">&copy; <span id="year">2026</span> Tracy USA. All rights reserved.</div>
+</footer>
+
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>

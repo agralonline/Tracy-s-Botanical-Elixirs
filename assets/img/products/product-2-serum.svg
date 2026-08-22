@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="p2title">
+  <title id="p2title">Slender amber glass serum dropper bottle on a dark marble slab with a clean white and gold label and dark navy drapery background</title>
+  <defs>
+    <linearGradient id="p2-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1424"/>
+      <stop offset="100%" stop-color="#050b14"/>
+    </linearGradient>
+    <radialGradient id="p2-glow" cx="55%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#2be8a8" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#050b14" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="p2-drapery" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0a1220"/>
+      <stop offset="50%" stop-color="#141d33"/>
+      <stop offset="100%" stop-color="#0a1220"/>
+    </linearGradient>
+    <linearGradient id="p2-marble" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1b2030"/>
+      <stop offset="100%" stop-color="#05070c"/>
+    </linearGradient>
+    <linearGradient id="p2-amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9a5a1e"/>
+      <stop offset="50%" stop-color="#6b3b12"/>
+      <stop offset="100%" stop-color="#3c1f08"/>
+    </linearGradient>
+    <linearGradient id="p2-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F1D888"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#8a7128"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="600" fill="url(#p2-bg)"/>
+  <rect width="600" height="600" fill="url(#p2-glow)"/>
+
+  <!-- drapery folds -->
+  <g opacity="0.55">
+    <path d="M0 0 L90 0 Q60 260 100 600 L0 600 Z" fill="url(#p2-drapery)"/>
+    <path d="M600 0 L500 0 Q540 260 505 600 L600 600 Z" fill="url(#p2-drapery)"/>
+    <path d="M40 0 Q10 300 55 600" stroke="#1c273f" stroke-width="2" fill="none" opacity="0.6"/>
+    <path d="M560 0 Q590 300 545 600" stroke="#1c273f" stroke-width="2" fill="none" opacity="0.6"/>
+  </g>
+
+  <!-- marble slab -->
+  <g>
+    <path d="M40 470 L560 470 L600 560 L0 560 Z" fill="url(#p2-marble)"/>
+    <path d="M40 470 L560 470" stroke="#3a4258" stroke-width="1.5" opacity="0.5"/>
+    <path d="M90 480 Q300 490 510 478" stroke="#3a4258" stroke-width="1" fill="none" opacity="0.4"/>
+    <path d="M60 505 Q300 520 540 500" stroke="#3a4258" stroke-width="1" fill="none" opacity="0.3"/>
+    <path d="M20 540 Q300 555 580 535" stroke="#2a3146" stroke-width="1" fill="none" opacity="0.4"/>
+  </g>
+
+  <!-- bottle shadow -->
+  <ellipse cx="300" cy="472" rx="60" ry="10" fill="#000000" opacity="0.5"/>
+
+  <!-- slender amber bottle -->
+  <g>
+    <rect x="270" y="190" width="60" height="282" rx="14" fill="url(#p2-amber)" stroke="#c98a3c" stroke-opacity="0.4" stroke-width="1.2"/>
+    <rect x="278" y="205" width="9" height="240" rx="4" fill="#ffffff" opacity="0.14"/>
+
+    <!-- shoulder/neck -->
+    <path d="M280 190 L280 160 Q280 148 292 148 L308 148 Q320 148 320 160 L320 190 Z" fill="url(#p2-amber)" stroke="#c98a3c" stroke-opacity="0.35" stroke-width="1.2"/>
+
+    <!-- white/gold label -->
+    <rect x="280" y="280" width="40" height="120" rx="3" fill="#f6f1e6" opacity="0.95"/>
+    <rect x="280" y="280" width="40" height="120" rx="3" fill="none" stroke="url(#p2-gold)" stroke-width="1"/>
+    <text x="300" y="315" text-anchor="middle" font-family="Georgia, serif" font-size="7.5" letter-spacing="1.5" fill="#1c2333">TRACY</text>
+    <line x1="288" y1="325" x2="312" y2="325" stroke="#D4AF37" stroke-width="0.6"/>
+    <text x="300" y="342" text-anchor="middle" font-family="Georgia, serif" font-size="6" letter-spacing="1" fill="#3a4258">RENEWAL</text>
+    <text x="300" y="352" text-anchor="middle" font-family="Georgia, serif" font-size="6" letter-spacing="1" fill="#3a4258">SERUM</text>
+    <text x="300" y="390" text-anchor="middle" font-family="Georgia, serif" font-size="5.5" letter-spacing="1" fill="#8a7128">30 ML / 1 FL OZ</text>
+
+    <!-- gold cap + dropper -->
+    <rect x="286" y="122" width="28" height="30" rx="5" fill="url(#p2-gold)"/>
+    <rect x="286" y="122" width="28" height="7" rx="3" fill="#F1D888" opacity="0.6"/>
+    <rect x="296" y="55" width="8" height="70" rx="4" fill="url(#p2-gold)" opacity="0.9"/>
+    <rect x="293" y="46" width="14" height="14" rx="3" fill="#3a2c12"/>
+  </g>
+
+  <!-- ambient sparkle -->
+  <circle cx="470" cy="150" r="2" fill="#34e8e0" opacity="0.7"/>
+  <circle cx="500" cy="220" r="1.6" fill="#D4AF37" opacity="0.7"/>
+  <circle cx="120" cy="200" r="1.8" fill="#2be8a8" opacity="0.6"/>
+</svg>

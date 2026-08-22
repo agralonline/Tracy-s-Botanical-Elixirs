@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Order Confirmed — Tracy USA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230a0f1d' stroke='%23D4AF37' stroke-width='4'/%3E%3Ctext x='50' y='63' font-size='46' text-anchor='middle' fill='%23D4AF37' font-family='Georgia,serif'%3ET%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: { navy: { 950:"#050b14",900:"#0a0f1d" }, gold: { DEFAULT:"#D4AF37", soft:"#E8C766" } },
+    fontFamily: { display: ["Cormorant Garamond","serif"], sans: ["Inter","Arial","sans-serif"] },
+  } } };
+</script>
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body class="font-sans">
+<section class="max-w-xl mx-auto px-5 py-24 text-center">
+  <div class="glass-panel rounded-2xl p-12">
+    <div class="mx-auto mb-6 w-16 h-16 rounded-full flex items-center justify-center" style="background:rgba(43,232,168,0.12); border:1px solid rgba(43,232,168,0.35);">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2be8a8" stroke-width="2.2"><path d="M4 12l5 5L20 6"/></svg>
+    </div>
+    <h1 class="heading-serif text-3xl gold-gradient-text mb-3">Thank You For Your Order</h1>
+    <p class="text-ink-300 mb-8">Your payment was successful. A confirmation email is on its way — your ritual is on its way too.</p>
+    <p id="session-ref" class="text-xs text-ink-700 mb-8"></p>
+    <a href="/shop.html" class="btn-gold">Continue Shopping</a>
+  </div>
+</section>
+<script type="module">
+  import { clearCart } from "/assets/js/cart.js";
+  // The Stripe webhook (functions/stripe-webhook.js) is the source of truth for
+  // order fulfillment — this client-side clear is just a convenience so the
+  // shopper doesn't see stale items if they navigate back to the cart.
+  clearCart();
+  const sessionId = new URLSearchParams(window.location.search).get("session_id");
+  if (sessionId) {
+    document.getElementById("session-ref").textContent = `Reference: ${sessionId}`;
+  }
+</script>
+</body>
+</html>

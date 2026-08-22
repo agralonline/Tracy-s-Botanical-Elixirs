@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="p4title">
+  <title id="p4title">Premium set of two dark glass hair oil bottles with gold caps, argan nuts, and rosemary sprigs against a dark navy background with cyan-emerald gradients</title>
+  <defs>
+    <linearGradient id="p4-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a1a22"/>
+      <stop offset="55%" stop-color="#0a0f1d"/>
+      <stop offset="100%" stop-color="#05140f"/>
+    </linearGradient>
+    <radialGradient id="p4-glowc" cx="18%" cy="20%" r="55%">
+      <stop offset="0%" stop-color="#34e8e0" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="p4-glowe" cx="85%" cy="85%" r="55%">
+      <stop offset="0%" stop-color="#2be8a8" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <linearGradient id="p4-glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#232a3a"/>
+      <stop offset="55%" stop-color="#141824"/>
+      <stop offset="100%" stop-color="#080a10"/>
+    </linearGradient>
+    <linearGradient id="p4-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F1D888"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#8a7128"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="600" fill="url(#p4-bg)"/>
+  <rect width="600" height="600" fill="url(#p4-glowc)"/>
+  <rect width="600" height="600" fill="url(#p4-glowe)"/>
+  <ellipse cx="300" cy="515" rx="230" ry="24" fill="#000000" opacity="0.4"/>
+
+  <!-- rosemary sprigs -->
+  <g opacity="0.9">
+    <g transform="translate(120,190) rotate(-15)">
+      <line x1="0" y1="0" x2="0" y2="130" stroke="#3f5a44" stroke-width="2.4"/>
+      <g fill="#4f7a55">
+        <ellipse cx="-8" cy="18" rx="3" ry="12" transform="rotate(-30 -8 18)"/>
+        <ellipse cx="8" cy="18" rx="3" ry="12" transform="rotate(30 8 18)"/>
+        <ellipse cx="-9" cy="42" rx="3" ry="12" transform="rotate(-30 -9 42)"/>
+        <ellipse cx="9" cy="42" rx="3" ry="12" transform="rotate(30 9 42)"/>
+        <ellipse cx="-8" cy="66" rx="3" ry="12" transform="rotate(-30 -8 66)"/>
+        <ellipse cx="8" cy="66" rx="3" ry="12" transform="rotate(30 8 66)"/>
+        <ellipse cx="0" cy="6" rx="3" ry="10"/>
+      </g>
+    </g>
+    <g transform="translate(475,210) rotate(18)">
+      <line x1="0" y1="0" x2="0" y2="115" stroke="#3f5a44" stroke-width="2.2"/>
+      <g fill="#4f7a55">
+        <ellipse cx="-7" cy="16" rx="2.6" ry="10" transform="rotate(-30 -7 16)"/>
+        <ellipse cx="7" cy="16" rx="2.6" ry="10" transform="rotate(30 7 16)"/>
+        <ellipse cx="-8" cy="38" rx="2.6" ry="10" transform="rotate(-30 -8 38)"/>
+        <ellipse cx="8" cy="38" rx="2.6" ry="10" transform="rotate(30 8 38)"/>
+        <ellipse cx="-7" cy="60" rx="2.6" ry="10" transform="rotate(-30 -7 60)"/>
+        <ellipse cx="7" cy="60" rx="2.6" ry="10" transform="rotate(30 7 60)"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- argan nuts -->
+  <g fill="#8a6a3c">
+    <ellipse cx="150" cy="460" rx="14" ry="11" transform="rotate(15 150 460)"/>
+    <ellipse cx="178" cy="475" rx="12" ry="9.5" transform="rotate(-10 178 475)"/>
+    <ellipse cx="440" cy="470" rx="13" ry="10" transform="rotate(-12 440 470)"/>
+    <ellipse cx="465" cy="455" rx="11" ry="9" transform="rotate(20 465 455)"/>
+  </g>
+  <g fill="#6b4f2a" opacity="0.7">
+    <ellipse cx="150" cy="460" rx="4" ry="7" transform="rotate(15 150 460)"/>
+    <ellipse cx="440" cy="470" rx="4" ry="6" transform="rotate(-12 440 470)"/>
+  </g>
+
+  <!-- bottle 1 (left, taller) -->
+  <g>
+    <rect x="195" y="230" width="90" height="250" rx="16" fill="url(#p4-glass)" stroke="#3a4258" stroke-width="1.2"/>
+    <rect x="206" y="245" width="12" height="215" rx="6" fill="#ffffff" opacity="0.08"/>
+    <path d="M215 230 L215 195 Q215 180 232 180 L248 180 Q265 180 265 195 L265 230 Z" fill="url(#p4-glass)" stroke="#3a4258" stroke-width="1.2"/>
+    <rect x="205" y="330" width="70" height="70" rx="3" fill="#f0ece0" opacity="0.92"/>
+    <text x="240" y="357" text-anchor="middle" font-family="Georgia, serif" font-size="8" letter-spacing="1.5" fill="#1c2333">TRACY</text>
+    <line x1="216" y1="365" x2="264" y2="365" stroke="#D4AF37" stroke-width="0.6"/>
+    <text x="240" y="380" text-anchor="middle" font-family="Georgia, serif" font-size="6" letter-spacing="1" fill="#3a4258">ARGAN &amp; ROSEMARY</text>
+    <text x="240" y="390" text-anchor="middle" font-family="Georgia, serif" font-size="6" letter-spacing="1" fill="#3a4258">HAIR OIL</text>
+    <rect x="222" y="152" width="36" height="30" rx="6" fill="url(#p4-gold)"/>
+    <rect x="222" y="152" width="36" height="7" rx="3" fill="#F1D888" opacity="0.6"/>
+  </g>
+
+  <!-- bottle 2 (right, shorter) -->
+  <g>
+    <rect x="320" y="270" width="82" height="210" rx="15" fill="url(#p4-glass)" stroke="#3a4258" stroke-width="1.2"/>
+    <rect x="330" y="284" width="11" height="180" rx="5.5" fill="#ffffff" opacity="0.08"/>
+    <path d="M338 270 L338 236 Q338 222 354 222 L368 222 Q384 222 384 236 L384 270 Z" fill="url(#p4-glass)" stroke="#3a4258" stroke-width="1.2"/>
+    <rect x="329" y="355" width="64" height="62" rx="3" fill="#f0ece0" opacity="0.92"/>
+    <text x="361" y="380" text-anchor="middle" font-family="Georgia, serif" font-size="7.5" letter-spacing="1.4" fill="#1c2333">TRACY</text>
+    <line x1="340" y1="387" x2="382" y2="387" stroke="#D4AF37" stroke-width="0.6"/>
+    <text x="361" y="401" text-anchor="middle" font-family="Georgia, serif" font-size="5.5" letter-spacing="1" fill="#3a4258">SCALP RENEWAL</text>
+    <rect x="345" y="198" width="32" height="26" rx="6" fill="url(#p4-gold)"/>
+    <rect x="345" y="198" width="32" height="6" rx="3" fill="#F1D888" opacity="0.6"/>
+  </g>
+
+  <ellipse cx="300" cy="486" rx="140" ry="10" fill="#2be8a8" opacity="0.12"/>
+</svg>

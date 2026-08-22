@@ -1,0 +1,44 @@
+[build]
+  publish = "."
+  functions = "functions"
+  command = "echo 'No build step — static HTML/CSS/JS site.'"
+
+[functions]
+  node_bundler = "esbuild"
+
+# The frontend calls fetch("/api/...") uniformly across both Netlify and
+# Vercel (see assets/js/cart.js and admin/admin.js). On Netlify, functions
+# actually live at /.netlify/functions/<name> — these rewrites let the
+# rest of the codebase stay platform-agnostic.
+[[redirects]]
+  from = "/api/translate-and-save"
+  to = "/.netlify/functions/translate-and-save"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/create-checkout-session"
+  to = "/.netlify/functions/create-checkout-session"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/stripe-webhook"
+  to = "/.netlify/functions/stripe-webhook"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/locales/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

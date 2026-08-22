@@ -1,0 +1,18 @@
+{
+  "name": "tracy-usa-shop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Tracy USA — luxury essential oils & organic skincare storefront. Static frontend + Firebase Firestore + Stripe Checkout, deployable to Vercel or Netlify.",
+  "scripts": {
+    "dev": "npx serve . -l 5173",
+    "seed": "node scripts/seed-firestore.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.1.1",
+    "stripe": "^16.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

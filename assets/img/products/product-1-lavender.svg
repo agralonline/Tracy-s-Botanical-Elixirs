@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="p1title">
+  <title id="p1title">Dark violet glass essential oil bottle with gold label and dropper, on dark slate with scattered lavender buds under a warm gold glow</title>
+  <defs>
+    <radialGradient id="p1-glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.35"/>
+      <stop offset="45%" stop-color="#34e8e0" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#0a0f1d" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="p1-slate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#141a2b"/>
+      <stop offset="100%" stop-color="#070a12"/>
+    </linearGradient>
+    <linearGradient id="p1-glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4b2e6b"/>
+      <stop offset="45%" stop-color="#2c1740"/>
+      <stop offset="100%" stop-color="#160c22"/>
+    </linearGradient>
+    <linearGradient id="p1-glass-shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="p1-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F1D888"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#8a7128"/>
+    </linearGradient>
+    <linearGradient id="p1-label" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2c1740"/>
+      <stop offset="100%" stop-color="#1c0f2a"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="600" fill="url(#p1-slate)"/>
+  <ellipse cx="300" cy="230" rx="280" ry="280" fill="url(#p1-glow)"/>
+  <ellipse cx="300" cy="512" rx="220" ry="26" fill="#000000" opacity="0.45"/>
+
+  <!-- scattered lavender buds -->
+  <g opacity="0.85">
+    <g transform="translate(95,150) rotate(-18)">
+      <line x1="0" y1="0" x2="0" y2="70" stroke="#7c6a46" stroke-width="2"/>
+      <ellipse cx="0" cy="8" rx="6" ry="12" fill="#9b7fc9"/>
+      <ellipse cx="0" cy="20" rx="6" ry="12" fill="#8a6cc0"/>
+      <ellipse cx="0" cy="32" rx="6" ry="12" fill="#9b7fc9"/>
+    </g>
+    <g transform="translate(130,110) rotate(12)">
+      <line x1="0" y1="0" x2="0" y2="55" stroke="#7c6a46" stroke-width="2"/>
+      <ellipse cx="0" cy="6" rx="5" ry="10" fill="#8a6cc0"/>
+      <ellipse cx="0" cy="16" rx="5" ry="10" fill="#9b7fc9"/>
+    </g>
+    <g transform="translate(478,170) rotate(24)">
+      <line x1="0" y1="0" x2="0" y2="60" stroke="#7c6a46" stroke-width="2"/>
+      <ellipse cx="0" cy="6" rx="5" ry="10" fill="#9b7fc9"/>
+      <ellipse cx="0" cy="16" rx="5" ry="10" fill="#8a6cc0"/>
+      <ellipse cx="0" cy="26" rx="5" ry="10" fill="#9b7fc9"/>
+    </g>
+    <g transform="translate(505,230) rotate(-10)">
+      <line x1="0" y1="0" x2="0" y2="45" stroke="#7c6a46" stroke-width="2"/>
+      <ellipse cx="0" cy="5" rx="4" ry="8" fill="#8a6cc0"/>
+      <ellipse cx="0" cy="13" rx="4" ry="8" fill="#9b7fc9"/>
+    </g>
+    <circle cx="150" cy="470" r="3" fill="#c8b6e8"/>
+    <circle cx="430" cy="480" r="3" fill="#c8b6e8"/>
+    <circle cx="170" cy="450" r="2.4" fill="#e8c766"/>
+    <circle cx="410" cy="455" r="2.4" fill="#e8c766"/>
+  </g>
+
+  <!-- bottle body -->
+  <g>
+    <rect x="235" y="235" width="130" height="255" rx="18" fill="url(#p1-glass)"/>
+    <rect x="235" y="235" width="130" height="255" rx="18" fill="none" stroke="#5a3a7d" stroke-opacity="0.6" stroke-width="1.5"/>
+    <rect x="248" y="248" width="16" height="220" rx="8" fill="url(#p1-glass-shine)"/>
+
+    <!-- shoulder / neck -->
+    <path d="M262 235 L262 195 Q262 178 285 178 L315 178 Q338 178 338 195 L338 235 Z" fill="url(#p1-glass)" stroke="#5a3a7d" stroke-opacity="0.5" stroke-width="1.5"/>
+
+    <!-- gold label -->
+    <rect x="252" y="330" width="96" height="80" rx="4" fill="url(#p1-label)" stroke="url(#p1-gold)" stroke-width="1.5"/>
+    <text x="300" y="358" text-anchor="middle" font-family="Georgia, serif" font-size="11" letter-spacing="2" fill="#E8C766">TRACY</text>
+    <line x1="270" y1="368" x2="330" y2="368" stroke="#D4AF37" stroke-width="0.75"/>
+    <text x="300" y="384" text-anchor="middle" font-family="Georgia, serif" font-size="7.5" letter-spacing="1.5" fill="#cbb98a">LAVENDER</text>
+    <text x="300" y="396" text-anchor="middle" font-family="Georgia, serif" font-size="6.5" letter-spacing="1.5" fill="#9d8f6c">ESSENTIAL OIL</text>
+
+    <!-- gold cap + dropper -->
+    <rect x="270" y="150" width="60" height="34" rx="6" fill="url(#p1-gold)"/>
+    <rect x="270" y="150" width="60" height="8" rx="4" fill="#F1D888" opacity="0.6"/>
+    <rect x="292" y="70" width="16" height="86" rx="6" fill="url(#p1-gold)" opacity="0.9"/>
+    <rect x="296" y="60" width="8" height="20" rx="3" fill="#3a2c12"/>
+  </g>
+
+  <!-- ground reflection glow -->
+  <ellipse cx="300" cy="497" rx="90" ry="10" fill="#D4AF37" opacity="0.18"/>
+</svg>
