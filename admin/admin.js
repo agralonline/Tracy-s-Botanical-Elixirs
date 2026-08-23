@@ -18,6 +18,7 @@
  */
 
 import { getFirebaseServices, isFirebaseConfigured } from "/assets/js/firebase-config.js";
+import { CATEGORIES as SEED_CATEGORIES } from "/data/seed-products.js";
 
 const state = { services: null, user: null, products: [], editingId: null, categories: [], editingCategoryId: null };
 
@@ -183,8 +184,41 @@ async function loadCategories() {
     state.categories = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   }
 
+  // The original 4 categories (Essential Oils, Serums, Skincare, Hair Care)
+  // only ever existed as hardcoded fallback data for the storefront — they
+  // were never actual saved records, so a brand-new tracy_categories
+  // collection shows up empty here even though the storefront displays them
+  // fine. The first time this admin panel finds the collection completely
+  // empty, seed it with those 4 as real, editable/deletable records.
+  if (!state.categories.length) {
+    await seedDefaultCategories();
+    const snap2 = await getDocs(collection(db, "tracy_categories"));
+    state.categories = snap2.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
   renderCategoryTable();
   populateCategorySelect();
+}
+
+/** One-time bootstrap: write the 4 built-in categories into Firestore as real records. */
+async function seedDefaultCategories() {
+  const { db, firestoreMod } = state.services;
+  try {
+    await Promise.all(
+      SEED_CATEGORIES.map((cat) =>
+        firestoreMod.setDoc(firestoreMod.doc(db, "tracy_categories", cat.slug), {
+          name: cat.name,
+          slug: cat.slug,
+          description: cat.description || "",
+          image: cat.image || "",
+          createdAt: firestoreMod.serverTimestamp(),
+          updatedAt: firestoreMod.serverTimestamp(),
+        })
+      )
+    );
+  } catch (err) {
+    console.warn("Could not seed default categories:", err);
+  }
 }
 
 function renderCategoryTable() {
