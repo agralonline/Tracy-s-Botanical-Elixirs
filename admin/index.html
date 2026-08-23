@@ -81,8 +81,8 @@
 </section>
 
 <!-- ============ PRODUCT FORM MODAL ============ -->
-<div id="product-modal-overlay" class="hidden fixed inset-0 bg-black/70 z-50 flex items-start md:items-center justify-center p-4 overflow-y-auto">
-  <div class="glass-panel rounded-2xl w-full max-w-2xl p-8 my-8">
+<div id="product-modal-overlay" class="hidden fixed inset-0 bg-black/70 z-50 flex items-start md:items-center justify-center p-4">
+  <div id="product-modal-panel" class="glass-panel rounded-2xl w-full max-w-2xl p-8 my-8" style="max-height:calc(100vh - 4rem);overflow-y:auto;-webkit-overflow-scrolling:touch;">
     <div class="flex items-center justify-between mb-6">
       <h2 id="product-modal-title" class="heading-serif text-2xl gold-gradient-text">New Product</h2>
       <button id="product-modal-close" type="button" class="btn-ghost p-1" aria-label="Close">

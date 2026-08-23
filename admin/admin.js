@@ -193,9 +193,25 @@ function openProductForm(product = null) {
 
   $("product-modal-overlay").classList.remove("hidden");
   $("product-modal-overlay").classList.add("flex");
+  // Always start scrolled to the top of the form (Title field), regardless
+  // of where a previous open of this modal was left scrolled to.
+  const panel = $("product-modal-panel");
+  if (panel) panel.scrollTop = 0;
 }
 
-function closeProductForm() {
+/** True if any field in the New/Edit Product form has user-entered content. */
+function productFormHasUnsavedInput() {
+  const textFields = ["pf-title", "pf-short", "pf-desc", "pf-sku", "pf-slug", "pf-price", "pf-compare-price", "pf-volume", "pf-quantity", "pf-ingredients", "pf-image-url"];
+  if (textFields.some((id) => $(id) && $(id).value.trim())) return true;
+  if ($("pf-image-file")?.files?.length) return true;
+  return false;
+}
+
+function closeProductForm({ skipConfirm = false } = {}) {
+  if (!skipConfirm && productFormHasUnsavedInput()) {
+    const ok = window.confirm("Discard this product? What you've typed hasn't been saved yet.");
+    if (!ok) return;
+  }
   $("product-modal-overlay").classList.add("hidden");
   $("product-modal-overlay").classList.remove("flex");
 }
@@ -273,7 +289,7 @@ async function handleTranslateAndSave(e) {
     statusEl.textContent = `Saved — ${Object.keys(saved.translations || {}).length}/24 languages translated.`;
     showBanner(`"${saved.translations?.en?.title}" saved and translated into all 24 languages.`);
     await loadProducts();
-    setTimeout(closeProductForm, 900);
+    setTimeout(() => closeProductForm({ skipConfirm: true }), 900);
   } catch (err) {
     console.error(err);
     statusEl.textContent = "";
@@ -296,10 +312,10 @@ function wireStaticUI() {
   $("login-form").addEventListener("submit", handleLogin);
   $("admin-logout-btn").addEventListener("click", handleLogout);
   $("new-product-btn").addEventListener("click", () => openProductForm(null));
-  $("product-modal-close").addEventListener("click", closeProductForm);
-  $("product-modal-overlay").addEventListener("click", (e) => {
-    if (e.target.id === "product-modal-overlay") closeProductForm();
-  });
+  $("product-modal-close").addEventListener("click", () => closeProductForm());
+  // Tapping the dark backdrop no longer closes the form — on mobile a stray
+  // tap while scrolling/pasting was silently discarding everything typed.
+  // Use the visible × button (which now confirms before discarding) instead.
   $("product-form").addEventListener("submit", handleTranslateAndSave);
   $("pf-title").addEventListener("blur", () => {
     if (!$("pf-slug").value) $("pf-slug").value = slugify($("pf-title").value);
