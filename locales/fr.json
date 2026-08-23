@@ -121,5 +121,22 @@
   "faq_q7": "Expédiez-vous à l'international ?",
   "faq_a7": "Oui, nous expédions dans le monde entier. Les frais de port et le délai de livraison estimé sont calculés lors du paiement en fonction de votre destination ; le client est responsable des droits de douane ou taxes d'importation éventuels.",
   "faq_a3": "Les produits non ouverts peuvent être retournés dans les 30 jours suivant la livraison pour un remboursement complet. Les produits ouverts ne peuvent être retournés qu'en cas de dommage ou de défaut. Consultez notre page <a href=\"/shipping.html\" class=\"text-gold-soft\">Livraison et Retours</a> pour tous les détails.",
-  "category_all": "Tout"
+  "category_all": "Tout",
+  "return_page_title": "Demande de Retour / Remboursement",
+  "return_intro": "Besoin de retourner un article ou de demander un remboursement ? Remplissez le formulaire ci-dessous et notre équipe vous répondra par e-mail — consultez notre page Livraison et Retours pour connaître les conditions.",
+  "return_email_placeholder": "Votre e-mail",
+  "return_order_ref_placeholder": "Numéro de commande ou e-mail utilisé lors du paiement",
+  "return_reason_label": "Motif",
+  "return_reason_damaged": "Endommagé ou défectueux",
+  "return_reason_changed_mind": "J'ai changé d'avis",
+  "return_reason_wrong_item": "J'ai reçu le mauvais article",
+  "return_reason_other": "Autre",
+  "return_details_placeholder": "Détails supplémentaires (facultatif)",
+  "return_submit": "Envoyer la Demande",
+  "return_thank_you": "Merci — nous avons bien reçu votre demande et vous répondrons par e-mail sous un jour ouvré.",
+  "chat_widget_title": "Discutez avec nous",
+  "chat_placeholder": "Écrivez un message…",
+  "chat_send": "Envoyer",
+  "chat_greeting": "Bonjour ! Posez-moi vos questions sur la livraison, les ingrédients ou nos produits.",
+  "chat_unavailable": "Le chat est temporairement indisponible — veuillez utiliser notre page Contact."
 }

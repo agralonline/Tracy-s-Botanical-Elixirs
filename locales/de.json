@@ -121,5 +121,22 @@
   "faq_q7": "Versenden Sie international?",
   "faq_a7": "Ja, wir versenden weltweit. Versandkosten und voraussichtliche Lieferzeit werden an der Kasse basierend auf Ihrem Zielort berechnet; der Kunde ist für etwaige Zölle oder Einfuhrsteuern verantwortlich.",
   "faq_a3": "Ungeöffnete Produkte können innerhalb von 30 Tagen nach Lieferung zur vollständigen Rückerstattung zurückgegeben werden. Geöffnete Produkte können nur bei Beschädigung oder Mängeln zurückgegeben werden. Alle Details finden Sie auf unserer Seite <a href=\"/shipping.html\" class=\"text-gold-soft\">Versand &amp; Rücksendungen</a>.",
-  "category_all": "Alle"
+  "category_all": "Alle",
+  "return_page_title": "Rückgabe-/Erstattungsantrag",
+  "return_intro": "Möchten Sie einen Artikel zurücksenden oder eine Rückerstattung beantragen? Füllen Sie das untenstehende Formular aus — unser Team meldet sich per E-Mail. Die Voraussetzungen finden Sie auf unserer Seite Versand & Rücksendungen.",
+  "return_email_placeholder": "Ihre E-Mail",
+  "return_order_ref_placeholder": "Bestellnummer oder beim Checkout verwendete E-Mail",
+  "return_reason_label": "Grund",
+  "return_reason_damaged": "Beschädigt oder defekt",
+  "return_reason_changed_mind": "Ich habe es mir anders überlegt",
+  "return_reason_wrong_item": "Falschen Artikel erhalten",
+  "return_reason_other": "Sonstiges",
+  "return_details_placeholder": "Zusätzliche Details (optional)",
+  "return_submit": "Antrag Senden",
+  "return_thank_you": "Danke — wir haben Ihren Antrag erhalten und melden uns innerhalb eines Werktags per E-Mail.",
+  "chat_widget_title": "Chatten Sie mit uns",
+  "chat_placeholder": "Nachricht eingeben…",
+  "chat_send": "Senden",
+  "chat_greeting": "Hallo! Fragen Sie mich zu Versand, Inhaltsstoffen oder unseren Produkten.",
+  "chat_unavailable": "Der Chat ist vorübergehend nicht verfügbar — nutzen Sie bitte unsere Kontaktseite."
 }

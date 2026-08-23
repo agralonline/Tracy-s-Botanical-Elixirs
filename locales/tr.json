@@ -121,5 +121,22 @@
   "faq_q7": "Uluslararası gönderim yapıyor musunuz?",
   "faq_a7": "Evet, dünya çapında gönderim yapıyoruz. Kargo ücreti ve tahmini teslimat süresi, varış yerinize göre ödeme sırasında hesaplanır; gümrük vergileri veya ithalat vergileri müşteriye aittir.",
   "faq_a3": "Açılmamış ürünler, teslimattan itibaren 30 gün içinde tam iade için geri gönderilebilir. Açılmış ürünler yalnızca hasarlı veya kusurlu olması durumunda iade edilebilir. Tüm ayrıntılar için <a href=\"/shipping.html\" class=\"text-gold-soft\">Kargo ve İadeler</a> sayfamıza bakın.",
-  "category_all": "Tümü"
+  "category_all": "Tümü",
+  "return_page_title": "İade / Geri Ödeme Talebi",
+  "return_intro": "Bir ürünü iade etmeniz veya para iadesi talep etmeniz mi gerekiyor? Aşağıdaki formu doldurun, ekibimiz e-posta ile size dönüş yapacaktır — uygunluk koşulları için Kargo ve İade sayfamıza bakın.",
+  "return_email_placeholder": "E-postanız",
+  "return_order_ref_placeholder": "Sipariş numarası veya ödemede kullanılan e-posta",
+  "return_reason_label": "Neden",
+  "return_reason_damaged": "Hasarlı veya kusurlu",
+  "return_reason_changed_mind": "Fikrimi değiştirdim",
+  "return_reason_wrong_item": "Yanlış ürün geldi",
+  "return_reason_other": "Diğer",
+  "return_details_placeholder": "Ek detaylar (isteğe bağlı)",
+  "return_submit": "Talebi Gönder",
+  "return_thank_you": "Teşekkürler — talebinizi aldık ve bir iş günü içinde e-posta ile size dönüş yapacağız.",
+  "chat_widget_title": "Bizimle sohbet edin",
+  "chat_placeholder": "Bir mesaj yazın…",
+  "chat_send": "Gönder",
+  "chat_greeting": "Merhaba! Kargo, içerikler veya ürünlerimiz hakkında bana sorabilirsiniz.",
+  "chat_unavailable": "Sohbet geçici olarak kullanılamıyor — lütfen İletişim sayfamızı kullanın."
 }

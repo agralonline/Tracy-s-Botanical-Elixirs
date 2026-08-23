@@ -56,6 +56,10 @@
   <div class="flex items-center gap-2 mb-8 border-b border-white/5">
     <button id="tab-products-btn" type="button" class="admin-tab-btn admin-tab-active px-4 py-3 text-sm">Products</button>
     <button id="tab-categories-btn" type="button" class="admin-tab-btn px-4 py-3 text-sm">Categories</button>
+    <button id="tab-blog-btn" type="button" class="admin-tab-btn px-4 py-3 text-sm">Blog</button>
+    <button id="tab-orders-btn" type="button" class="admin-tab-btn px-4 py-3 text-sm">Orders</button>
+    <button id="tab-requests-btn" type="button" class="admin-tab-btn px-4 py-3 text-sm">Requests</button>
+    <button id="tab-settings-btn" type="button" class="admin-tab-btn px-4 py-3 text-sm">Settings</button>
   </div>
 
   <div id="admin-status-banner" class="hidden mb-6 glass-panel rounded-xl p-4 text-sm"></div>
@@ -116,6 +120,131 @@
         </tbody>
       </table>
     </div>
+  </div>
+
+  <!-- ---------- BLOG PANEL ---------- -->
+  <div id="blog-panel" class="hidden">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
+      <div>
+        <h1 class="heading-serif text-3xl gold-gradient-text">Journal / Blog</h1>
+        <p class="text-ink-500 text-sm">Published in English only, same as before — write once, no translation step.</p>
+      </div>
+      <button id="new-post-btn" type="button" class="btn-gold">+ New Post</button>
+    </div>
+
+    <div class="glass-static rounded-2xl overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-ink-500 border-b border-white/5">
+            <th class="p-4">Title</th>
+            <th class="p-4">Category</th>
+            <th class="p-4">Status</th>
+            <th class="p-4">Published</th>
+            <th class="p-4"></th>
+          </tr>
+        </thead>
+        <tbody id="post-table-body">
+          <tr><td colspan="5" class="p-8 text-center text-ink-500">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ---------- ORDERS PANEL ---------- -->
+  <div id="orders-panel" class="hidden">
+    <div class="mb-10">
+      <h1 class="heading-serif text-3xl gold-gradient-text">Orders</h1>
+      <p class="text-ink-500 text-sm">Every paid order, written automatically by the Stripe webhook when a customer checks out.</p>
+    </div>
+
+    <div class="glass-static rounded-2xl overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-ink-500 border-b border-white/5">
+            <th class="p-4">Date</th>
+            <th class="p-4">Customer</th>
+            <th class="p-4">Items</th>
+            <th class="p-4">Total</th>
+            <th class="p-4">Shipping Address</th>
+            <th class="p-4">Status</th>
+          </tr>
+        </thead>
+        <tbody id="order-table-body">
+          <tr><td colspan="6" class="p-8 text-center text-ink-500">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ---------- REQUESTS PANEL (returns/refunds) ---------- -->
+  <div id="requests-panel" class="hidden">
+    <div class="mb-10">
+      <h1 class="heading-serif text-3xl gold-gradient-text">Return / Refund Requests</h1>
+      <p class="text-ink-500 text-sm">Submitted from the storefront's return request form.</p>
+    </div>
+
+    <div class="glass-static rounded-2xl overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-ink-500 border-b border-white/5">
+            <th class="p-4">Date</th>
+            <th class="p-4">Email</th>
+            <th class="p-4">Order Reference</th>
+            <th class="p-4">Reason</th>
+            <th class="p-4">Status</th>
+            <th class="p-4"></th>
+          </tr>
+        </thead>
+        <tbody id="request-table-body">
+          <tr><td colspan="6" class="p-8 text-center text-ink-500">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ---------- SETTINGS PANEL ---------- -->
+  <div id="settings-panel" class="hidden max-w-2xl">
+    <div class="mb-10">
+      <h1 class="heading-serif text-3xl gold-gradient-text">Settings</h1>
+      <p class="text-ink-500 text-sm">Announcement bar, footer social links, and the free-shipping threshold used at checkout.</p>
+    </div>
+
+    <form id="settings-form" class="glass-static rounded-2xl p-8 flex flex-col gap-5">
+      <div>
+        <label class="flex items-center gap-2 text-sm text-ink-300"><input id="sf-announcement-enabled" type="checkbox" /> Show announcement bar</label>
+        <input id="sf-announcement-text" class="input-glass mt-2" placeholder="e.g. Free shipping on US orders over $75" />
+      </div>
+
+      <div>
+        <label class="text-xs eyebrow block mb-1">Free Shipping Threshold (USD)</label>
+        <input id="sf-free-shipping" type="number" min="0" step="1" class="input-glass" placeholder="75" />
+        <p class="text-xs text-ink-700 mt-1">Orders at or above this amount get a free shipping option at checkout.</p>
+      </div>
+
+      <hr class="hairline-gold" />
+      <p class="text-xs eyebrow">Social Links (leave blank to hide)</p>
+      <div>
+        <label class="text-xs text-ink-500 block mb-1">Instagram URL</label>
+        <input id="sf-social-instagram" class="input-glass" placeholder="https://instagram.com/..." />
+      </div>
+      <div>
+        <label class="text-xs text-ink-500 block mb-1">Facebook URL</label>
+        <input id="sf-social-facebook" class="input-glass" placeholder="https://facebook.com/..." />
+      </div>
+      <div>
+        <label class="text-xs text-ink-500 block mb-1">TikTok URL</label>
+        <input id="sf-social-tiktok" class="input-glass" placeholder="https://tiktok.com/@..." />
+      </div>
+      <div>
+        <label class="text-xs text-ink-500 block mb-1">Pinterest URL</label>
+        <input id="sf-social-pinterest" class="input-glass" placeholder="https://pinterest.com/..." />
+      </div>
+
+      <div class="border-t border-white/5 pt-5 mt-2 flex items-center justify-between gap-4">
+        <p id="settings-status" class="text-xs text-ink-500 flex-1"></p>
+        <button type="submit" id="settings-save-btn" class="btn-gold whitespace-nowrap">Save Settings</button>
+      </div>
+    </form>
   </div>
 </section>
 
@@ -256,6 +385,51 @@
       <div class="border-t border-white/5 pt-5 mt-2 flex items-center justify-between gap-4">
         <p id="category-status" class="text-xs text-ink-500 flex-1"></p>
         <button type="submit" id="category-save-btn" class="btn-gold whitespace-nowrap">Save Category</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ BLOG POST FORM MODAL ============ -->
+<div id="post-modal-overlay" class="hidden fixed inset-0 bg-black/70 z-50 flex items-start md:items-center justify-center p-4">
+  <div id="post-modal-panel" class="glass-panel rounded-2xl w-full max-w-2xl p-8 my-8" style="max-height:calc(100vh - 4rem);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+    <div class="flex items-center justify-between mb-6">
+      <h2 id="post-modal-title" class="heading-serif text-2xl gold-gradient-text">New Post</h2>
+      <button id="post-modal-close" type="button" class="btn-ghost p-1" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <form id="post-form" class="flex flex-col gap-4">
+      <input type="hidden" id="pof-id" />
+
+      <div>
+        <label class="text-xs eyebrow block mb-1">Title</label>
+        <input id="pof-title" required class="input-glass" placeholder="5 Ways to Use Lavender Oil in Your Evening Routine" />
+      </div>
+
+      <div>
+        <label class="text-xs eyebrow block mb-1">Category Tag</label>
+        <input id="pof-category" class="input-glass" placeholder="Rituals" />
+      </div>
+
+      <div>
+        <label class="text-xs eyebrow block mb-1">Body</label>
+        <textarea id="pof-body" required rows="10" class="input-glass" placeholder="Separate paragraphs with a blank line. Wrap text in **double asterisks** for bold."></textarea>
+        <p class="text-xs text-ink-700 mt-1">Blank line = new paragraph. **text** = bold.</p>
+      </div>
+
+      <div>
+        <label class="text-xs eyebrow block mb-1">Status</label>
+        <select id="pof-status" class="input-glass">
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+
+      <div class="border-t border-white/5 pt-5 mt-2 flex items-center justify-between gap-4">
+        <p id="post-status-msg" class="text-xs text-ink-500 flex-1"></p>
+        <button type="submit" id="post-save-btn" class="btn-gold whitespace-nowrap">Save Post</button>
       </div>
     </form>
   </div>

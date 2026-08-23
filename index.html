@@ -171,6 +171,7 @@
     <div>
       <p class="eyebrow mb-2" data-i18n="language_selector_label">Language</p>
       <select id="languageSelectorFooter" class="input-glass !py-2 !px-3 text-xs" aria-label="Language"></select>
+      <div id="footer-social-links" class="hidden flex items-center gap-1 mt-3"></div>
     </div>
   </div>
   <div class="flex flex-wrap items-center justify-center gap-2 mt-8">
@@ -203,9 +204,11 @@
   import { onLocaleChange } from "/assets/js/i18n.js";
   import { initHeroSlider } from "/assets/js/hero-slider.js";
   import { fetchCategories, getCategoryLabel, getCategoryImage } from "/assets/js/categories.js";
+  import { fetchSiteSettings, renderSocialLinks } from "/assets/js/settings.js";
 
   await bootstrapPage();
   initHeroSlider(document.getElementById("hero-slider"));
+  fetchSiteSettings().then((s) => renderSocialLinks(document.getElementById("footer-social-links"), s.social));
 
   function escapeHtml(str = "") {
     return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");

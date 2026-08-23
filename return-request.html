@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Journal — Tracy's Botanical Elixirs</title>
-<meta name="description" content="Tracy's Botanical Elixirs Journal — always published in English." />
+<title>Return / Refund Request — Tracy's Botanical Elixirs</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230a0f1d' stroke='%23D4AF37' stroke-width='4'/%3E%3Ctext x='50' y='63' font-size='46' text-anchor='middle' fill='%23D4AF37' font-family='Georgia,serif'%3ET%3C/text%3E%3C/svg%3E" />
 <link rel="apple-touch-icon" href="/assets/img/icons/apple-touch-icon.png" />
 <link rel="manifest" href="/manifest.json" />
@@ -55,14 +54,27 @@
   </nav>
 </header>
 
-<section class="max-w-4xl mx-auto px-5 md:px-8 py-20">
-  <p class="eyebrow mb-4" data-i18n="blog_eyebrow">The Journal</p>
-  <h1 class="heading-serif text-4xl gold-gradient-text mb-3" data-i18n="blog_title">Rituals, Ingredients &amp; Craft</h1>
-  <p class="text-ink-500 text-sm mb-12" data-i18n="blog_english_note">Our Journal is published in English only.</p>
+<section class="max-w-xl mx-auto px-5 md:px-8 py-20">
+  <h1 class="heading-serif text-4xl gold-gradient-text mb-4" data-i18n="return_page_title">Return / Refund Request</h1>
+  <p class="text-ink-300 mb-8" data-i18n="return_intro">Need to return an item or request a refund? Fill out the form below and our team will follow up by email — please see our Shipping & Returns page for eligibility.</p>
 
-  <div id="blog-posts">
-    <p class="text-center text-ink-500 py-16">Loading…</p>
-  </div>
+  <form id="return-request-form" class="glass-static rounded-2xl p-8 flex flex-col gap-4">
+    <input required type="email" id="rr-email" placeholder="Your email" data-i18n-placeholder="return_email_placeholder" class="input-glass" />
+    <input required type="text" id="rr-order-ref" placeholder="Order number or email used at checkout" data-i18n-placeholder="return_order_ref_placeholder" class="input-glass" />
+    <div>
+      <label class="text-xs eyebrow block mb-1" data-i18n="return_reason_label">Reason</label>
+      <select id="rr-reason" class="input-glass">
+        <option value="damaged" data-i18n="return_reason_damaged">Damaged or defective</option>
+        <option value="changed_mind" data-i18n="return_reason_changed_mind">Changed my mind</option>
+        <option value="wrong_item" data-i18n="return_reason_wrong_item">Received the wrong item</option>
+        <option value="other" data-i18n="return_reason_other">Other</option>
+      </select>
+    </div>
+    <textarea id="rr-details" rows="4" placeholder="Any additional details (optional)" data-i18n-placeholder="return_details_placeholder" class="input-glass"></textarea>
+    <button type="submit" id="rr-submit-btn" class="btn-gold" data-i18n="return_submit">Submit Request</button>
+    <p id="rr-error" class="hidden text-xs text-red-400"></p>
+    <p id="rr-status" data-status class="hidden text-xs text-emerald-glow" data-i18n="return_thank_you">Thank you — we've received your request and will follow up by email within one business day.</p>
+  </form>
 </section>
 
 <footer class="border-t border-white/5 py-12">
@@ -79,9 +91,43 @@
 
 <script type="module">
   import { bootstrapPage } from "/assets/js/main.js";
-  import { renderBlogList } from "/assets/js/blog.js";
+  import { getFirebaseServices } from "/assets/js/firebase-config.js";
+  import { getCurrentLocale } from "/assets/js/i18n.js";
+
   await bootstrapPage();
-  await renderBlogList(document.getElementById("blog-posts"));
+
+  document.getElementById("return-request-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("rr-submit-btn");
+    const errorEl = document.getElementById("rr-error");
+    const statusEl = document.getElementById("rr-status");
+    errorEl.classList.add("hidden");
+    btn.disabled = true;
+    btn.style.opacity = ".6";
+
+    try {
+      const services = await getFirebaseServices();
+      if (!services) throw new Error("This form isn't available right now — please email us directly instead.");
+      const { db, firestoreMod } = services;
+      await firestoreMod.addDoc(firestoreMod.collection(db, "tracy_refundRequests"), {
+        email: document.getElementById("rr-email").value.trim(),
+        orderReference: document.getElementById("rr-order-ref").value.trim(),
+        reason: document.getElementById("rr-reason").value,
+        details: document.getElementById("rr-details").value.trim(),
+        locale: getCurrentLocale(),
+        status: "new",
+        createdAt: firestoreMod.serverTimestamp(),
+      });
+      document.getElementById("return-request-form").reset();
+      statusEl.classList.remove("hidden");
+    } catch (err) {
+      errorEl.textContent = err.message || "Something went wrong. Please try again.";
+      errorEl.classList.remove("hidden");
+    } finally {
+      btn.disabled = false;
+      btn.style.opacity = "";
+    }
+  });
 </script>
 </body>
 </html>

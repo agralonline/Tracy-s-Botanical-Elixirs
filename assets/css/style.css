@@ -7,6 +7,15 @@
    fine-tuned typography, and component-level rules.
    ========================================================================= */
 
+/* Scales the entire UI down ~15% at typical desktop widths (Tailwind's
+   utilities are rem-based, so this cascades through every spacing/type
+   value site-wide) — the site felt oversized at 100% browser zoom. Left
+   alone below 1024px so mobile/tablet keep their normal, already-compact
+   sizing. */
+@media (min-width: 1024px) {
+  html { font-size: 85%; }
+}
+
 :root {
   --navy-950: #050b14;
   --navy-900: #0a0f1d;

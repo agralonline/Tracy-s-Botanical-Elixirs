@@ -121,5 +121,22 @@
   "faq_q7": "Czy wysyłacie za granicę?",
   "faq_a7": "Tak, wysyłamy na cały świat. Koszt wysyłki i szacowany czas dostawy są obliczane podczas finalizacji zamówienia na podstawie miejsca docelowego; klient odpowiada za wszelkie cła lub podatki importowe.",
   "faq_a3": "Nieotwarte produkty można zwrócić w ciągu 30 dni od dostawy w celu pełnego zwrotu kosztów. Otwarte produkty można zwrócić tylko w przypadku uszkodzenia lub wady. Pełne informacje znajdziesz na stronie <a href=\"/shipping.html\" class=\"text-gold-soft\">Wysyłka i Zwroty</a>.",
-  "category_all": "Wszystkie"
+  "category_all": "Wszystkie",
+  "return_page_title": "Wniosek o Zwrot / Refundację",
+  "return_intro": "Chcesz zwrócić produkt lub poprosić o zwrot pieniędzy? Wypełnij poniższy formularz, a nasz zespół skontaktuje się e-mailem — warunki znajdziesz na stronie Wysyłka i Zwroty.",
+  "return_email_placeholder": "Twój e-mail",
+  "return_order_ref_placeholder": "Numer zamówienia lub e-mail użyty przy zakupie",
+  "return_reason_label": "Powód",
+  "return_reason_damaged": "Uszkodzony lub wadliwy",
+  "return_reason_changed_mind": "Zmieniłem/am zdanie",
+  "return_reason_wrong_item": "Otrzymałem/am zły produkt",
+  "return_reason_other": "Inne",
+  "return_details_placeholder": "Dodatkowe informacje (opcjonalnie)",
+  "return_submit": "Wyślij Wniosek",
+  "return_thank_you": "Dziękujemy — otrzymaliśmy Twój wniosek i odpowiemy e-mailem w ciągu jednego dnia roboczego.",
+  "chat_widget_title": "Porozmawiaj z nami",
+  "chat_placeholder": "Napisz wiadomość…",
+  "chat_send": "Wyślij",
+  "chat_greeting": "Cześć! Zapytaj mnie o wysyłkę, składniki lub nasze produkty.",
+  "chat_unavailable": "Czat jest tymczasowo niedostępny — skorzystaj z naszej strony Kontakt."
 }

@@ -121,5 +121,22 @@
   "faq_q7": "Zasíláte i do zahraničí?",
   "faq_a7": "Ano, zasíláme po celém světě. Náklady na dopravu a odhadovaná doba doručení se počítají při pokladně podle vaší destinace; zákazník odpovídá za případná cla nebo dovozní daně.",
   "faq_a3": "Neotevřené produkty lze vrátit do 30 dnů od doručení pro plnou refundaci. Otevřené produkty lze vrátit pouze v případě poškození nebo vady. Úplné podrobnosti najdete na stránce <a href=\"/shipping.html\" class=\"text-gold-soft\">Doprava a Vrácení</a>.",
-  "category_all": "Vše"
+  "category_all": "Vše",
+  "return_page_title": "Žádost o Vrácení / Refundaci",
+  "return_intro": "Potřebujete vrátit zboží nebo požádat o vrácení peněz? Vyplňte níže uvedený formulář a náš tým se vám ozve e-mailem — podmínky najdete na stránce Doprava a Vrácení zboží.",
+  "return_email_placeholder": "Váš e-mail",
+  "return_order_ref_placeholder": "Číslo objednávky nebo e-mail použitý při platbě",
+  "return_reason_label": "Důvod",
+  "return_reason_damaged": "Poškozené nebo vadné",
+  "return_reason_changed_mind": "Rozmyslel/a jsem si to",
+  "return_reason_wrong_item": "Obdržel/a jsem špatnou položku",
+  "return_reason_other": "Jiné",
+  "return_details_placeholder": "Další podrobnosti (nepovinné)",
+  "return_submit": "Odeslat Žádost",
+  "return_thank_you": "Děkujeme — vaši žádost jsme obdrželi a ozveme se e-mailem do jednoho pracovního dne.",
+  "chat_widget_title": "Chatujte s námi",
+  "chat_placeholder": "Napište zprávu…",
+  "chat_send": "Odeslat",
+  "chat_greeting": "Ahoj! Zeptejte se mě na dopravu, složení nebo naše produkty.",
+  "chat_unavailable": "Chat je dočasně nedostupný — použijte prosím naši stránku Kontakt."
 }

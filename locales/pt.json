@@ -121,5 +121,22 @@
   "faq_q7": "Vocês enviam para outros países?",
   "faq_a7": "Sim, enviamos para todo o mundo. O custo do frete e o prazo estimado de entrega são calculados no checkout com base no seu destino; o cliente é responsável por quaisquer taxas alfandegárias ou impostos de importação.",
   "faq_a3": "Produtos não abertos podem ser devolvidos em até 30 dias após a entrega para reembolso total. Produtos abertos só podem ser devolvidos se estiverem danificados ou com defeito. Veja nossa página de <a href=\"/shipping.html\" class=\"text-gold-soft\">Envio e Devoluções</a> para mais detalhes.",
-  "category_all": "Todos"
+  "category_all": "Todos",
+  "return_page_title": "Solicitação de Devolução / Reembolso",
+  "return_intro": "Precisa devolver um item ou solicitar um reembolso? Preencha o formulário abaixo e nossa equipe entrará em contato por e-mail — consulte nossa página de Envio e Devoluções para verificar a elegibilidade.",
+  "return_email_placeholder": "Seu e-mail",
+  "return_order_ref_placeholder": "Número do pedido ou e-mail usado na compra",
+  "return_reason_label": "Motivo",
+  "return_reason_damaged": "Danificado ou com defeito",
+  "return_reason_changed_mind": "Mudei de ideia",
+  "return_reason_wrong_item": "Recebi o item errado",
+  "return_reason_other": "Outro",
+  "return_details_placeholder": "Detalhes adicionais (opcional)",
+  "return_submit": "Enviar Solicitação",
+  "return_thank_you": "Obrigado — recebemos sua solicitação e entraremos em contato por e-mail dentro de um dia útil.",
+  "chat_widget_title": "Converse conosco",
+  "chat_placeholder": "Digite uma mensagem…",
+  "chat_send": "Enviar",
+  "chat_greeting": "Olá! Pergunte-me sobre envio, ingredientes ou nossos produtos.",
+  "chat_unavailable": "O chat está temporariamente indisponível — use nossa página de Contato."
 }

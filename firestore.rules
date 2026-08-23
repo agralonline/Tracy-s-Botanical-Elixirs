@@ -78,5 +78,26 @@ service cloud.firestore {
                     && request.resource.data.email is string;
       allow read, update, delete: if isAdmin();
     }
+
+    // ---------------------------------------------------------------
+    // tracy_settings — a single "site" doc holding admin-editable site
+    // settings (announcement bar, social links, free-shipping threshold).
+    // Public read so the storefront can display them; admin-only write.
+    // ---------------------------------------------------------------
+    match /tracy_settings/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------
+    // tracy_refundRequests — customer-submitted return/refund requests.
+    // Write-only from the client (no enumeration of other customers'
+    // requests); admin can read, update (mark resolved), and delete.
+    // ---------------------------------------------------------------
+    match /tracy_refundRequests/{docId} {
+      allow create: if request.resource.data.keys().hasAll(['email', 'orderReference', 'reason', 'createdAt'])
+                    && request.resource.data.email is string;
+      allow read, update, delete: if isAdmin();
+    }
   }
 }

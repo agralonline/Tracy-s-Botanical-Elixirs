@@ -121,5 +121,22 @@
   "faq_q7": "Verzendt u internationaal?",
   "faq_a7": "Ja, wij verzenden wereldwijd. Verzendkosten en geschatte levertijd worden bij het afrekenen berekend op basis van uw bestemming; de klant is verantwoordelijk voor eventuele douanerechten of invoerbelastingen.",
   "faq_a3": "Ongeopende producten kunnen binnen 30 dagen na levering worden geretourneerd voor een volledige terugbetaling. Geopende producten kunnen alleen worden geretourneerd indien beschadigd of defect. Bekijk onze pagina <a href=\"/shipping.html\" class=\"text-gold-soft\">Verzending en Retouren</a> voor alle details.",
-  "category_all": "Alles"
+  "category_all": "Alles",
+  "return_page_title": "Retour-/Terugbetalingsverzoek",
+  "return_intro": "Wilt u een artikel retourneren of een terugbetaling aanvragen? Vul onderstaand formulier in — ons team neemt per e-mail contact met u op. Zie onze pagina Verzending & Retouren voor de voorwaarden.",
+  "return_email_placeholder": "Uw e-mail",
+  "return_order_ref_placeholder": "Bestelnummer of e-mail gebruikt bij afrekenen",
+  "return_reason_label": "Reden",
+  "return_reason_damaged": "Beschadigd of defect",
+  "return_reason_changed_mind": "Van gedachten veranderd",
+  "return_reason_wrong_item": "Verkeerd artikel ontvangen",
+  "return_reason_other": "Anders",
+  "return_details_placeholder": "Aanvullende details (optioneel)",
+  "return_submit": "Verzoek Versturen",
+  "return_thank_you": "Bedankt — we hebben uw verzoek ontvangen en reageren binnen één werkdag per e-mail.",
+  "chat_widget_title": "Chat met ons",
+  "chat_placeholder": "Typ een bericht…",
+  "chat_send": "Verzenden",
+  "chat_greeting": "Hallo! Vraag me gerust naar verzending, ingrediënten of onze producten.",
+  "chat_unavailable": "Chat is tijdelijk niet beschikbaar — gebruik onze contactpagina."
 }

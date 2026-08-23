@@ -121,5 +121,22 @@
   "faq_q7": "你们提供国际配送吗？",
   "faq_a7": "是的，我们提供全球配送。运费和预计送达时间将在结账时根据您的目的地计算；客户需自行承担任何关税或进口税。",
   "faq_a3": "未开封的产品可在收到货物后30天内退货并获得全额退款。已开封的产品仅在损坏或有缺陷时才可退货。完整详情请见我们的<a href=\"/shipping.html\" class=\"text-gold-soft\">配送与退货</a>页面。",
-  "category_all": "全部"
+  "category_all": "全部",
+  "return_page_title": "退货/退款申请",
+  "return_intro": "需要退货或申请退款？请填写以下表格，我们的团队将通过电子邮件与您联系——请查看我们的配送与退货页面了解退换条件。",
+  "return_email_placeholder": "您的邮箱",
+  "return_order_ref_placeholder": "订单号或结账时使用的邮箱",
+  "return_reason_label": "原因",
+  "return_reason_damaged": "损坏或有缺陷",
+  "return_reason_changed_mind": "改变主意了",
+  "return_reason_wrong_item": "收到错误的商品",
+  "return_reason_other": "其他",
+  "return_details_placeholder": "其他说明（选填）",
+  "return_submit": "提交申请",
+  "return_thank_you": "感谢您——我们已收到您的申请，将在一个工作日内通过电子邮件回复。",
+  "chat_widget_title": "与我们聊天",
+  "chat_placeholder": "输入消息…",
+  "chat_send": "发送",
+  "chat_greeting": "您好！欢迎咨询配送、成分或我们的产品。",
+  "chat_unavailable": "聊天暂时不可用——请使用我们的联系页面。"
 }

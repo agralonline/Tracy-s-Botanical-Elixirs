@@ -121,5 +121,22 @@
   "faq_q7": "Effettuate spedizioni internazionali?",
   "faq_a7": "Sì, spediamo in tutto il mondo. Il costo di spedizione e i tempi di consegna stimati vengono calcolati al momento del pagamento in base alla destinazione; il cliente è responsabile di eventuali dazi doganali o tasse di importazione.",
   "faq_a3": "I prodotti non aperti possono essere restituiti entro 30 giorni dalla consegna per un rimborso completo. I prodotti aperti possono essere restituiti solo se danneggiati o difettosi. Consulta la nostra pagina <a href=\"/shipping.html\" class=\"text-gold-soft\">Spedizioni e Resi</a> per i dettagli completi.",
-  "category_all": "Tutti"
+  "category_all": "Tutti",
+  "return_page_title": "Richiesta di Reso / Rimborso",
+  "return_intro": "Devi restituire un articolo o richiedere un rimborso? Compila il modulo qui sotto: il nostro team ti risponderà via email — consulta la pagina Spedizioni e Resi per i requisiti.",
+  "return_email_placeholder": "La tua email",
+  "return_order_ref_placeholder": "Numero d'ordine o email usata al checkout",
+  "return_reason_label": "Motivo",
+  "return_reason_damaged": "Danneggiato o difettoso",
+  "return_reason_changed_mind": "Ho cambiato idea",
+  "return_reason_wrong_item": "Ho ricevuto l'articolo sbagliato",
+  "return_reason_other": "Altro",
+  "return_details_placeholder": "Ulteriori dettagli (facoltativo)",
+  "return_submit": "Invia Richiesta",
+  "return_thank_you": "Grazie: abbiamo ricevuto la tua richiesta e ti risponderemo via email entro un giorno lavorativo.",
+  "chat_widget_title": "Chatta con noi",
+  "chat_placeholder": "Scrivi un messaggio…",
+  "chat_send": "Invia",
+  "chat_greeting": "Ciao! Chiedimi pure di spedizioni, ingredienti o dei nostri prodotti.",
+  "chat_unavailable": "La chat è temporaneamente non disponibile: usa la nostra pagina Contatti."
 }

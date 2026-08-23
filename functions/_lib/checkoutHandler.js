@@ -14,6 +14,7 @@
  */
 
 import Stripe from "stripe";
+import { getAdminDb } from "./firebaseAdmin.js";
 
 const STRIPE_LOCALE_MAP = {
   en: "en", es: "es", pt: "pt", fr: "fr", de: "de", it: "it", nl: "nl",
@@ -35,6 +36,53 @@ function badRequest(message) {
   const err = new Error(message);
   err.statusCode = 400;
   return err;
+}
+
+const DEFAULT_FREE_SHIPPING_THRESHOLD_CENTS = 7500; // $75, matches the site's existing "free_shipping_note" copy
+const STANDARD_SHIPPING_RATE_CENTS = 695; // $6.95 flat rate below the free-shipping threshold
+
+/** Read the admin-configurable free-shipping threshold from tracy_settings/site, falling back to the default. */
+async function getFreeShippingThresholdCents() {
+  try {
+    const snap = await getAdminDb().collection("tracy_settings").doc("site").get();
+    const cents = snap.exists ? snap.data()?.freeShippingThresholdCents : null;
+    return typeof cents === "number" && cents >= 0 ? cents : DEFAULT_FREE_SHIPPING_THRESHOLD_CENTS;
+  } catch (err) {
+    console.warn("Could not read free-shipping threshold from tracy_settings/site, using default.", err.message);
+    return DEFAULT_FREE_SHIPPING_THRESHOLD_CENTS;
+  }
+}
+
+function buildShippingOptions(subtotalCents, freeShippingThresholdCents) {
+  const standard = {
+    shipping_rate_data: {
+      type: "fixed_amount",
+      fixed_amount: { amount: STANDARD_SHIPPING_RATE_CENTS, currency: "usd" },
+      display_name: "Standard Shipping",
+      delivery_estimate: {
+        minimum: { unit: "business_day", value: 3 },
+        maximum: { unit: "business_day", value: 7 },
+      },
+    },
+  };
+
+  if (subtotalCents >= freeShippingThresholdCents) {
+    const free = {
+      shipping_rate_data: {
+        type: "fixed_amount",
+        fixed_amount: { amount: 0, currency: "usd" },
+        display_name: "Free Shipping",
+        delivery_estimate: {
+          minimum: { unit: "business_day", value: 3 },
+          maximum: { unit: "business_day", value: 7 },
+        },
+      },
+    };
+    // Free option listed first so it's the default-selected radio in Stripe Checkout.
+    return [free, standard];
+  }
+
+  return [standard];
 }
 
 export async function handleCreateCheckoutSession({ body }) {
@@ -72,6 +120,9 @@ export async function handleCreateCheckoutSession({ body }) {
     };
   });
 
+  const subtotalCents = items.reduce((sum, item) => sum + item.unitAmount * item.quantity, 0);
+  const freeShippingThresholdCents = await getFreeShippingThresholdCents();
+
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     line_items,
@@ -80,9 +131,13 @@ export async function handleCreateCheckoutSession({ body }) {
     customer_email: payload.email || undefined,
     locale: STRIPE_LOCALE_MAP[payload.locale] || "auto",
     shipping_address_collection: { allowed_countries: SHIPPING_COUNTRIES },
+    shipping_options: buildShippingOptions(subtotalCents, freeShippingThresholdCents),
     billing_address_collection: "auto",
     phone_number_collection: { enabled: true },
     automatic_tax: { enabled: process.env.STRIPE_AUTOMATIC_TAX === "true" },
+    // Lets customers enter a promo code at checkout. Create/manage codes in
+    // the Stripe Dashboard → Product catalog → Coupons — no site code needed.
+    allow_promotion_codes: true,
     metadata: {
       locale: payload.locale || "en",
       productIds: items.map((i) => i.productId).join(","),

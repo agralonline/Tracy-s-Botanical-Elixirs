@@ -121,5 +121,22 @@
   "faq_q7": "Ar siunčiate į kitas šalis?",
   "faq_a7": "Taip, siunčiame į visą pasaulį. Pristatymo kaina ir numatoma pristatymo trukmė apskaičiuojama atsiskaitant, priklausomai nuo paskirties vietos; už muitus ar importo mokesčius atsako pirkėjas.",
   "faq_a3": "Neatidaryti gaminiai gali būti grąžinti per 30 dienų nuo pristatymo, gaunant visą pinigų grąžinimą. Atidaryti gaminiai gali būti grąžinami tik jei jie pažeisti ar sugedę. Visą informaciją rasite mūsų puslapyje <a href=\"/shipping.html\" class=\"text-gold-soft\">Pristatymas ir Grąžinimas</a>.",
-  "category_all": "Visi"
+  "category_all": "Visi",
+  "return_page_title": "Grąžinimo / Pinigų Grąžinimo Prašymas",
+  "return_intro": "Reikia grąžinti prekę ar prašyti pinigų grąžinimo? Užpildykite žemiau esančią formą, o mūsų komanda susisieks el. paštu — sąlygas rasite puslapyje Pristatymas ir Grąžinimai.",
+  "return_email_placeholder": "Jūsų el. paštas",
+  "return_order_ref_placeholder": "Užsakymo numeris arba el. paštas, naudotas perkant",
+  "return_reason_label": "Priežastis",
+  "return_reason_damaged": "Sugadinta arba su defektu",
+  "return_reason_changed_mind": "Persigalvojau",
+  "return_reason_wrong_item": "Gavau ne tą prekę",
+  "return_reason_other": "Kita",
+  "return_details_placeholder": "Papildoma informacija (neprivaloma)",
+  "return_submit": "Pateikti Prašymą",
+  "return_thank_you": "Ačiū — gavome jūsų prašymą ir atsakysime el. paštu per vieną darbo dieną.",
+  "chat_widget_title": "Susirašinėkite su mumis",
+  "chat_placeholder": "Įrašykite žinutę…",
+  "chat_send": "Siųsti",
+  "chat_greeting": "Sveiki! Klauskite apie pristatymą, sudėtį ar mūsų produktus.",
+  "chat_unavailable": "Pokalbis laikinai nepasiekiamas — naudokitės mūsų kontaktų puslapiu."
 }

@@ -121,5 +121,22 @@
   "faq_q7": "Szállítanak nemzetközileg is?",
   "faq_a7": "Igen, világszerte szállítunk. A szállítási költséget és a becsült szállítási időt a fizetésnél számítjuk ki a célország alapján; a vámokért vagy behozatali adókért a vásárló felelős.",
   "faq_a3": "A bontatlan termékek a kézbesítéstől számított 30 napon belül teljes visszatérítéssel visszaküldhetők. A bontott termékek csak sérülés vagy hiba esetén küldhetők vissza. A teljes részletekért lásd a <a href=\"/shipping.html\" class=\"text-gold-soft\">Szállítás és Visszaküldés</a> oldalunkat.",
-  "category_all": "Összes"
+  "category_all": "Összes",
+  "return_page_title": "Visszaküldési / Visszatérítési Kérelem",
+  "return_intro": "Terméket szeretne visszaküldeni vagy visszatérítést kérni? Töltse ki az alábbi űrlapot, csapatunk e-mailben jelentkezik — a feltételeket a Szállítás és Visszaküldés oldalon találja.",
+  "return_email_placeholder": "Az Ön e-mail címe",
+  "return_order_ref_placeholder": "Rendelésszám vagy a fizetéskor használt e-mail",
+  "return_reason_label": "Indok",
+  "return_reason_damaged": "Sérült vagy hibás",
+  "return_reason_changed_mind": "Meggondoltam magam",
+  "return_reason_wrong_item": "Rossz terméket kaptam",
+  "return_reason_other": "Egyéb",
+  "return_details_placeholder": "További részletek (opcionális)",
+  "return_submit": "Kérelem Küldése",
+  "return_thank_you": "Köszönjük — megkaptuk kérelmét, és egy munkanapon belül e-mailben jelentkezünk.",
+  "chat_widget_title": "Csevegjen velünk",
+  "chat_placeholder": "Írjon üzenetet…",
+  "chat_send": "Küldés",
+  "chat_greeting": "Üdv! Kérdezzen a szállításról, összetevőkről vagy termékeinkről.",
+  "chat_unavailable": "A csevegés átmenetileg nem elérhető — használja a Kapcsolat oldalt."
 }

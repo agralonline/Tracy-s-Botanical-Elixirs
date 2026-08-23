@@ -121,5 +121,22 @@
   "faq_q7": "Skickar ni internationellt?",
   "faq_a7": "Ja, vi skickar över hela världen. Fraktkostnad och beräknad leveranstid beräknas i kassan baserat på din destination; kunden ansvarar för eventuella tullavgifter eller importskatter.",
   "faq_a3": "Oöppnade produkter kan returneras inom 30 dagar efter leverans för full återbetalning. Öppnade produkter kan endast returneras om de är skadade eller defekta. Se vår sida <a href=\"/shipping.html\" class=\"text-gold-soft\">Frakt och Returer</a> för fullständig information.",
-  "category_all": "Alla"
+  "category_all": "Alla",
+  "return_page_title": "Retur-/Återbetalningsförfrågan",
+  "return_intro": "Behöver du returnera en vara eller begära återbetalning? Fyll i formuläret nedan så återkommer vårt team via e-post — se vår sida Frakt & Returer för villkor.",
+  "return_email_placeholder": "Din e-post",
+  "return_order_ref_placeholder": "Ordernummer eller e-post som användes vid köp",
+  "return_reason_label": "Anledning",
+  "return_reason_damaged": "Skadad eller defekt",
+  "return_reason_changed_mind": "Har ändrat mig",
+  "return_reason_wrong_item": "Fick fel vara",
+  "return_reason_other": "Annat",
+  "return_details_placeholder": "Ytterligare detaljer (valfritt)",
+  "return_submit": "Skicka Förfrågan",
+  "return_thank_you": "Tack — vi har tagit emot din förfrågan och återkommer via e-post inom en arbetsdag.",
+  "chat_widget_title": "Chatta med oss",
+  "chat_placeholder": "Skriv ett meddelande…",
+  "chat_send": "Skicka",
+  "chat_greeting": "Hej! Fråga mig gärna om frakt, ingredienser eller våra produkter.",
+  "chat_unavailable": "Chatten är tillfälligt otillgänglig — använd vår kontaktsida."
 }

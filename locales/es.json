@@ -121,5 +121,22 @@
   "faq_q7": "¿Realizan envíos internacionales?",
   "faq_a7": "Sí, enviamos a todo el mundo. El costo de envío y el tiempo estimado de entrega se calculan al finalizar la compra según tu destino; el cliente es responsable de los aranceles o impuestos de importación.",
   "faq_a3": "Los productos sin abrir se pueden devolver dentro de los 30 días posteriores a la entrega para un reembolso completo. Los productos abiertos solo se pueden devolver si están dañados o defectuosos. Consulta nuestra página de <a href=\"/shipping.html\" class=\"text-gold-soft\">Envíos y Devoluciones</a> para más detalles.",
-  "category_all": "Todo"
+  "category_all": "Todo",
+  "return_page_title": "Solicitud de Devolución / Reembolso",
+  "return_intro": "¿Necesita devolver un artículo o solicitar un reembolso? Complete el siguiente formulario y nuestro equipo se pondrá en contacto por correo electrónico; consulte nuestra página de Envíos y Devoluciones para conocer los requisitos.",
+  "return_email_placeholder": "Su correo electrónico",
+  "return_order_ref_placeholder": "Número de pedido o correo usado en la compra",
+  "return_reason_label": "Motivo",
+  "return_reason_damaged": "Dañado o defectuoso",
+  "return_reason_changed_mind": "Cambié de opinión",
+  "return_reason_wrong_item": "Recibí el artículo incorrecto",
+  "return_reason_other": "Otro",
+  "return_details_placeholder": "Detalles adicionales (opcional)",
+  "return_submit": "Enviar Solicitud",
+  "return_thank_you": "Gracias: hemos recibido su solicitud y le responderemos por correo electrónico dentro de un día hábil.",
+  "chat_widget_title": "Chatea con nosotros",
+  "chat_placeholder": "Escribe un mensaje…",
+  "chat_send": "Enviar",
+  "chat_greeting": "¡Hola! Pregúntame sobre envíos, ingredientes o nuestros productos.",
+  "chat_unavailable": "El chat no está disponible temporalmente. Usa nuestra página de Contacto."
 }

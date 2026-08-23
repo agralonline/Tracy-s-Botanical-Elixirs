@@ -121,5 +121,22 @@
   "faq_q7": "Do you ship internationally?",
   "faq_a7": "Yes, we ship worldwide. Shipping cost and estimated delivery time are calculated at checkout based on your destination; the customer is responsible for any customs duties or import taxes.",
   "faq_a3": "Unopened products can be returned within 30 days of delivery for a full refund. Opened products can only be returned if damaged or defective. See our <a href=\"/shipping.html\" class=\"text-gold-soft\">Shipping &amp; Returns</a> page for full details.",
-  "category_all": "All"
+  "category_all": "All",
+  "return_page_title": "Return / Refund Request",
+  "return_intro": "Need to return an item or request a refund? Fill out the form below and our team will follow up by email — please see our Shipping & Returns page for eligibility.",
+  "return_email_placeholder": "Your email",
+  "return_order_ref_placeholder": "Order number or email used at checkout",
+  "return_reason_label": "Reason",
+  "return_reason_damaged": "Damaged or defective",
+  "return_reason_changed_mind": "Changed my mind",
+  "return_reason_wrong_item": "Received the wrong item",
+  "return_reason_other": "Other",
+  "return_details_placeholder": "Any additional details (optional)",
+  "return_submit": "Submit Request",
+  "return_thank_you": "Thank you — we've received your request and will follow up by email within one business day.",
+  "chat_widget_title": "Chat with us",
+  "chat_placeholder": "Type a message…",
+  "chat_send": "Send",
+  "chat_greeting": "Hi! Ask me about shipping, ingredients, or our products.",
+  "chat_unavailable": "Chat is temporarily unavailable — please use our Contact page."
 }

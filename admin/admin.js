@@ -20,7 +20,15 @@
 import { getFirebaseServices, isFirebaseConfigured } from "/assets/js/firebase-config.js";
 import { CATEGORIES as SEED_CATEGORIES } from "/data/seed-products.js";
 
-const state = { services: null, user: null, products: [], editingId: null, categories: [], editingCategoryId: null };
+const state = {
+  services: null, user: null,
+  products: [], editingId: null,
+  categories: [], editingCategoryId: null,
+  posts: [], editingPostId: null, postsLoaded: false,
+  orders: [], ordersLoaded: false,
+  requests: [], requestsLoaded: false,
+  settingsLoaded: false,
+};
 
 const $ = (id) => document.getElementById(id);
 
@@ -362,12 +370,345 @@ async function handleSaveCategory(e) {
   }
 }
 
+const TABS = ["products", "categories", "blog", "orders", "requests", "settings"];
+
 function switchTab(tab) {
-  const isProducts = tab === "products";
-  $("products-panel").classList.toggle("hidden", !isProducts);
-  $("categories-panel").classList.toggle("hidden", isProducts);
-  $("tab-products-btn").classList.toggle("admin-tab-active", isProducts);
-  $("tab-categories-btn").classList.toggle("admin-tab-active", !isProducts);
+  TABS.forEach((name) => {
+    $(`${name}-panel`).classList.toggle("hidden", name !== tab);
+    $(`tab-${name}-btn`).classList.toggle("admin-tab-active", name === tab);
+  });
+  if (tab === "blog" && !state.postsLoaded) loadPosts();
+  if (tab === "orders" && !state.ordersLoaded) loadOrders();
+  if (tab === "requests" && !state.requestsLoaded) loadRequests();
+  if (tab === "settings" && !state.settingsLoaded) loadSettings();
+}
+
+/* -----------------------------------------------------------------
+ * Blog / Journal posts — English-only, same policy as before, just
+ * now editable from here instead of hand-edited into blog.html.
+ * --------------------------------------------------------------- */
+
+async function loadPosts() {
+  const { db, firestoreMod } = state.services;
+  const { collection, getDocs, orderBy, query } = firestoreMod;
+  const tbody = $("post-table-body");
+  if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-ink-500">Loading…</td></tr>`;
+
+  try {
+    const snap = await getDocs(query(collection(db, "tracy_blogPosts"), orderBy("publishedAt", "desc")));
+    state.posts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    const { collection: col2, getDocs: getDocs2 } = firestoreMod;
+    const snap = await getDocs2(col2(db, "tracy_blogPosts"));
+    state.posts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  state.postsLoaded = true;
+  renderPostTable();
+}
+
+function formatDateShort(value) {
+  if (!value) return "";
+  const ms = typeof value.toMillis === "function" ? value.toMillis() : typeof value.seconds === "number" ? value.seconds * 1000 : new Date(value).getTime();
+  if (!ms || Number.isNaN(ms)) return "";
+  return new Date(ms).toLocaleDateString();
+}
+
+function renderPostTable() {
+  const tbody = $("post-table-body");
+  if (!tbody) return;
+  if (!state.posts.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-ink-500">No posts yet. Click "New Post" to write your first one.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = state.posts
+    .map((p) => `
+      <tr class="border-b border-white/5 hover:bg-white/[0.02]">
+        <td class="p-4 font-medium">${escapeHtml(p.title || "")}</td>
+        <td class="p-4 text-ink-500">${escapeHtml(p.category || "")}</td>
+        <td class="p-4 text-ink-500 capitalize">${escapeHtml(p.status || "draft")}</td>
+        <td class="p-4 text-ink-500">${formatDateShort(p.publishedAt)}</td>
+        <td class="p-4 text-right whitespace-nowrap">
+          <button class="btn-ghost text-xs mr-3" data-edit-post="${p.id}">Edit</button>
+          <button class="btn-ghost text-xs text-red-400" data-delete-post="${p.id}">Delete</button>
+        </td>
+      </tr>`)
+    .join("");
+
+  tbody.querySelectorAll("[data-edit-post]").forEach((btn) => {
+    btn.addEventListener("click", () => openPostForm(state.posts.find((p) => p.id === btn.getAttribute("data-edit-post"))));
+  });
+  tbody.querySelectorAll("[data-delete-post]").forEach((btn) => {
+    btn.addEventListener("click", () => deletePost(btn.getAttribute("data-delete-post")));
+  });
+}
+
+async function deletePost(id) {
+  if (!confirm("Delete this post? This cannot be undone.")) return;
+  const { db, firestoreMod } = state.services;
+  await firestoreMod.deleteDoc(firestoreMod.doc(db, "tracy_blogPosts", id));
+  showBanner("Post deleted.");
+  await loadPosts();
+}
+
+function openPostForm(post = null) {
+  state.editingPostId = post?.id || null;
+  $("post-modal-title").textContent = post ? "Edit Post" : "New Post";
+  $("post-status-msg").textContent = "";
+  $("pof-id").value = post?.id || "";
+  $("pof-title").value = post?.title || "";
+  $("pof-category").value = post?.category || "";
+  $("pof-body").value = post?.body || "";
+  $("pof-status").value = post?.status || "published";
+  $("post-modal-overlay").classList.remove("hidden");
+  $("post-modal-overlay").classList.add("flex");
+  const panel = $("post-modal-panel");
+  if (panel) panel.scrollTop = 0;
+}
+
+function postFormHasUnsavedInput() {
+  return ["pof-title", "pof-category", "pof-body"].some((id) => $(id) && $(id).value.trim());
+}
+
+function closePostForm({ skipConfirm = false } = {}) {
+  if (!skipConfirm && postFormHasUnsavedInput()) {
+    const ok = window.confirm("Discard this post? What you've typed hasn't been saved yet.");
+    if (!ok) return;
+  }
+  $("post-modal-overlay").classList.add("hidden");
+  $("post-modal-overlay").classList.remove("flex");
+}
+
+async function handleSavePost(e) {
+  e.preventDefault();
+  const btn = $("post-save-btn");
+  const statusEl = $("post-status-msg");
+  btn.disabled = true;
+  btn.style.opacity = ".6";
+  statusEl.textContent = "Saving…";
+
+  try {
+    const { db, firestoreMod } = state.services;
+    const editingId = $("pof-id").value || null;
+    const data = {
+      title: $("pof-title").value.trim(),
+      category: $("pof-category").value.trim(),
+      body: $("pof-body").value.trim(),
+      status: $("pof-status").value,
+      updatedAt: firestoreMod.serverTimestamp(),
+    };
+
+    if (editingId) {
+      await firestoreMod.updateDoc(firestoreMod.doc(db, "tracy_blogPosts", editingId), data);
+    } else {
+      data.publishedAt = firestoreMod.serverTimestamp();
+      data.createdAt = firestoreMod.serverTimestamp();
+      await firestoreMod.addDoc(firestoreMod.collection(db, "tracy_blogPosts"), data);
+    }
+
+    statusEl.textContent = "Saved.";
+    showBanner(`"${data.title}" saved.`);
+    await loadPosts();
+    setTimeout(() => closePostForm({ skipConfirm: true }), 500);
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "";
+    showBanner(err.message || "Saving the post failed.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.style.opacity = "";
+  }
+}
+
+/* -----------------------------------------------------------------
+ * Orders — read-only view of tracy_orders, written by the Stripe
+ * webhook. This doubles as the customer database (email + shipping
+ * address per order).
+ * --------------------------------------------------------------- */
+
+async function loadOrders() {
+  const { db, firestoreMod } = state.services;
+  const { collection, getDocs, orderBy, query } = firestoreMod;
+  const tbody = $("order-table-body");
+  if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-ink-500">Loading…</td></tr>`;
+
+  try {
+    const snap = await getDocs(query(collection(db, "tracy_orders"), orderBy("createdAt", "desc")));
+    state.orders = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    const { collection: col2, getDocs: getDocs2 } = firestoreMod;
+    const snap = await getDocs2(col2(db, "tracy_orders"));
+    state.orders = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  state.ordersLoaded = true;
+  renderOrderTable();
+}
+
+function formatMoney(cents, currency = "usd") {
+  if (typeof cents !== "number") return "";
+  try {
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
+  } catch (e) {
+    return `$${(cents / 100).toFixed(2)}`;
+  }
+}
+
+function renderOrderTable() {
+  const tbody = $("order-table-body");
+  if (!tbody) return;
+  if (!state.orders.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-ink-500">No orders yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = state.orders
+    .map((o) => {
+      const addr = o.shippingAddress;
+      const addrText = addr ? [addr.name, addr.line1, addr.city, addr.state, addr.postalCode, addr.country].filter(Boolean).join(", ") : "";
+      const itemsText = (o.lineItems || []).map((li) => `${li.quantity}× ${li.description}`).join(", ");
+      return `
+      <tr class="border-b border-white/5 hover:bg-white/[0.02]">
+        <td class="p-4 text-ink-500 whitespace-nowrap">${formatDateShort(o.createdAt)}</td>
+        <td class="p-4">${escapeHtml(o.customerEmail || "")}</td>
+        <td class="p-4 text-ink-500 max-w-xs">${escapeHtml(itemsText)}</td>
+        <td class="p-4">${formatMoney(o.amountTotal, o.currency)}</td>
+        <td class="p-4 text-ink-500 max-w-xs">${escapeHtml(addrText)}</td>
+        <td class="p-4 text-ink-500 capitalize">${escapeHtml(o.status || "paid")}</td>
+      </tr>`;
+    })
+    .join("");
+}
+
+/* -----------------------------------------------------------------
+ * Return / refund requests — submitted from the storefront's
+ * return-request.html form (tracy_refundRequests, client create-only).
+ * --------------------------------------------------------------- */
+
+async function loadRequests() {
+  const { db, firestoreMod } = state.services;
+  const { collection, getDocs, orderBy, query } = firestoreMod;
+  const tbody = $("request-table-body");
+  if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-ink-500">Loading…</td></tr>`;
+
+  try {
+    const snap = await getDocs(query(collection(db, "tracy_refundRequests"), orderBy("createdAt", "desc")));
+    state.requests = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    const { collection: col2, getDocs: getDocs2 } = firestoreMod;
+    const snap = await getDocs2(col2(db, "tracy_refundRequests"));
+    state.requests = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  state.requestsLoaded = true;
+  renderRequestTable();
+}
+
+function renderRequestTable() {
+  const tbody = $("request-table-body");
+  if (!tbody) return;
+  if (!state.requests.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-ink-500">No return/refund requests yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = state.requests
+    .map((r) => `
+      <tr class="border-b border-white/5 hover:bg-white/[0.02]">
+        <td class="p-4 text-ink-500 whitespace-nowrap">${formatDateShort(r.createdAt)}</td>
+        <td class="p-4">${escapeHtml(r.email || "")}</td>
+        <td class="p-4 text-ink-500">${escapeHtml(r.orderReference || "")}</td>
+        <td class="p-4 text-ink-500 max-w-xs">${escapeHtml(r.reason || "")}</td>
+        <td class="p-4 text-ink-500 capitalize">${escapeHtml(r.status || "new")}</td>
+        <td class="p-4 text-right whitespace-nowrap">
+          ${r.status !== "resolved" ? `<button class="btn-ghost text-xs mr-3" data-resolve-request="${r.id}">Mark Resolved</button>` : ""}
+          <button class="btn-ghost text-xs text-red-400" data-delete-request="${r.id}">Delete</button>
+        </td>
+      </tr>`)
+    .join("");
+
+  tbody.querySelectorAll("[data-resolve-request]").forEach((btn) => {
+    btn.addEventListener("click", () => resolveRequest(btn.getAttribute("data-resolve-request")));
+  });
+  tbody.querySelectorAll("[data-delete-request]").forEach((btn) => {
+    btn.addEventListener("click", () => deleteRequest(btn.getAttribute("data-delete-request")));
+  });
+}
+
+async function resolveRequest(id) {
+  const { db, firestoreMod } = state.services;
+  await firestoreMod.updateDoc(firestoreMod.doc(db, "tracy_refundRequests", id), { status: "resolved" });
+  await loadRequests();
+}
+
+async function deleteRequest(id) {
+  if (!confirm("Delete this request? This cannot be undone.")) return;
+  const { db, firestoreMod } = state.services;
+  await firestoreMod.deleteDoc(firestoreMod.doc(db, "tracy_refundRequests", id));
+  await loadRequests();
+}
+
+/* -----------------------------------------------------------------
+ * Settings — a single tracy_settings/site doc (announcement bar,
+ * social links, free-shipping threshold).
+ * --------------------------------------------------------------- */
+
+async function loadSettings() {
+  const { db, firestoreMod } = state.services;
+  const statusEl = $("settings-status");
+  if (statusEl) statusEl.textContent = "Loading…";
+
+  let data = {};
+  try {
+    const snap = await firestoreMod.getDoc(firestoreMod.doc(db, "tracy_settings", "site"));
+    if (snap.exists()) data = snap.data();
+  } catch (err) {
+    console.warn("Could not load settings:", err);
+  }
+
+  $("sf-announcement-enabled").checked = !!data.announcementEnabled;
+  $("sf-announcement-text").value = data.announcementText || "";
+  $("sf-free-shipping").value = typeof data.freeShippingThresholdCents === "number" ? (data.freeShippingThresholdCents / 100) : 75;
+  $("sf-social-instagram").value = data.social?.instagram || "";
+  $("sf-social-facebook").value = data.social?.facebook || "";
+  $("sf-social-tiktok").value = data.social?.tiktok || "";
+  $("sf-social-pinterest").value = data.social?.pinterest || "";
+
+  state.settingsLoaded = true;
+  if (statusEl) statusEl.textContent = "";
+}
+
+async function handleSaveSettings(e) {
+  e.preventDefault();
+  const btn = $("settings-save-btn");
+  const statusEl = $("settings-status");
+  btn.disabled = true;
+  btn.style.opacity = ".6";
+  statusEl.textContent = "Saving…";
+
+  try {
+    const { db, firestoreMod } = state.services;
+    const data = {
+      announcementEnabled: $("sf-announcement-enabled").checked,
+      announcementText: $("sf-announcement-text").value.trim(),
+      freeShippingThresholdCents: Math.round(Number($("sf-free-shipping").value || 75) * 100),
+      social: {
+        instagram: $("sf-social-instagram").value.trim(),
+        facebook: $("sf-social-facebook").value.trim(),
+        tiktok: $("sf-social-tiktok").value.trim(),
+        pinterest: $("sf-social-pinterest").value.trim(),
+      },
+      updatedAt: firestoreMod.serverTimestamp(),
+    };
+    await firestoreMod.setDoc(firestoreMod.doc(db, "tracy_settings", "site"), data, { merge: true });
+    statusEl.textContent = "Saved.";
+    showBanner("Settings saved.");
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "";
+    showBanner(err.message || "Saving settings failed.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.style.opacity = "";
+  }
 }
 
 async function deleteProduct(id) {
@@ -533,8 +874,9 @@ function wireStaticUI() {
     if (!$("pf-slug").value) $("pf-slug").value = slugify($("pf-title").value);
   });
 
-  $("tab-products-btn").addEventListener("click", () => switchTab("products"));
-  $("tab-categories-btn").addEventListener("click", () => switchTab("categories"));
+  TABS.forEach((name) => {
+    $(`tab-${name}-btn`).addEventListener("click", () => switchTab(name));
+  });
 
   $("new-category-btn").addEventListener("click", () => openCategoryForm(null));
   $("category-modal-close").addEventListener("click", () => closeCategoryForm());
@@ -542,6 +884,12 @@ function wireStaticUI() {
   $("cf-name").addEventListener("blur", () => {
     if (!$("cf-slug").value) $("cf-slug").value = slugify($("cf-name").value);
   });
+
+  $("new-post-btn").addEventListener("click", () => openPostForm(null));
+  $("post-modal-close").addEventListener("click", () => closePostForm());
+  $("post-form").addEventListener("submit", handleSavePost);
+
+  $("settings-form").addEventListener("submit", handleSaveSettings);
 }
 
 wireStaticUI();

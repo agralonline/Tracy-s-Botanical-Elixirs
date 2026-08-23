@@ -121,5 +121,22 @@
   "faq_q7": "海外発送は行っていますか？",
   "faq_a7": "はい、世界中に発送しております。送料と配送予定日は、配送先に応じて決済時に算出されます。関税や輸入税が発生する場合はお客様のご負担となります。",
   "faq_a3": "未開封の商品は、配達後30日以内であれば全額返金にて返品可能です。開封済みの商品は、破損または不良の場合のみ返品可能です。詳細は<a href=\"/shipping.html\" class=\"text-gold-soft\">配送と返品</a>ページをご覧ください。",
-  "category_all": "すべて"
+  "category_all": "すべて",
+  "return_page_title": "返品・返金リクエスト",
+  "return_intro": "商品の返品や返金をご希望ですか？以下のフォームにご記入いただければ、担当チームよりメールでご連絡いたします。条件については配送・返品ページをご覧ください。",
+  "return_email_placeholder": "メールアドレス",
+  "return_order_ref_placeholder": "注文番号またはご購入時のメールアドレス",
+  "return_reason_label": "理由",
+  "return_reason_damaged": "破損または不良",
+  "return_reason_changed_mind": "気が変わった",
+  "return_reason_wrong_item": "間違った商品が届いた",
+  "return_reason_other": "その他",
+  "return_details_placeholder": "補足情報（任意）",
+  "return_submit": "リクエストを送信",
+  "return_thank_you": "ありがとうございます。リクエストを受け付けました。1営業日以内にメールでご連絡いたします。",
+  "chat_widget_title": "チャットでお問い合わせ",
+  "chat_placeholder": "メッセージを入力…",
+  "chat_send": "送信",
+  "chat_greeting": "こんにちは！配送、成分、商品について何でもお尋ねください。",
+  "chat_unavailable": "チャットは一時的にご利用いただけません。お問い合わせページをご利用ください。"
 }

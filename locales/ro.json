@@ -121,5 +121,22 @@
   "faq_q7": "Livrați internațional?",
   "faq_a7": "Da, livrăm în întreaga lume. Costul de livrare și timpul estimat de livrare sunt calculate la finalizarea comenzii în funcție de destinație; clientul este responsabil pentru orice taxe vamale sau taxe de import.",
   "faq_a3": "Produsele nedesfăcute pot fi returnate în termen de 30 de zile de la livrare pentru o rambursare completă. Produsele desfăcute pot fi returnate doar dacă sunt deteriorate sau defecte. Vezi pagina noastră <a href=\"/shipping.html\" class=\"text-gold-soft\">Livrare și Retururi</a> pentru detalii complete.",
-  "category_all": "Toate"
+  "category_all": "Toate",
+  "return_page_title": "Cerere de Retur / Rambursare",
+  "return_intro": "Trebuie să returnați un articol sau să solicitați o rambursare? Completați formularul de mai jos, iar echipa noastră vă va contacta prin e-mail — consultați pagina Livrare și Retururi pentru condiții.",
+  "return_email_placeholder": "E-mailul dvs.",
+  "return_order_ref_placeholder": "Numărul comenzii sau e-mailul folosit la finalizare",
+  "return_reason_label": "Motiv",
+  "return_reason_damaged": "Deteriorat sau defect",
+  "return_reason_changed_mind": "M-am răzgândit",
+  "return_reason_wrong_item": "Am primit articolul greșit",
+  "return_reason_other": "Altul",
+  "return_details_placeholder": "Detalii suplimentare (opțional)",
+  "return_submit": "Trimite Cererea",
+  "return_thank_you": "Mulțumim — am primit cererea dvs. și vă vom răspunde prin e-mail într-o zi lucrătoare.",
+  "chat_widget_title": "Discută cu noi",
+  "chat_placeholder": "Scrieți un mesaj…",
+  "chat_send": "Trimite",
+  "chat_greeting": "Bună! Întrebați-mă despre livrare, ingrediente sau produsele noastre.",
+  "chat_unavailable": "Chatul este temporar indisponibil — vă rugăm să folosiți pagina de Contact."
 }

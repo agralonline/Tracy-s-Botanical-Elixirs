@@ -43,6 +43,73 @@ export async function handleStripeWebhook({ rawBody, signatureHeader }) {
   return { statusCode: 200, jsonBody: { received: true } };
 }
 
+function formatMoney(cents, currency) {
+  try {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: (currency || "usd").toUpperCase() }).format((cents || 0) / 100);
+  } catch (e) {
+    return `$${((cents || 0) / 100).toFixed(2)}`;
+  }
+}
+
+/**
+ * Sends a branded order confirmation email via Resend's HTTP API
+ * (https://resend.com — a simple email API, generous free tier, no SDK
+ * dependency needed since this is one plain fetch call).
+ *
+ * Requires two env vars to actually send:
+ *   RESEND_API_KEY     — from the Resend dashboard
+ *   ORDER_EMAIL_FROM   — a "From" address on a domain verified in Resend,
+ *                         e.g. "Tracy's Botanical Elixirs <orders@tracyusa.com>"
+ *
+ * Silently skipped (order still saves fine) if either is missing — order
+ * confirmation email is a nice-to-have on top of Stripe's own payment
+ * receipt, not something checkout should ever depend on.
+ */
+async function sendOrderConfirmationEmail(order) {
+  if (!process.env.RESEND_API_KEY || !process.env.ORDER_EMAIL_FROM) {
+    console.warn("Order confirmation email skipped: RESEND_API_KEY / ORDER_EMAIL_FROM not configured.");
+    return;
+  }
+  if (!order.customerEmail) return;
+
+  const itemsHtml = (order.lineItems || [])
+    .map((li) => `<tr><td style="padding:6px 0;">${li.quantity}× ${escapeHtmlEmail(li.description)}</td><td style="padding:6px 0;text-align:right;">${formatMoney(li.amountTotal, order.currency)}</td></tr>`)
+    .join("");
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;color:#1a1a1a;">
+      <h1 style="font-size:20px;">Thank you for your order!</h1>
+      <p style="color:#555;">Order confirmation — ${escapeHtmlEmail(order.id)}</p>
+      <table style="width:100%;border-collapse:collapse;margin:16px 0;">${itemsHtml}</table>
+      <p style="font-weight:bold;">Total: ${formatMoney(order.amountTotal, order.currency)}</p>
+      ${order.shippingAddress ? `<p style="color:#555;">Shipping to:<br/>${[order.shippingAddress.name, order.shippingAddress.line1, order.shippingAddress.line2, `${order.shippingAddress.city || ""} ${order.shippingAddress.state || ""} ${order.shippingAddress.postalCode || ""}`, order.shippingAddress.country].filter(Boolean).map(escapeHtmlEmail).join("<br/>")}</p>` : ""}
+      <p style="color:#999;font-size:12px;margin-top:24px;">Tracy's Botanical Elixirs</p>
+    </div>`;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.RESEND_API_KEY}` },
+      body: JSON.stringify({
+        from: process.env.ORDER_EMAIL_FROM,
+        to: order.customerEmail,
+        subject: "Your Tracy's Botanical Elixirs order is confirmed",
+        html,
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`Order confirmation email failed (${res.status}):`, body);
+    }
+  } catch (err) {
+    console.error("Order confirmation email failed:", err.message);
+  }
+}
+
+function escapeHtmlEmail(str = "") {
+  return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+}
+
 async function fulfillOrder(stripe, session) {
   const db = getAdminDb();
   const orderRef = db.collection("tracy_orders").doc(session.id);
@@ -82,6 +149,8 @@ async function fulfillOrder(stripe, session) {
   };
 
   await orderRef.set(order);
+
+  await sendOrderConfirmationEmail(order);
 
   // Best-effort inventory decrement, matched via the productIds we stashed
   // in session metadata at checkout-session creation time.
