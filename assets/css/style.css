@@ -502,6 +502,71 @@ select.input-glass {
   animation: fade-up 0.35s ease both;
 }
 
+/* ---------------------------------------------------------------------
+   Hero slider
+   --------------------------------------------------------------------- */
+.hero-slider {
+  position: relative;
+  width: 100%;
+  min-height: 560px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.hero-slide.active { opacity: 1; }
+.hero-slider-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, rgba(5,11,20,0.94) 0%, rgba(5,11,20,0.78) 32%, rgba(5,11,20,0.4) 62%, rgba(5,11,20,0.55) 100%);
+}
+[dir="rtl"] .hero-slider-scrim {
+  background: linear-gradient(270deg, rgba(5,11,20,0.94) 0%, rgba(5,11,20,0.78) 32%, rgba(5,11,20,0.4) 62%, rgba(5,11,20,0.55) 100%);
+}
+.hero-slider-content {
+  position: relative;
+  z-index: 2;
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
+}
+.hero-slider-dots {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 0.5rem;
+}
+.hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.35);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease, width 0.3s ease;
+}
+.hero-dot.active {
+  background: var(--gold);
+  width: 26px;
+}
+@media (max-width: 767px) {
+  .hero-slider { min-height: 480px; }
+  .hero-slider-scrim {
+    background: linear-gradient(180deg, rgba(5,11,20,0.5) 0%, rgba(5,11,20,0.85) 58%, rgba(5,11,20,0.96) 100%);
+  }
+}
+
 .cookie-consent-banner {
   position: fixed;
   left: 0;
