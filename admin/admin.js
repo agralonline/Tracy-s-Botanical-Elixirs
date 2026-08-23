@@ -19,7 +19,7 @@
 
 import { getFirebaseServices, isFirebaseConfigured } from "/assets/js/firebase-config.js";
 
-const state = { services: null, user: null, products: [], editingId: null };
+const state = { services: null, user: null, products: [], editingId: null, categories: [], editingCategoryId: null };
 
 const $ = (id) => document.getElementById(id);
 
@@ -56,6 +56,7 @@ async function init() {
       $("admin-user-chip").classList.remove("hidden");
       $("admin-user-chip").classList.add("flex");
       $("admin-user-email").textContent = user.email;
+      await loadCategories();
       await loadProducts();
     } else {
       $("login-view").classList.remove("hidden");
@@ -156,6 +157,183 @@ function renderProductTable() {
 
 function escapeHtml(str = "") {
   return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}
+
+/* -----------------------------------------------------------------
+ * Categories
+ * Unlike products, categories are NOT auto-translated — they store a
+ * plain English name/description (same policy as Journal posts) and
+ * are written straight to Firestore from this admin panel with the
+ * client SDK, since there's no translation step that needs the
+ * trusted serverless function.
+ * --------------------------------------------------------------- */
+
+async function loadCategories() {
+  const { db, firestoreMod } = state.services;
+  const { collection, getDocs, orderBy, query } = firestoreMod;
+  const tbody = $("category-table-body");
+  if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-ink-500">Loading…</td></tr>`;
+
+  try {
+    const snap = await getDocs(query(collection(db, "tracy_categories"), orderBy("createdAt", "asc")));
+    state.categories = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    const { collection: col2, getDocs: getDocs2 } = firestoreMod;
+    const snap = await getDocs2(col2(db, "tracy_categories"));
+    state.categories = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
+  renderCategoryTable();
+  populateCategorySelect();
+}
+
+function renderCategoryTable() {
+  const tbody = $("category-table-body");
+  if (!tbody) return;
+  if (!state.categories.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-ink-500">No categories yet. Click "New Category" to add your first one.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = state.categories
+    .map((c) => `
+      <tr class="border-b border-white/5 hover:bg-white/[0.02]">
+        <td class="p-4">
+          <div class="w-12 h-12 rounded-md overflow-hidden flex-shrink-0" style="background:var(--navy-850)">
+            ${c.image ? `<img src="${escapeHtml(c.image)}" class="w-full h-full object-cover" alt="" />` : ""}
+          </div>
+        </td>
+        <td class="p-4 font-medium">${escapeHtml(c.name || "")}</td>
+        <td class="p-4 text-ink-500">${escapeHtml(c.slug || "")}</td>
+        <td class="p-4 text-ink-500 max-w-xs truncate">${escapeHtml(c.description || "")}</td>
+        <td class="p-4 text-right whitespace-nowrap">
+          <button class="btn-ghost text-xs mr-3" data-edit-category="${c.id}">Edit</button>
+          <button class="btn-ghost text-xs text-red-400" data-delete-category="${c.id}">Delete</button>
+        </td>
+      </tr>`)
+    .join("");
+
+  tbody.querySelectorAll("[data-edit-category]").forEach((btn) => {
+    btn.addEventListener("click", () => openCategoryForm(state.categories.find((c) => c.id === btn.getAttribute("data-edit-category"))));
+  });
+  tbody.querySelectorAll("[data-delete-category]").forEach((btn) => {
+    btn.addEventListener("click", () => deleteCategory(btn.getAttribute("data-delete-category")));
+  });
+}
+
+/** Keep the product form's Category dropdown in sync with the live category list. */
+function populateCategorySelect() {
+  const select = $("pf-category");
+  if (!select) return;
+  const previousValue = select.value;
+  select.innerHTML = state.categories.map((c) => `<option value="${escapeHtml(c.slug)}">${escapeHtml(c.name || c.slug)}</option>`).join("");
+  if (state.categories.some((c) => c.slug === previousValue)) select.value = previousValue;
+}
+
+async function deleteCategory(id) {
+  if (!confirm("Delete this category? Products already assigned to it will keep their category value, but it will no longer appear as a filter or tile until reassigned.")) return;
+  const { db, firestoreMod } = state.services;
+  await firestoreMod.deleteDoc(firestoreMod.doc(db, "tracy_categories", id));
+  showBanner("Category deleted.");
+  await loadCategories();
+}
+
+function openCategoryForm(category = null) {
+  state.editingCategoryId = category?.id || null;
+  $("category-modal-title").textContent = category ? "Edit Category" : "New Category";
+  $("category-status").textContent = "";
+
+  $("cf-id").value = category?.id || "";
+  $("cf-name").value = category?.name || "";
+  $("cf-slug").value = category?.slug || "";
+  $("cf-description").value = category?.description || "";
+  $("cf-image-url").value = category?.image || "";
+  $("cf-image-file").value = "";
+
+  $("category-modal-overlay").classList.remove("hidden");
+  $("category-modal-overlay").classList.add("flex");
+  const panel = $("category-modal-panel");
+  if (panel) panel.scrollTop = 0;
+}
+
+function categoryFormHasUnsavedInput() {
+  const textFields = ["cf-name", "cf-slug", "cf-description", "cf-image-url"];
+  if (textFields.some((id) => $(id) && $(id).value.trim())) return true;
+  if ($("cf-image-file")?.files?.length) return true;
+  return false;
+}
+
+function closeCategoryForm({ skipConfirm = false } = {}) {
+  if (!skipConfirm && categoryFormHasUnsavedInput()) {
+    const ok = window.confirm("Discard this category? What you've typed hasn't been saved yet.");
+    if (!ok) return;
+  }
+  $("category-modal-overlay").classList.add("hidden");
+  $("category-modal-overlay").classList.remove("flex");
+}
+
+async function uploadCategoryImageIfNeeded() {
+  const file = $("cf-image-file").files?.[0];
+  const manualUrl = $("cf-image-url").value.trim();
+  if (!file) return manualUrl || null;
+
+  const { storage, storageMod } = state.services;
+  const path = `category-images/${Date.now()}-${file.name}`;
+  const storageRef = storageMod.ref(storage, path);
+  await storageMod.uploadBytes(storageRef, file);
+  return storageMod.getDownloadURL(storageRef);
+}
+
+async function handleSaveCategory(e) {
+  e.preventDefault();
+  const btn = $("category-save-btn");
+  const statusEl = $("category-status");
+  btn.disabled = true;
+  btn.style.opacity = ".6";
+  statusEl.textContent = "Uploading image…";
+
+  try {
+    const imageUrl = await uploadCategoryImageIfNeeded();
+    const { db, firestoreMod } = state.services;
+    const editingId = $("cf-id").value || null;
+
+    const data = {
+      name: $("cf-name").value.trim(),
+      slug: $("cf-slug").value.trim() || slugify($("cf-name").value),
+      description: $("cf-description").value.trim(),
+      image: imageUrl || "",
+      updatedAt: firestoreMod.serverTimestamp(),
+    };
+
+    statusEl.textContent = "Saving…";
+
+    if (editingId) {
+      await firestoreMod.updateDoc(firestoreMod.doc(db, "tracy_categories", editingId), data);
+    } else {
+      data.createdAt = firestoreMod.serverTimestamp();
+      await firestoreMod.addDoc(firestoreMod.collection(db, "tracy_categories"), data);
+    }
+
+    statusEl.textContent = "Saved.";
+    showBanner(`"${data.name}" category saved.`);
+    await loadCategories();
+    setTimeout(() => closeCategoryForm({ skipConfirm: true }), 500);
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "";
+    showBanner(err.message || "Saving the category failed.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.style.opacity = "";
+  }
+}
+
+function switchTab(tab) {
+  const isProducts = tab === "products";
+  $("products-panel").classList.toggle("hidden", !isProducts);
+  $("categories-panel").classList.toggle("hidden", isProducts);
+  $("tab-products-btn").classList.toggle("admin-tab-active", isProducts);
+  $("tab-categories-btn").classList.toggle("admin-tab-active", !isProducts);
 }
 
 async function deleteProduct(id) {
@@ -319,6 +497,16 @@ function wireStaticUI() {
   $("product-form").addEventListener("submit", handleTranslateAndSave);
   $("pf-title").addEventListener("blur", () => {
     if (!$("pf-slug").value) $("pf-slug").value = slugify($("pf-title").value);
+  });
+
+  $("tab-products-btn").addEventListener("click", () => switchTab("products"));
+  $("tab-categories-btn").addEventListener("click", () => switchTab("categories"));
+
+  $("new-category-btn").addEventListener("click", () => openCategoryForm(null));
+  $("category-modal-close").addEventListener("click", () => closeCategoryForm());
+  $("category-form").addEventListener("submit", handleSaveCategory);
+  $("cf-name").addEventListener("blur", () => {
+    if (!$("cf-slug").value) $("cf-slug").value = slugify($("cf-name").value);
   });
 }
 

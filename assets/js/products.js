@@ -17,10 +17,11 @@
  * DOM instantly with no page reload and no network refetch.
  */
 
-import { SEED_PRODUCTS, CATEGORIES } from "/data/seed-products.js";
+import { SEED_PRODUCTS } from "/data/seed-products.js";
 import { getProductText, t } from "/assets/js/i18n.js";
 import { getFirebaseServices } from "/assets/js/firebase-config.js";
 import { getCartQuantityFor } from "/assets/js/cart.js";
+import { fetchCategories, getCategoryLabel } from "/assets/js/categories.js";
 
 let productCache = null; // Array<Product> | null until first fetch resolves
 
@@ -55,10 +56,6 @@ export async function fetchProducts({ forceRefresh = false } = {}) {
 
   productCache = SEED_PRODUCTS;
   return productCache;
-}
-
-export function getCategories() {
-  return CATEGORIES;
 }
 
 export async function getProductBySlug(slug) {
@@ -125,7 +122,7 @@ export function productCardHTML(product) {
         </div>
       </a>
       <div class="p-5 flex flex-col gap-2">
-        <p class="eyebrow">${escapeHtml(t(categoryLabelKey(product.category)))}</p>
+        <p class="eyebrow">${escapeHtml(getCategoryLabel(product.category))}</p>
         <a href="/product.html?slug=${encodeURIComponent(product.slug)}" class="heading-serif text-lg leading-snug hover:text-gold-soft transition-colors">${escapeHtml(title)}</a>
         <p class="text-sm text-ink-300 line-clamp-2">${escapeHtml(short)}</p>
         <div class="flex items-center justify-between mt-2">
@@ -149,16 +146,6 @@ export function productCardHTML(product) {
   `;
 }
 
-function categoryLabelKey(categorySlug) {
-  const map = {
-    "essential-oils": "category_essential_oils",
-    serums: "category_serums",
-    skincare: "category_skincare",
-    "hair-care": "category_hair_care",
-  };
-  return map[categorySlug] || "category_essential_oils";
-}
-
 function escapeHtml(str = "") {
   return String(str)
     .replaceAll("&", "&amp;")
@@ -177,7 +164,7 @@ export async function renderProductGrid(containerEl, { category = null, featured
   if (!containerEl) return;
   containerEl.innerHTML = skeletonGridHTML(8);
 
-  const products = await fetchProducts();
+  const [products] = await Promise.all([fetchProducts(), fetchCategories()]);
   let filtered = products;
 
   if (category) filtered = filtered.filter((p) => p.category === category);
@@ -235,7 +222,7 @@ function wireAddToCartButtons(root) {
 /** Render the full product detail view into `containerEl` (used by product.html). */
 export async function renderProductDetail(containerEl, slug) {
   if (!containerEl) return;
-  const product = await getProductBySlug(slug);
+  const [product] = await Promise.all([getProductBySlug(slug), fetchCategories()]);
   if (!product) {
     containerEl.innerHTML = `<p class="text-center text-ink-500 py-24" data-i18n="search_no_results">${t("search_no_results")}</p>`;
     return;
@@ -255,7 +242,7 @@ export async function renderProductDetail(containerEl, slug) {
         </div>
       </div>
       <div class="flex flex-col gap-5">
-        <p class="eyebrow">${escapeHtml(t(categoryLabelKey(product.category)))}</p>
+        <p class="eyebrow">${escapeHtml(getCategoryLabel(product.category))}</p>
         <h1 class="heading-serif text-4xl gold-gradient-text">${escapeHtml(title)}</h1>
         ${product.rating ? `<p class="text-sm text-ink-500">★ ${product.rating.average.toFixed(1)} · <span data-i18n-count>${t("rating_reviews", { count: product.rating.count })}</span></p>` : ""}
         <div class="flex items-baseline gap-3">
@@ -276,7 +263,7 @@ export async function renderProductDetail(containerEl, slug) {
         <div class="flex flex-wrap gap-2">
           ${product.attributes?.organic ? `<span class="chip-gold chip">${escapeHtml(t("why_organic_title"))}</span>` : ""}
           ${product.attributes?.crueltyFree ? `<span class="chip">${escapeHtml(t("why_cruelty_title"))}</span>` : ""}
-          ${product.attributes?.vegan ? `<span class="chip">Vegan</span>` : ""}
+          ${product.attributes?.vegan ? `<span class="chip">${escapeHtml(t("product_vegan_label"))}</span>` : ""}
         </div>
         <button
           type="button"

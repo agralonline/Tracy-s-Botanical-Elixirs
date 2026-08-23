@@ -35,7 +35,7 @@
       <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
     </nav>
     <div class="flex items-center gap-3 md:gap-4">
-      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs hidden sm:block" aria-label="Language"></select>
+      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs" aria-label="Language"></select>
       <button id="cart-toggle-btn" type="button" class="relative btn-ghost p-2" aria-label="Cart">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="10" cy="21" r="1.4" fill="currentColor"/><circle cx="18" cy="21" r="1.4" fill="currentColor"/></svg>
         <span id="cart-count-badge" class="badge-cart-count" style="display:none;">0</span>
@@ -52,7 +52,6 @@
     <a href="/blog.html" class="nav-link" data-i18n="nav_blog">Journal</a>
     <a href="/faq.html" class="nav-link" data-i18n="nav_faq">FAQ</a>
     <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
-    <select id="languageSelectorMobile" class="input-glass !py-2 !px-3 text-xs mt-2" aria-label="Language"></select>
   </nav>
 </header>
 
@@ -61,32 +60,32 @@
 
   <div class="space-y-3" id="faq-list">
     <details class="glass rounded-xl p-5" open>
-      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">How long does shipping take?</summary>
-      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Orders ship from our US fulfillment center within 1–2 business days. Domestic orders typically arrive within 3–7 business days; international delivery times vary by destination and are shown at checkout.</p>
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft" data-i18n="faq_q1">How long does shipping take?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed" data-i18n="faq_a1">Orders ship from our US fulfillment center within 1–2 business days. Domestic orders typically arrive within 3–7 business days; international delivery times vary by destination and are shown at checkout.</p>
     </details>
     <details class="glass rounded-xl p-5">
-      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">Are your ingredients organic and cruelty-free?</summary>
-      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Yes. Every product is formulated with certified organic botanical extracts, is never tested on animals, and is free of synthetic fillers. Look for the Organic, Vegan, and Cruelty-Free badges on each product page.</p>
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft" data-i18n="faq_q2">Are your ingredients organic and cruelty-free?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed" data-i18n="faq_a2">Yes. Every product is formulated with certified organic botanical extracts, is never tested on animals, and is free of synthetic fillers. Look for the Organic, Vegan, and Cruelty-Free badges on each product page.</p>
     </details>
     <details class="glass rounded-xl p-5">
-      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">What is your return policy?</summary>
-      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Unopened products can be returned within 30 days of delivery for a full refund. Opened products can only be returned if damaged or defective. See our <a href="/shipping.html" class="text-gold-soft">Shipping &amp; Returns</a> page for full details.</p>
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft" data-i18n="faq_q3">What is your return policy?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed" data-i18n-html="faq_a3">Unopened products can be returned within 30 days of delivery for a full refund. Opened products can only be returned if damaged or defective. See our <a href="/shipping.html" class="text-gold-soft">Shipping &amp; Returns</a> page for full details.</p>
     </details>
     <details class="glass rounded-xl p-5">
-      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">Do I need an account to place an order?</summary>
-      <p class="text-ink-300 text-sm mt-3 leading-relaxed">No account or login is required. Checkout is handled securely by Stripe as a guest — just your email and shipping address.</p>
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft" data-i18n="faq_q4">Do I need an account to place an order?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed" data-i18n="faq_a4">No account or login is required. Checkout is handled securely by Stripe as a guest — just your email and shipping address.</p>
     </details>
     <details class="glass rounded-xl p-5">
-      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">Is my payment information secure?</summary>
-      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Yes. All payments are processed directly by Stripe, a PCI-compliant payment processor. We never see or store your card details.</p>
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft" data-i18n="faq_q5">Is my payment information secure?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed" data-i18n="faq_a5">Yes. All payments are processed directly by Stripe, a PCI-compliant payment processor. We never see or store your card details.</p>
     </details>
     <details class="glass rounded-xl p-5">
-      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">Can I use essential oils if I'm pregnant or have a medical condition?</summary>
-      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Please consult a physician before use if you are pregnant, nursing, or managing a medical condition. Always perform a patch test before first use.</p>
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft" data-i18n="faq_q6">Can I use essential oils if I'm pregnant or have a medical condition?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed" data-i18n="faq_a6">Please consult a physician before use if you are pregnant, nursing, or managing a medical condition. Always perform a patch test before first use.</p>
     </details>
     <details class="glass rounded-xl p-5">
-      <summary class="heading-serif text-lg cursor-pointer text-gold-soft">Do you ship internationally?</summary>
-      <p class="text-ink-300 text-sm mt-3 leading-relaxed">Yes, we ship worldwide. Shipping cost and estimated delivery time are calculated at checkout based on your destination; the customer is responsible for any customs duties or import taxes.</p>
+      <summary class="heading-serif text-lg cursor-pointer text-gold-soft" data-i18n="faq_q7">Do you ship internationally?</summary>
+      <p class="text-ink-300 text-sm mt-3 leading-relaxed" data-i18n="faq_a7">Yes, we ship worldwide. Shipping cost and estimated delivery time are calculated at checkout based on your destination; the customer is responsible for any customs duties or import taxes.</p>
     </details>
   </div>
 </section>
@@ -100,7 +99,7 @@
     <span class="payment-badge">Apple Pay</span>
     <span class="payment-badge">Stripe</span>
   </div>
-  <p class="text-center text-ink-700 text-xs mt-2">Created and designed by <span class="text-gold-soft">AgralOnline</span></p>
+  <p class="text-center text-ink-700 text-xs mt-2"><a href="mailto:agralonline@gmail.com" class="hover:text-gold-soft transition-colors"><span data-i18n="footer_credit">Created and designed by</span> <span class="text-gold-soft">AgralOnline</span></a></p>
 </footer>
 
 <script type="module">

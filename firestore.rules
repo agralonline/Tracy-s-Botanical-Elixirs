@@ -30,6 +30,16 @@ service cloud.firestore {
     }
 
     // ---------------------------------------------------------------
+    // tracy_categories — public read (storefront), admin-only write.
+    // Categories an admin creates hold a plain English name/description
+    // (no per-language translation — same policy as tracy_blogPosts).
+    // ---------------------------------------------------------------
+    match /tracy_categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------
     // tracy_blogPosts — public read of published posts, admin-only write.
     // English-only by product policy (see /firestore-schema.md).
     // ---------------------------------------------------------------

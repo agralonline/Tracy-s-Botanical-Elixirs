@@ -54,7 +54,7 @@
     </nav>
 
     <div class="flex items-center gap-3 md:gap-4">
-      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs hidden sm:block" aria-label="Language"></select>
+      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs" aria-label="Language"></select>
 
       <button id="cart-toggle-btn" type="button" class="relative btn-ghost p-2" aria-label="Cart">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="10" cy="21" r="1.4" fill="currentColor"/><circle cx="18" cy="21" r="1.4" fill="currentColor"/></svg>
@@ -74,7 +74,6 @@
     <a href="/blog.html" class="nav-link" data-i18n="nav_blog">Journal</a>
     <a href="/faq.html" class="nav-link" data-i18n="nav_faq">FAQ</a>
     <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
-    <select id="languageSelectorMobile" class="input-glass !py-2 !px-3 text-xs mt-2" aria-label="Language"></select>
   </nav>
 </header>
 
@@ -125,24 +124,7 @@
 <!-- ================= CATEGORIES ================= -->
 <section class="max-w-7xl mx-auto px-5 md:px-8 pb-20">
   <h2 class="text-center eyebrow mb-10" data-i18n="section_categories">Shop by Category</h2>
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-    <a href="/shop.html?category=essential-oils" class="glass p-3 flex flex-col items-center gap-3 text-center overflow-hidden">
-      <div class="category-tile-media"><img src="/assets/img/products/product-1-lavender.jpg" alt="" /></div>
-      <span class="heading-serif pb-2" data-i18n="category_essential_oils">Essential Oils</span>
-    </a>
-    <a href="/shop.html?category=serums" class="glass p-3 flex flex-col items-center gap-3 text-center overflow-hidden">
-      <div class="category-tile-media"><img src="/assets/img/products/product-2-serum.jpg" alt="" /></div>
-      <span class="heading-serif pb-2" data-i18n="category_serums">Serums</span>
-    </a>
-    <a href="/shop.html?category=skincare" class="glass p-3 flex flex-col items-center gap-3 text-center overflow-hidden">
-      <div class="category-tile-media"><img src="/assets/img/products/product-3-cream-jar.jpg" alt="" /></div>
-      <span class="heading-serif pb-2" data-i18n="category_skincare">Skincare</span>
-    </a>
-    <a href="/shop.html?category=hair-care" class="glass p-3 flex flex-col items-center gap-3 text-center overflow-hidden">
-      <div class="category-tile-media"><img src="/assets/img/products/product-4-hair-oil-set.jpg" alt="" /></div>
-      <span class="heading-serif pb-2" data-i18n="category_hair_care">Hair Care</span>
-    </a>
-  </div>
+  <div id="category-tiles" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
 </section>
 
 <!-- ================= BESTSELLERS ================= -->
@@ -172,7 +154,7 @@
   <div class="max-w-7xl mx-auto px-5 md:px-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm">
     <div>
       <span class="heading-serif text-xl gold-gradient-text">Tracy's Botanical Elixirs</span>
-      <p class="text-ink-500 mt-3 text-xs leading-relaxed">Luxury essential oils and organic skincare, small-batch crafted and shipped worldwide from the United States.</p>
+      <p class="text-ink-500 mt-3 text-xs leading-relaxed" data-i18n="footer_tagline">Luxury essential oils and organic skincare, small-batch crafted and shipped worldwide from the United States.</p>
     </div>
     <div class="flex flex-col gap-2">
       <a href="/shop.html" class="nav-link" data-i18n="nav_shop">Shop</a>
@@ -199,7 +181,7 @@
     <span class="payment-badge">Stripe</span>
   </div>
   <p class="text-center text-ink-700 text-xs mt-6">&copy; <span data-current-year>2026</span> Tracy's Botanical Elixirs. <span data-i18n="footer_rights">All rights reserved.</span></p>
-  <p class="text-center text-ink-700 text-xs mt-2">Created and designed by <span class="text-gold-soft">AgralOnline</span></p>
+  <p class="text-center text-ink-700 text-xs mt-2"><a href="mailto:agralonline@gmail.com" class="hover:text-gold-soft transition-colors"><span data-i18n="footer_credit">Created and designed by</span> <span class="text-gold-soft">AgralOnline</span></a></p>
 </footer>
 
 <!-- ================= CART DRAWER ================= -->
@@ -218,25 +200,30 @@
 <script type="module">
   import { bootstrapPage } from "/assets/js/main.js";
   import { renderProductGrid } from "/assets/js/products.js";
-  import { onLocaleChange, initLanguageSelector } from "/assets/js/i18n.js";
+  import { onLocaleChange } from "/assets/js/i18n.js";
   import { initHeroSlider } from "/assets/js/hero-slider.js";
+  import { fetchCategories, getCategoryLabel, getCategoryImage } from "/assets/js/categories.js";
 
   await bootstrapPage();
   initHeroSlider(document.getElementById("hero-slider"));
 
-  // Mirror the language selector into the mobile nav + footer copies.
-  ["languageSelectorMobile", "languageSelectorFooter"].forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) initLanguageSelector(el);
-  });
-  document.getElementById("languageSelectorMobile")?.addEventListener("change", (e) => {
-    document.getElementById("languageSelector").value = e.target.value;
-    document.getElementById("languageSelector").dispatchEvent(new Event("change"));
-  });
-  document.getElementById("languageSelectorFooter")?.addEventListener("change", (e) => {
-    document.getElementById("languageSelector").value = e.target.value;
-    document.getElementById("languageSelector").dispatchEvent(new Event("change"));
-  });
+  function escapeHtml(str = "") {
+    return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  }
+
+  async function renderCategoryTiles() {
+    const tilesEl = document.getElementById("category-tiles");
+    if (!tilesEl) return;
+    const categories = await fetchCategories();
+    tilesEl.innerHTML = categories.map((cat) => `
+      <a href="/shop.html?category=${encodeURIComponent(cat.slug)}" class="glass p-3 flex flex-col items-center gap-3 text-center overflow-hidden">
+        <div class="category-tile-media"><img src="${getCategoryImage(cat)}" alt="${escapeHtml(getCategoryLabel(cat))}" /></div>
+        <span class="heading-serif pb-2">${escapeHtml(getCategoryLabel(cat))}</span>
+      </a>
+    `).join("");
+  }
+  await renderCategoryTiles();
+  onLocaleChange(renderCategoryTiles);
 
   const grid = document.getElementById("product-grid");
   await renderProductGrid(grid, { featuredOnly: true });

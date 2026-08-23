@@ -37,10 +37,25 @@ function wireMobileNav() {
   const toggle = document.getElementById("mobile-nav-toggle");
   const nav = document.getElementById("mobile-nav");
   if (!toggle || !nav) return;
-  toggle.addEventListener("click", () => {
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
     nav.classList.toggle("hidden");
   });
   nav.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => nav.classList.add("hidden")));
+
+  // Tap/click anywhere outside the open menu (the backdrop) closes it.
+  document.addEventListener("click", (e) => {
+    if (nav.classList.contains("hidden")) return;
+    if (nav.contains(e.target) || toggle.contains(e.target)) return;
+    nav.classList.add("hidden");
+  });
+
+  // Escape key also closes it.
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !nav.classList.contains("hidden")) {
+      nav.classList.add("hidden");
+    }
+  });
 }
 
 function wireNewsletterForm() {

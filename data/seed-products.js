@@ -232,11 +232,41 @@ export const SEED_PRODUCTS = [
   },
 ];
 
+// NOTE: `labelKey` is only present on these 4 built-in categories, which ship
+// with full 24-language i18n translations (see /locales/*.json). Categories an
+// admin creates later through the admin panel do NOT get a labelKey — they
+// store a plain English `name`/`description` instead (the same English-only
+// policy used for blog posts), and the storefront displays that name directly
+// rather than routing it through the translation system. See categories.js.
 export const CATEGORIES = [
-  { slug: "essential-oils", labelKey: "category_essential_oils" },
-  { slug: "serums", labelKey: "category_serums" },
-  { slug: "skincare", labelKey: "category_skincare" },
-  { slug: "hair-care", labelKey: "category_hair_care" },
+  {
+    slug: "essential-oils",
+    labelKey: "category_essential_oils",
+    name: "Essential Oils",
+    description: "Pure, steam-distilled essential oils for calm, focus, and everyday ritual.",
+    image: "/assets/img/categories/category-essential-oils.jpg",
+  },
+  {
+    slug: "serums",
+    labelKey: "category_serums",
+    name: "Serums",
+    description: "Lightweight, fast-absorbing serums for brighter, firmer, more even-toned skin.",
+    image: "/assets/img/categories/category-serums.jpg",
+  },
+  {
+    slug: "skincare",
+    labelKey: "category_skincare",
+    name: "Skincare",
+    description: "Rich botanical creams and balms for deep, lasting nourishment.",
+    image: "/assets/img/categories/category-skincare.jpg",
+  },
+  {
+    slug: "hair-care",
+    labelKey: "category_hair_care",
+    name: "Hair Care",
+    description: "Strengthening oils and treatments for shine, resilience, and repair.",
+    image: "/assets/img/categories/category-hair-care.jpg",
+  },
 ];
 
 // Convenience for non-module consumers (e.g. a classic <script> fallback).

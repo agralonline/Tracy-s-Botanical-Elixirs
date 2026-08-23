@@ -158,6 +158,8 @@ export async function setLocale(code) {
 
   const selector = document.getElementById("languageSelector");
   if (selector && selector.value !== code) selector.value = code;
+  const footerSelector = document.getElementById("languageSelectorFooter");
+  if (footerSelector && footerSelector.value !== code) footerSelector.value = code;
 
   for (const cb of changeListeners) {
     try {
@@ -201,6 +203,8 @@ export async function initI18n() {
   await setLocale(initial);
   const selector = document.getElementById("languageSelector");
   if (selector) initLanguageSelector(selector);
+  const footerSelector = document.getElementById("languageSelectorFooter");
+  if (footerSelector) initLanguageSelector(footerSelector);
   document.querySelectorAll("[data-current-year]").forEach((el) => {
     el.textContent = new Date().getFullYear();
   });

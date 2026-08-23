@@ -38,7 +38,7 @@
     </nav>
 
     <div class="flex items-center gap-3 md:gap-4">
-      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs hidden sm:block" aria-label="Language"></select>
+      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs" aria-label="Language"></select>
 
       <button id="cart-toggle-btn" type="button" class="relative btn-ghost p-2" aria-label="Cart">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="10" cy="21" r="1.4" fill="currentColor"/><circle cx="18" cy="21" r="1.4" fill="currentColor"/></svg>
@@ -58,7 +58,6 @@
     <a href="/blog.html" class="nav-link" data-i18n="nav_blog">Journal</a>
     <a href="/faq.html" class="nav-link" data-i18n="nav_faq">FAQ</a>
     <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
-    <select id="languageSelectorMobile" class="input-glass !py-2 !px-3 text-xs mt-2" aria-label="Language"></select>
   </nav>
 </header>
 
@@ -86,7 +85,7 @@
       <label class="text-xs eyebrow" data-i18n="checkout_email">Email</label>
       <input type="email" id="checkout-email" required class="input-glass" placeholder="you@example.com" />
       <p class="text-xs text-ink-500 -mt-2" data-i18n="checkout_shipping_address">Shipping Address</p>
-      <p class="text-xs text-ink-700 -mt-3">— collected securely on the next step —</p>
+      <p class="text-xs text-ink-700 -mt-3" data-i18n="cart_secure_note">— collected securely on the next step —</p>
       <button type="submit" id="checkout-submit-btn" class="btn-gold w-full mt-2" data-i18n="checkout_pay_now">Pay Securely</button>
       <p id="checkout-error" class="hidden text-xs text-red-400"></p>
     </form>
@@ -104,7 +103,7 @@
     <span class="payment-badge">Apple Pay</span>
     <span class="payment-badge">Stripe</span>
   </div>
-  <p class="text-center text-ink-700 text-xs mt-2">Created and designed by <span class="text-gold-soft">AgralOnline</span></p>
+  <p class="text-center text-ink-700 text-xs mt-2"><a href="mailto:agralonline@gmail.com" class="hover:text-gold-soft transition-colors"><span data-i18n="footer_credit">Created and designed by</span> <span class="text-gold-soft">AgralOnline</span></a></p>
 </footer>
 
 <script type="module">

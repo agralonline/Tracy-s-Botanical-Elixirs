@@ -376,6 +376,30 @@ select.input-glass {
 .nav-link:hover { color: var(--gold-soft); }
 .nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
 
+/* Admin panel tab buttons (Products / Categories). */
+.admin-tab-btn {
+  color: var(--ink-500);
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+.admin-tab-btn:hover { color: var(--ink-100); }
+.admin-tab-btn.admin-tab-active {
+  color: var(--gold-soft);
+  border-bottom-color: var(--gold);
+}
+
+/* Always-visible compact language switcher in the header (mobile + desktop). */
+#languageSelector {
+  width: auto;
+  max-width: 92px;
+  padding-right: 1.8rem !important;
+  flex-shrink: 0;
+}
+@media (min-width: 640px) {
+  #languageSelector { max-width: 150px; }
+}
+
 /* ---------------------------------------------------------------------
    Badges / chips
    --------------------------------------------------------------------- */
