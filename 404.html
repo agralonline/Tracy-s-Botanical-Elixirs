@@ -26,9 +26,42 @@
 
 <header class="site-header sticky top-0 z-40">
   <div class="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between gap-4">
-    <a href="/index.html" class="flex items-center gap-2 shrink-0"><span class="heading-serif text-lg sm:text-2xl tracking-wide gold-gradient-text">Tracy's<span class="text-ink-100 font-normal"> Botanical Elixirs</span></span></a>
-    <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs hidden sm:block" aria-label="Language"></select>
+    <a href="/index.html" class="flex items-center gap-2 shrink-0">
+      <span class="heading-serif text-lg sm:text-2xl tracking-wide gold-gradient-text">Tracy's<span class="text-ink-100 font-normal"> Botanical Elixirs</span></span>
+    </a>
+
+    <nav class="hidden lg:flex items-center gap-7">
+      <a href="/index.html" class="nav-link" data-i18n="nav_home">Home</a>
+      <a href="/shop.html" class="nav-link" data-i18n="nav_shop">Shop</a>
+      <a href="/about.html" class="nav-link" data-i18n="nav_about">Our Story</a>
+      <a href="/blog.html" class="nav-link" data-i18n="nav_blog">Journal</a>
+      <a href="/faq.html" class="nav-link" data-i18n="nav_faq">FAQ</a>
+      <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
+    </nav>
+
+    <div class="flex items-center gap-3 md:gap-4">
+      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs hidden sm:block" aria-label="Language"></select>
+
+      <button id="cart-toggle-btn" type="button" class="relative btn-ghost p-2" aria-label="Cart">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="10" cy="21" r="1.4" fill="currentColor"/><circle cx="18" cy="21" r="1.4" fill="currentColor"/></svg>
+        <span id="cart-count-badge" class="badge-cart-count" style="display:none;">0</span>
+      </button>
+
+      <button id="mobile-nav-toggle" type="button" class="lg:hidden btn-ghost p-2" aria-label="Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
   </div>
+
+  <nav id="mobile-nav" class="hidden lg:hidden glass-panel mx-4 mb-3 p-4 rounded-xl flex flex-col gap-3">
+    <a href="/index.html" class="nav-link" data-i18n="nav_home">Home</a>
+    <a href="/shop.html" class="nav-link" data-i18n="nav_shop">Shop</a>
+    <a href="/about.html" class="nav-link" data-i18n="nav_about">Our Story</a>
+    <a href="/blog.html" class="nav-link" data-i18n="nav_blog">Journal</a>
+    <a href="/faq.html" class="nav-link" data-i18n="nav_faq">FAQ</a>
+    <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
+    <select id="languageSelectorMobile" class="input-glass !py-2 !px-3 text-xs mt-2" aria-label="Language"></select>
+  </nav>
 </header>
 
 <section class="max-w-2xl mx-auto px-5 md:px-8 py-32 text-center">
@@ -43,10 +76,8 @@
 </footer>
 
 <script type="module">
-  import { initI18n } from "/assets/js/i18n.js";
-  import { injectCookieConsent } from "/assets/js/cookie-consent.js";
-  await initI18n();
-  injectCookieConsent();
+  import { bootstrapPage } from "/assets/js/main.js";
+  await bootstrapPage();
 </script>
 </body>
 </html>
