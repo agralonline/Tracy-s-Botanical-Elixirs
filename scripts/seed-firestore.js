@@ -33,7 +33,7 @@ async function main() {
       updatedAt: now,
       updatedBy: "seed-script",
     };
-    await db.collection("products").doc(product.id).set(doc, { merge: true });
+    await db.collection("tracy_products").doc(product.id).set(doc, { merge: true });
     console.log(`✓ Seeded ${product.id} (${Object.keys(product.translations).length} locales)`);
   }
 

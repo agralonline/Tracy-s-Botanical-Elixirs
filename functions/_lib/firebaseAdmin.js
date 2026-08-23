@@ -76,7 +76,7 @@ export async function requireAdmin(authorizationHeader) {
   const idToken = authorizationHeader.slice("Bearer ".length);
   const decoded = await getAdminAuth().verifyIdToken(idToken);
 
-  const adminDoc = await getAdminDb().collection("admins").doc(decoded.uid).get();
+  const adminDoc = await getAdminDb().collection("tracy_admins").doc(decoded.uid).get();
   if (!adminDoc.exists) {
     const err = new Error("This account is not authorized as an admin.");
     err.statusCode = 403;

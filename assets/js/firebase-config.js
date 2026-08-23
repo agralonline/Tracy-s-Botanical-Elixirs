@@ -17,12 +17,12 @@
  */
 
 const DEFAULT_CONFIG = {
-  apiKey: "REPLACE_WITH_FIREBASE_API_KEY",
-  authDomain: "REPLACE_WITH_PROJECT.firebaseapp.com",
-  projectId: "REPLACE_WITH_PROJECT_ID",
-  storageBucket: "REPLACE_WITH_PROJECT.appspot.com",
-  messagingSenderId: "REPLACE_WITH_SENDER_ID",
-  appId: "REPLACE_WITH_APP_ID",
+  apiKey: "AIzaSyB_SlR_qBwXGCCfkNmy4zz7ZjoY0oUeIU8",
+  authDomain: "agralonline-apps.firebaseapp.com",
+  projectId: "agralonline-apps",
+  storageBucket: "agralonline-apps.firebasestorage.app",
+  messagingSenderId: "742972120760",
+  appId: "1:742972120760:web:81e7b87a643d93e076de4d",
 };
 
 export const firebaseConfig = (typeof window !== "undefined" && window.__TRACY_FIREBASE_CONFIG__)

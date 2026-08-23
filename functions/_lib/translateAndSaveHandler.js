@@ -54,7 +54,7 @@ export async function handleTranslateAndSave({ body, authorizationHeader }) {
   const { translations, errors } = await translateProductCopy(source, { locales: SUPPORTED_LOCALES });
 
   const db = getAdminDb();
-  const docRef = db.collection("products").doc(payload.id || slug);
+  const docRef = db.collection("tracy_products").doc(payload.id || slug);
   const existingSnap = await docRef.get();
   const now = new Date().toISOString();
 

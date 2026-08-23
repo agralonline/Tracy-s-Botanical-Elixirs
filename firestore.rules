@@ -9,57 +9,61 @@ service cloud.firestore {
 
     function isAdmin() {
       return isSignedIn() &&
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+        exists(/databases/$(database)/documents/tracy_admins/$(request.auth.uid));
     }
 
     // ---------------------------------------------------------------
-    // products — public read (storefront + SEO), admin-only write.
+    // tracy_products — public read (storefront + SEO), admin-only write.
     // The Translate & Save flow actually writes via the Firebase Admin
     // SDK from a trusted serverless function (which bypasses these
     // rules entirely), but we still lock down direct client writes so
     // a compromised/admin browser session can't be used to corrupt
     // catalog data outside that flow.
+    //
+    // Collections are prefixed "tracy_" because this project is shared
+    // with other AgralOnline apps in the same Firebase project — this
+    // keeps Tracy's data cleanly separated from theirs.
     // ---------------------------------------------------------------
-    match /products/{productId} {
+    match /tracy_products/{productId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
     }
 
     // ---------------------------------------------------------------
-    // blogPosts — public read of published posts, admin-only write.
+    // tracy_blogPosts — public read of published posts, admin-only write.
     // English-only by product policy (see /firestore-schema.md).
     // ---------------------------------------------------------------
-    match /blogPosts/{postId} {
+    match /tracy_blogPosts/{postId} {
       allow read: if resource.data.status == 'published' || isAdmin();
       allow create, update, delete: if isAdmin();
     }
 
     // ---------------------------------------------------------------
-    // orders — never client-writable. Only the Stripe webhook function
-    // (via the Admin SDK, which bypasses rules) creates these. A signed-
-    // in admin may read them for support/fulfillment purposes.
+    // tracy_orders — never client-writable. Only the Stripe webhook
+    // function (via the Admin SDK, which bypasses rules) creates these.
+    // A signed-in admin may read them for support/fulfillment purposes.
     // ---------------------------------------------------------------
-    match /orders/{orderId} {
+    match /tracy_orders/{orderId} {
       allow read: if isAdmin();
       allow write: if false;
     }
 
     // ---------------------------------------------------------------
-    // admins — membership list used by isAdmin() above. Never
+    // tracy_admins — membership list used by isAdmin() above. Never
     // client-writable; provision admins via the Firebase Console or
     // the Admin SDK directly (see README.md).
     // ---------------------------------------------------------------
-    match /admins/{uid} {
+    match /tracy_admins/{uid} {
       allow read: if isSignedIn() && request.auth.uid == uid;
       allow write: if false;
     }
 
     // ---------------------------------------------------------------
-    // newsletterSignups — optional collection if you wire the footer
-    // newsletter form to Firestore instead of an ESP. Write-only from
-    // the client (no enumeration of other people's emails).
+    // tracy_newsletterSignups — optional collection if you wire the
+    // footer newsletter form to Firestore instead of an ESP. Write-only
+    // from the client (no enumeration of other people's emails).
     // ---------------------------------------------------------------
-    match /newsletterSignups/{docId} {
+    match /tracy_newsletterSignups/{docId} {
       allow create: if request.resource.data.keys().hasOnly(['email', 'locale', 'createdAt'])
                     && request.resource.data.email is string;
       allow read, update, delete: if isAdmin();

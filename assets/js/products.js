@@ -42,7 +42,7 @@ export async function fetchProducts({ forceRefresh = false } = {}) {
     try {
       const { db, firestoreMod } = services;
       const { collection, getDocs, query, where } = firestoreMod;
-      const q = query(collection(db, "products"), where("status", "==", "active"));
+      const q = query(collection(db, "tracy_products"), where("status", "==", "active"));
       const snap = await getDocs(q);
       if (!snap.empty) {
         productCache = snap.docs.map((d) => ({ id: d.id, ...d.data() }));

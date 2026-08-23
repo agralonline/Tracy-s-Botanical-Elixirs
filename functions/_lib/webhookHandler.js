@@ -45,7 +45,7 @@ export async function handleStripeWebhook({ rawBody, signatureHeader }) {
 
 async function fulfillOrder(stripe, session) {
   const db = getAdminDb();
-  const orderRef = db.collection("orders").doc(session.id);
+  const orderRef = db.collection("tracy_orders").doc(session.id);
 
   const existing = await orderRef.get();
   if (existing.exists) return; // idempotent — Stripe may retry webhook delivery
@@ -88,7 +88,7 @@ async function fulfillOrder(stripe, session) {
   const productIds = (session.metadata?.productIds || "").split(",").filter(Boolean);
   await Promise.all(
     productIds.map(async (productId) => {
-      const productRef = db.collection("products").doc(productId);
+      const productRef = db.collection("tracy_products").doc(productId);
       try {
         await db.runTransaction(async (tx) => {
           const snap = await tx.get(productRef);

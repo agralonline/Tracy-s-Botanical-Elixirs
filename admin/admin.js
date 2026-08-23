@@ -99,12 +99,12 @@ async function loadProducts() {
   tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-ink-500">Loading…</td></tr>`;
 
   try {
-    const snap = await getDocs(query(collection(db, "products"), orderBy("updatedAt", "desc")));
+    const snap = await getDocs(query(collection(db, "tracy_products"), orderBy("updatedAt", "desc")));
     state.products = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch (err) {
     // Missing index or empty collection on a fresh project — fall back to unordered fetch.
     const { collection: col2, getDocs: getDocs2 } = firestoreMod;
-    const snap = await getDocs2(col2(db, "products"));
+    const snap = await getDocs2(col2(db, "tracy_products"));
     state.products = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   }
 
@@ -161,7 +161,7 @@ function escapeHtml(str = "") {
 async function deleteProduct(id) {
   if (!confirm("Delete this product? This cannot be undone.")) return;
   const { db, firestoreMod } = state.services;
-  await firestoreMod.deleteDoc(firestoreMod.doc(db, "products", id));
+  await firestoreMod.deleteDoc(firestoreMod.doc(db, "tracy_products", id));
   showBanner("Product deleted.");
   await loadProducts();
 }
