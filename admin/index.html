@@ -262,19 +262,29 @@
       <input type="hidden" id="pf-id" />
 
       <div class="sm:col-span-2">
-        <label class="text-xs eyebrow block mb-1">Title (English)</label>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs eyebrow">Title (English)</label>
+          <button type="button" class="field-translate-btn hidden" data-field="title" title="Re-translate just this field into all 24 languages">🌐 Translate this field</button>
+        </div>
         <input id="pf-title" required class="input-glass" placeholder="Lavender Serenity Essential Oil" />
       </div>
 
       <div class="sm:col-span-2">
-        <label class="text-xs eyebrow block mb-1">Short Description (English)</label>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs eyebrow">Short Description (English)</label>
+          <button type="button" class="field-translate-btn hidden" data-field="shortDescription" title="Re-translate just this field into all 24 languages">🌐 Translate this field</button>
+        </div>
         <input id="pf-short" required class="input-glass" placeholder="One sentence — shows on product cards" />
       </div>
 
       <div class="sm:col-span-2">
-        <label class="text-xs eyebrow block mb-1">Full Description (English)</label>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs eyebrow">Full Description (English)</label>
+          <button type="button" class="field-translate-btn hidden" data-field="description" title="Re-translate just this field into all 24 languages">🌐 Translate this field</button>
+        </div>
         <textarea id="pf-desc" required rows="4" class="input-glass" placeholder="Full product description shown on the detail page"></textarea>
       </div>
+      <p id="pf-field-translate-note" class="sm:col-span-2 text-xs text-ink-700 -mt-2 hidden">Editing an existing product: use "Save" below for price/SKU/inventory-type changes — it won't touch any existing translations. Change a field's English text above and click its own 🌐 button to re-translate just that field into all 24 languages, without re-translating (or overwriting) the other two.</p>
 
       <div>
         <label class="text-xs eyebrow block mb-1">SKU</label>
@@ -323,6 +333,7 @@
       <div class="sm:col-span-2">
         <label class="text-xs eyebrow block mb-1">Ingredients (comma-separated)</label>
         <input id="pf-ingredients" class="input-glass" placeholder="Lavandula angustifolia (Lavender) Oil" />
+        <p class="text-xs text-ink-700 mt-1">No translate button here on purpose — ingredient names (INCI/botanical Latin names like "Lavandula angustifolia") are shown the same way on cosmetic labels worldwide, in every language, so they're saved once in English and never translated.</p>
       </div>
 
       <div class="sm:col-span-2">

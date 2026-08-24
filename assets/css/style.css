@@ -398,6 +398,22 @@ select.input-glass {
   border-bottom-color: var(--gold);
 }
 
+/* Per-field "🌐 Translate this field" buttons on the admin product form —
+   small and quiet so they don't compete with the main Save button. */
+.field-translate-btn {
+  font-size: 0.7rem;
+  color: var(--gold-soft);
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.field-translate-btn:hover { background: rgba(212, 175, 55, 0.16); }
+.field-translate-btn:disabled { opacity: 0.6; cursor: default; }
+
 /* Always-visible compact language switcher in the header (mobile + desktop). */
 #languageSelector {
   width: auto;
@@ -626,13 +642,94 @@ select.input-glass {
 .payment-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.3rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.65rem;
-  letter-spacing: 0.04em;
-  color: var(--ink-500, #9aa5b8);
-  background: rgba(255,255,255,0.03);
+  justify-content: center;
+  height: 28px;
+  padding: 0 0.6rem;
+  border-radius: 7px;
+  background: #f4f4f2;
   border: 1px solid var(--glass-border);
+}
+.payment-badge svg { display: block; }
+
+/* Chatbot panel — desktop default is a small card anchored above the
+   toggle button, bottom-right. Actual show/hide is driven by JS setting
+   style.display directly (see chatbot.js) — this class only ever governs
+   position/size, never display, so the two never fight over specificity. */
+.chatbot-panel {
+  position: fixed;
+  bottom: 5rem;
+  right: 1.25rem;
+  z-index: 60;
+  width: min(340px, calc(100vw - 2.5rem));
+  max-height: min(480px, calc(100vh - 8rem));
+  flex-direction: column;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+@media (max-width: 640px) {
+  /* On phones, open as a small centered popup instead of a corner-anchored
+     panel that can feel cramped against the edge of the screen. */
+  .chatbot-panel {
+    bottom: auto;
+    right: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(320px, calc(100vw - 2rem));
+    max-height: min(70vh, 460px);
+  }
+}
+
+/* Journal — horizontal-scrolling carousel of post cards, each with its own
+   accent color (set via the --accent custom property per card) so a long
+   row reads as a deliberate chain rather than repeated identical boxes. */
+.blog-carousel-wrap {
+  position: relative;
+}
+.blog-carousel {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0.25rem 0.25rem 1.25rem;
+  margin: 0 -0.25rem;
+}
+.blog-carousel::-webkit-scrollbar { display: none; }
+.blog-card {
+  flex: 0 0 min(560px, 86vw);
+  scroll-snap-align: start;
+  padding: 2rem;
+  border-top: 3px solid var(--accent, var(--gold));
+}
+.blog-scroll-hint {
+  position: absolute;
+  top: 50%;
+  right: -0.25rem;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(10, 15, 26, 0.75);
+  border: 1px solid var(--glass-border);
+  color: var(--gold-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  animation: blog-hint-nudge 1.8s ease-in-out infinite;
+  transition: opacity 0.2s;
+}
+@keyframes blog-hint-nudge {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-50%) translateX(4px); }
+}
+@media (max-width: 640px) {
+  .blog-card { flex-basis: 90vw; padding: 1.5rem; }
+  .blog-scroll-hint { right: 0.25rem; }
 }
 
 /* Focus visibility for accessibility */

@@ -101,13 +101,21 @@ async function translateBatch(texts, targetLocale) {
   );
 }
 
+const ALL_PRODUCT_FIELDS = ["title", "shortDescription", "description"];
+
 /**
- * Translate { title, shortDescription, description } from English into
- * every locale in SUPPORTED_LOCALES. Runs target locales with limited
- * concurrency to stay within provider rate limits.
+ * Translate the given `fields` of sourceText (defaults to all three —
+ * title, shortDescription, description) from English into every locale in
+ * SUPPORTED_LOCALES. Runs target locales with limited concurrency to stay
+ * within provider rate limits.
+ *
+ * Passing a narrower `fields` list (e.g. just ["title"]) is what powers the
+ * admin's per-field "Translate" buttons — editing one field re-translates
+ * only that field's 23 locale variants instead of burning API quota (and
+ * overwriting any other field's existing translations) on a full re-run
+ * every time a single word changes.
  */
-export async function translateProductCopy(sourceText, { locales = SUPPORTED_LOCALES, concurrency = 5 } = {}) {
-  const fields = ["title", "shortDescription", "description"];
+export async function translateProductCopy(sourceText, { locales = SUPPORTED_LOCALES, concurrency = 5, fields = ALL_PRODUCT_FIELDS } = {}) {
   const texts = fields.map((f) => sourceText[f] || "");
   const targets = locales.filter((l) => l !== "en");
 

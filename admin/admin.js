@@ -18,7 +18,8 @@
  */
 
 import { getFirebaseServices, isFirebaseConfigured } from "/assets/js/firebase-config.js";
-import { CATEGORIES as SEED_CATEGORIES } from "/data/seed-products.js";
+import { CATEGORIES as SEED_CATEGORIES, SEED_PRODUCTS } from "/data/seed-products.js";
+import { SEED_POSTS } from "/assets/js/blog.js";
 
 const state = {
   services: null, user: null,
@@ -118,7 +119,40 @@ async function loadProducts() {
     state.products = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   }
 
+  // The storefront reads Firestore first and only falls back to the bundled
+  // SEED_PRODUCTS when tracy_products is completely EMPTY (see products.js).
+  // That means the moment even one real product exists in Firestore, any
+  // seed product that was never actually saved as a Firestore doc silently
+  // stops showing on the storefront. Fill in only the gaps — any seed
+  // product whose slug isn't already a real Firestore doc — so nothing an
+  // admin already created/edited gets touched or duplicated.
+  const existingSlugs = new Set(state.products.map((p) => p.slug).filter(Boolean));
+  const missing = SEED_PRODUCTS.filter((p) => !existingSlugs.has(p.slug));
+  if (missing.length) {
+    await seedMissingProducts(missing);
+    const snap2 = await getDocs(collection(db, "tracy_products"));
+    state.products = snap2.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
   renderProductTable();
+}
+
+/** Fill in any seed product that doesn't yet exist as a real Firestore doc (matched by slug). */
+async function seedMissingProducts(missing) {
+  const { db, firestoreMod } = state.services;
+  try {
+    await Promise.all(
+      missing.map((p) =>
+        firestoreMod.setDoc(firestoreMod.doc(db, "tracy_products", p.slug), {
+          ...p,
+          createdAt: firestoreMod.serverTimestamp(),
+          updatedAt: firestoreMod.serverTimestamp(),
+        })
+      )
+    );
+  } catch (err) {
+    console.warn("Could not seed missing products:", err);
+  }
 }
 
 function renderProductTable() {
@@ -403,8 +437,38 @@ async function loadPosts() {
     state.posts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   }
 
+  // Same gap-filling as products/categories: the Journal's launch posts only
+  // ever existed as bundled SEED_POSTS fallback data, never as real
+  // Firestore docs, so a fresh tracy_blogPosts collection shows empty here
+  // even though the storefront displays all of them fine from the fallback.
+  const existingIds = new Set(state.posts.map((p) => p.id).filter(Boolean));
+  const missingPosts = SEED_POSTS.filter((p) => !existingIds.has(p.id));
+  if (missingPosts.length) {
+    await seedMissingPosts(missingPosts);
+    const snap2 = await getDocs(collection(db, "tracy_blogPosts"));
+    state.posts = snap2.docs.map((d) => ({ id: d.id, ...d.data() }));
+  }
+
   state.postsLoaded = true;
   renderPostTable();
+}
+
+/** Fill in any seed Journal post that doesn't yet exist as a real Firestore doc. */
+async function seedMissingPosts(missing) {
+  const { db, firestoreMod } = state.services;
+  try {
+    await Promise.all(
+      missing.map(({ id, ...post }) =>
+        firestoreMod.setDoc(firestoreMod.doc(db, "tracy_blogPosts", id), {
+          ...post,
+          createdAt: firestoreMod.serverTimestamp(),
+          updatedAt: firestoreMod.serverTimestamp(),
+        })
+      )
+    );
+  } catch (err) {
+    console.warn("Could not seed missing blog posts:", err);
+  }
 }
 
 function formatDateShort(value) {
@@ -744,6 +808,15 @@ function openProductForm(product = null) {
   $("pf-cruelty-free").checked = !!product?.attributes?.crueltyFree;
   $("pf-featured").checked = !!product?.featured;
 
+  // The three small per-field "🌐 Translate this field" buttons (and the
+  // note explaining them) only make sense once a product already has
+  // translations to selectively preserve — hide them for a brand-new
+  // product, where the main button always translates all three fields.
+  const isEditing = !!product;
+  document.querySelectorAll(".field-translate-btn").forEach((btn) => btn.classList.toggle("hidden", !isEditing));
+  $("pf-field-translate-note")?.classList.toggle("hidden", !isEditing);
+  $("translate-save-btn").textContent = isEditing ? "Save" : "Translate & Save";
+
   $("product-modal-overlay").classList.remove("hidden");
   $("product-modal-overlay").classList.add("flex");
   // Always start scrolled to the top of the form (Title field), regardless
@@ -781,75 +854,114 @@ async function uploadImageIfNeeded() {
   return storageMod.getDownloadURL(storageRef);
 }
 
+/** Build the request payload shared by the full Save and the per-field Translate buttons. */
+async function buildProductPayload() {
+  const imageUrl = await uploadImageIfNeeded();
+  return {
+    id: $("pf-id").value || null,
+    sku: $("pf-sku").value.trim(),
+    slug: $("pf-slug").value.trim() || slugify($("pf-title").value),
+    category: $("pf-category").value,
+    status: $("pf-status").value,
+    featured: $("pf-featured").checked,
+    pricing: {
+      currency: "USD",
+      basePrice: parseFloat($("pf-price").value || "0"),
+      compareAtPrice: $("pf-compare-price").value ? parseFloat($("pf-compare-price").value) : null,
+    },
+    images: imageUrl ? [{ url: imageUrl, isPrimary: true }] : [],
+    attributes: {
+      volumeMl: $("pf-volume").value ? Number($("pf-volume").value) : null,
+      ingredients: $("pf-ingredients").value.split(",").map((s) => s.trim()).filter(Boolean),
+      organic: $("pf-organic").checked,
+      vegan: $("pf-vegan").checked,
+      crueltyFree: $("pf-cruelty-free").checked,
+    },
+    inventory: {
+      trackInventory: true,
+      quantity: $("pf-quantity").value ? Number($("pf-quantity").value) : 0,
+      allowBackorder: false,
+    },
+    sourceText: {
+      title: $("pf-title").value.trim(),
+      shortDescription: $("pf-short").value.trim(),
+      description: $("pf-desc").value.trim(),
+    },
+  };
+}
+
+async function postTranslateAndSave(payload) {
+  const idToken = await state.user.getIdToken();
+  const res = await fetch("/api/translate-and-save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}));
+    throw new Error(errBody.error || `Server responded ${res.status}`);
+  }
+  return res.json();
+}
+
+/** Main form submit — full Save when editing (translateFields: [], touches nothing translation-wise), full translate on first creation. */
 async function handleTranslateAndSave(e) {
   e.preventDefault();
   const btn = $("translate-save-btn");
   const statusEl = $("translate-status");
+  const isEditing = !!$("pf-id").value;
   btn.disabled = true;
   btn.style.opacity = ".6";
   statusEl.textContent = "Uploading image…";
 
   try {
-    const imageUrl = await uploadImageIfNeeded();
+    const payload = await buildProductPayload();
+    if (isEditing) payload.translateFields = []; // plain save — leave existing translations untouched
 
-    const payload = {
-      id: $("pf-id").value || null,
-      sku: $("pf-sku").value.trim(),
-      slug: $("pf-slug").value.trim() || slugify($("pf-title").value),
-      category: $("pf-category").value,
-      status: $("pf-status").value,
-      featured: $("pf-featured").checked,
-      pricing: {
-        currency: "USD",
-        basePrice: parseFloat($("pf-price").value || "0"),
-        compareAtPrice: $("pf-compare-price").value ? parseFloat($("pf-compare-price").value) : null,
-      },
-      images: imageUrl ? [{ url: imageUrl, isPrimary: true }] : [],
-      attributes: {
-        volumeMl: $("pf-volume").value ? Number($("pf-volume").value) : null,
-        ingredients: $("pf-ingredients").value.split(",").map((s) => s.trim()).filter(Boolean),
-        organic: $("pf-organic").checked,
-        vegan: $("pf-vegan").checked,
-        crueltyFree: $("pf-cruelty-free").checked,
-      },
-      inventory: {
-        trackInventory: true,
-        quantity: $("pf-quantity").value ? Number($("pf-quantity").value) : 0,
-        allowBackorder: false,
-      },
-      sourceText: {
-        title: $("pf-title").value.trim(),
-        shortDescription: $("pf-short").value.trim(),
-        description: $("pf-desc").value.trim(),
-      },
-    };
+    statusEl.textContent = isEditing ? "Saving…" : "Translating into 24 languages…";
+    const saved = await postTranslateAndSave(payload);
 
-    statusEl.textContent = "Translating into 24 languages…";
-
-    const idToken = await state.user.getIdToken();
-    const res = await fetch("/api/translate-and-save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      throw new Error(errBody.error || `Server responded ${res.status}`);
-    }
-
-    const saved = await res.json();
-    statusEl.textContent = `Saved — ${Object.keys(saved.translations || {}).length}/24 languages translated.`;
-    showBanner(`"${saved.translations?.en?.title}" saved and translated into all 24 languages.`);
+    statusEl.textContent = isEditing ? "Saved." : `Saved — ${Object.keys(saved.translations || {}).length}/24 languages translated.`;
+    showBanner(isEditing ? `"${saved.translations?.en?.title}" saved.` : `"${saved.translations?.en?.title}" saved and translated into all 24 languages.`);
     await loadProducts();
     setTimeout(() => closeProductForm({ skipConfirm: true }), 900);
   } catch (err) {
     console.error(err);
     statusEl.textContent = "";
-    showBanner(err.message || "Translate & Save failed.", "error");
+    showBanner(err.message || "Save failed.", "error");
   } finally {
     btn.disabled = false;
     btn.style.opacity = "";
+  }
+}
+
+/** One of the small per-field "🌐 Translate this field" buttons — re-translates ONLY that field into all 24 languages, leaving the other two fields' existing translations (and every other product detail) untouched. Only shown when editing an existing product. */
+async function handleFieldTranslate(field, btn) {
+  const statusEl = $("translate-status");
+  const productId = $("pf-id").value;
+  if (!productId) return; // shouldn't happen — buttons are hidden for new products
+
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Translating…";
+  statusEl.textContent = `Translating just this field into 24 languages…`;
+
+  try {
+    const payload = await buildProductPayload();
+    payload.translateFields = [field];
+    const saved = await postTranslateAndSave(payload);
+    statusEl.textContent = "Saved.";
+    showBanner(`"${field}" re-translated into 24 languages — other fields untouched.`);
+    // Refresh the in-memory product list so the table/edit state stays in sync,
+    // but keep the form open — the admin may want to translate another field next.
+    await loadProducts();
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "";
+    showBanner(err.message || "Translate failed.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
   }
 }
 
@@ -872,6 +984,9 @@ function wireStaticUI() {
   $("product-form").addEventListener("submit", handleTranslateAndSave);
   $("pf-title").addEventListener("blur", () => {
     if (!$("pf-slug").value) $("pf-slug").value = slugify($("pf-title").value);
+  });
+  document.querySelectorAll(".field-translate-btn").forEach((btn) => {
+    btn.addEventListener("click", () => handleFieldTranslate(btn.dataset.field, btn));
   });
 
   TABS.forEach((name) => {

@@ -34,6 +34,8 @@ function badRequest(message) {
   return err;
 }
 
+const ALL_TRANSLATABLE_FIELDS = ["title", "shortDescription", "description"];
+
 export async function handleTranslateAndSave({ body, authorizationHeader }) {
   const admin = await requireAdmin(authorizationHeader); // throws 401/403 on failure
 
@@ -51,11 +53,52 @@ export async function handleTranslateAndSave({ body, authorizationHeader }) {
   const slug = payload.slug ? slugify(payload.slug) : slugify(source.title);
   if (!slug) throw badRequest("Could not derive a slug from the title — please provide one explicitly.");
 
-  const { translations, errors } = await translateProductCopy(source, { locales: SUPPORTED_LOCALES });
-
   const db = getAdminDb();
   const docRef = db.collection("tracy_products").doc(payload.id || slug);
   const existingSnap = await docRef.get();
+  const existingTranslations = existingSnap.exists ? existingSnap.data().translations || {} : {};
+
+  // `translateFields`, when the admin used one of the small per-field
+  // "Translate" buttons, names just the one field that changed — e.g.
+  // ["title"]. Omitting it entirely (the plain "New Product" flow, which
+  // has nothing to preserve yet) translates all three fields as before.
+  // Passing an explicit empty array means "save the English source and
+  // other product details, but don't touch translations at all" — used by
+  // the plain "Save" button when editing non-text fields like price/SKU.
+  const requestedFields = Array.isArray(payload.translateFields) ? payload.translateFields : ALL_TRANSLATABLE_FIELDS;
+  // A brand-new product has no existing translations to fall back on — if
+  // the caller somehow asked for zero fields here, that would leave every
+  // non-English locale with only English text baked in. Always translate
+  // everything on first creation, no matter what was requested.
+  const fieldsToTranslate = existingSnap.exists
+    ? requestedFields.filter((f) => ALL_TRANSLATABLE_FIELDS.includes(f))
+    : ALL_TRANSLATABLE_FIELDS;
+
+  let translations;
+  let errors = [];
+
+  if (fieldsToTranslate.length) {
+    const result = await translateProductCopy(source, { locales: SUPPORTED_LOCALES, fields: fieldsToTranslate });
+    errors = result.errors;
+    // Merge the freshly-translated field(s) into whatever each locale
+    // already had, rather than overwriting the whole translations map —
+    // this is what keeps an untouched field's existing translation (hand
+    // -written or from an earlier save) intact when only one field changed.
+    translations = { en: { ...source } };
+    for (const locale of SUPPORTED_LOCALES) {
+      if (locale === "en") continue;
+      translations[locale] = {
+        ...ALL_TRANSLATABLE_FIELDS.reduce((acc, f) => ({ ...acc, [f]: source[f] || "" }), {}), // safe fallback
+        ...(existingTranslations[locale] || {}),
+        ...(result.translations[locale] || {}),
+      };
+    }
+  } else {
+    // No translation requested — keep every locale's existing translation
+    // exactly as-is, just refresh the English source text.
+    translations = { ...existingTranslations, en: { ...source } };
+  }
+
   const now = new Date().toISOString();
 
   const doc = {
