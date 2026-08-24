@@ -649,7 +649,7 @@ select.input-glass {
   background: #f4f4f2;
   border: 1px solid var(--glass-border);
 }
-.payment-badge svg { display: block; }
+.payment-badge svg { display: block; flex-shrink: 0; }
 
 /* Chatbot panel — desktop default is a small card anchored above the
    toggle button, bottom-right. Actual show/hide is driven by JS setting
