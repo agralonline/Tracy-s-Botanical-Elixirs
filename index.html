@@ -78,25 +78,10 @@
 </header>
 
 <!-- ================= HERO ================= -->
-<section id="hero-slider" class="hero-slider">
-  <div data-hero-track></div>
-  <div class="hero-slider-scrim"></div>
-  <div class="hero-slider-content max-w-7xl mx-auto px-5 md:px-8">
-    <div class="animate-fade-up max-w-xl">
-      <p class="eyebrow mb-4" data-i18n="hero_eyebrow">Luxury Botanical Rituals</p>
-      <h1 class="heading-serif text-4xl md:text-6xl leading-[1.08] mb-6">
-        <span class="gold-gradient-text" data-i18n="hero_title">Essential Oils &amp; Organic Skincare, Elevated</span>
-      </h1>
-      <p class="text-ink-300 text-lg mb-8 max-w-md" data-i18n="hero_subtitle">Small-batch, pure-grade essential oils and organic skincare crafted for those who notice the difference.</p>
-      <div class="flex flex-wrap gap-4">
-        <a href="/shop.html" class="btn-gold" data-i18n="hero_cta_shop">Shop Collection</a>
-        <a href="/about.html" class="btn-outline-gold" data-i18n="hero_cta_story">Our Story</a>
-      </div>
-      <p class="text-xs text-ink-500 mt-6" data-i18n="free_shipping_note">Free shipping on US orders over $75</p>
-    </div>
-  </div>
-  <div data-hero-dots class="hero-slider-dots"></div>
-</section>
+<!-- Built entirely in JS (see initHero() below) since the layout itself
+     (full-bleed background vs. left-text/right-box) is admin-selectable
+     via Settings → Hero Section. -->
+<section id="hero-mount"></section>
 
 <!-- ================= WHY US ================= -->
 <section class="max-w-7xl mx-auto px-5 md:px-8 pb-20">
@@ -127,6 +112,12 @@
   <div id="category-tiles" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
 </section>
 
+<!-- ================= SHOP BY WELLNESS GOAL ================= -->
+<section class="max-w-7xl mx-auto px-5 md:px-8 pb-20">
+  <h2 class="text-center eyebrow mb-10" data-i18n="section_wellness_goals">Shop by Wellness Goal</h2>
+  <div id="wellness-goal-tiles" class="grid grid-cols-2 lg:grid-cols-4 gap-5"></div>
+</section>
+
 <!-- ================= BESTSELLERS ================= -->
 <section class="max-w-7xl mx-auto px-5 md:px-8 pb-16">
   <div class="flex items-center justify-between mb-10">
@@ -138,6 +129,26 @@
 
 <!-- ================= PER-CATEGORY ROWS ================= -->
 <div id="category-rows"></div>
+
+<!-- ================= SPECIAL OFFERS ================= -->
+<section id="special-offers-section" class="max-w-7xl mx-auto px-5 md:px-8 pb-16 hidden">
+  <div class="flex items-center justify-between mb-10">
+    <h2 class="heading-serif text-3xl" data-i18n="section_special_offers">Special Offers</h2>
+    <a href="/shop.html" class="btn-outline-gold text-xs" data-i18n="hero_cta_shop">Shop Collection</a>
+  </div>
+  <div id="special-offers-grid" class="product-row-scroll"></div>
+</section>
+
+<!-- ================= SANCTUARY BRAND BANNER ================= -->
+<section class="relative overflow-hidden" style="min-height:380px;">
+  <img src="/assets/img/hero/hero-model.jpg" alt="" class="absolute inset-0 w-full h-full object-cover" style="filter:brightness(.55);" />
+  <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(5,11,20,0.35) 0%, rgba(5,11,20,0.75) 100%);"></div>
+  <div class="relative z-10 max-w-2xl mx-auto text-center px-5 py-24 flex flex-col items-center">
+    <p class="eyebrow mb-4 text-gold-soft" data-i18n="section_our_sanctuary">Our Sanctuary</p>
+    <p class="heading-serif text-2xl md:text-3xl text-ink-100 mb-8 leading-relaxed" data-i18n="sanctuary_tagline">Small-batch botanical rituals, hand-crafted for those who notice the difference.</p>
+    <a href="/about.html" class="btn-gold" data-i18n="sanctuary_cta">Read Our Story</a>
+  </div>
+</section>
 
 <!-- ================= NEWSLETTER ================= -->
 <section class="max-w-4xl mx-auto px-5 md:px-8 pb-24">
@@ -168,6 +179,7 @@
     </div>
     <div class="flex flex-col gap-2">
       <a href="/shipping.html" class="nav-link" data-i18n="footer_shipping">Shipping &amp; Returns</a>
+      <a href="/track-order.html" class="nav-link" data-i18n="nav_track_order">Track Order</a>
       <a href="/privacy.html" class="nav-link" data-i18n="footer_privacy">Privacy Policy</a>
       <a href="/terms.html" class="nav-link" data-i18n="footer_terms">Terms of Service</a>
     </div>
@@ -204,13 +216,61 @@
 <script type="module">
   import { bootstrapPage } from "/assets/js/main.js";
   import { renderProductRow } from "/assets/js/products.js";
-  import { onLocaleChange } from "/assets/js/i18n.js";
-  import { initHeroSlider } from "/assets/js/hero-slider.js";
+  import { onLocaleChange, applyDomTranslations, t } from "/assets/js/i18n.js";
+  import { initHeroSlider, HERO_SLIDES } from "/assets/js/hero-slider.js";
   import { fetchCategories, getCategoryLabel, getCategoryImage } from "/assets/js/categories.js";
   import { fetchSiteSettings, renderSocialLinks } from "/assets/js/settings.js";
+  import { WELLNESS_GOALS } from "/assets/js/wellness-goals.js";
 
   await bootstrapPage();
-  initHeroSlider(document.getElementById("hero-slider"));
+
+  // The hero's inner text is identical between layouts — only how it's
+  // arranged around the images differs — so it's built once and reused.
+  const HERO_TEXT_HTML = `
+    <p class="eyebrow mb-4" data-i18n="hero_eyebrow">Luxury Botanical Rituals</p>
+    <h1 class="heading-serif text-4xl md:text-6xl leading-[1.08] mb-6">
+      <span class="gold-gradient-text" data-i18n="hero_title">Essential Oils &amp; Organic Skincare, Elevated</span>
+    </h1>
+    <p class="text-ink-300 text-lg mb-8 max-w-md" data-i18n="hero_subtitle">Small-batch, pure-grade essential oils and organic skincare crafted for those who notice the difference.</p>
+    <div class="flex flex-wrap gap-4">
+      <a href="/shop.html" class="btn-gold" data-i18n="hero_cta_shop">Shop Collection</a>
+      <a href="/about.html" class="btn-outline-gold" data-i18n="hero_cta_story">Our Story</a>
+    </div>
+    <p class="text-xs text-ink-500 mt-6" data-i18n="free_shipping_note">Free shipping on US orders over $75</p>
+  `;
+
+  async function initHero() {
+    const mount = document.getElementById("hero-mount");
+    if (!mount) return;
+    const settings = await fetchSiteSettings();
+    const images = settings.heroImages?.length ? settings.heroImages : HERO_SLIDES;
+
+    if (settings.heroLayout === "box") {
+      mount.className = "hero-split";
+      mount.innerHTML = `
+        <div class="animate-fade-up">${HERO_TEXT_HTML}</div>
+        <div class="hero-split-box">
+          <div data-hero-track></div>
+          <div data-hero-dots class="hero-slider-dots"></div>
+        </div>
+      `;
+    } else {
+      mount.className = "hero-slider";
+      mount.innerHTML = `
+        <div data-hero-track></div>
+        <div class="hero-slider-scrim"></div>
+        <div class="hero-slider-content max-w-7xl mx-auto px-5 md:px-8">
+          <div class="animate-fade-up max-w-xl">${HERO_TEXT_HTML}</div>
+        </div>
+        <div data-hero-dots class="hero-slider-dots"></div>
+      `;
+    }
+    applyDomTranslations(mount);
+    onLocaleChange(() => applyDomTranslations(mount));
+    initHeroSlider(mount, images);
+  }
+  await initHero();
+
   fetchSiteSettings().then((s) => renderSocialLinks(document.getElementById("footer-social-links"), s.social));
 
   function escapeHtml(str = "") {
@@ -230,6 +290,19 @@
   }
   await renderCategoryTiles();
   onLocaleChange(renderCategoryTiles);
+
+  function renderWellnessGoalTiles() {
+    const tilesEl = document.getElementById("wellness-goal-tiles");
+    if (!tilesEl) return;
+    tilesEl.innerHTML = WELLNESS_GOALS.map((goal) => `
+      <a href="/shop.html?goal=${encodeURIComponent(goal.slug)}" class="wellness-goal-tile flex flex-col items-center gap-3 text-center">
+        <div class="wellness-goal-media"><img src="${goal.image}" alt="${escapeHtml(t(goal.i18nKey))}" /></div>
+        <span class="heading-serif text-sm" data-i18n="${goal.i18nKey}">${escapeHtml(t(goal.i18nKey))}</span>
+      </a>
+    `).join("");
+  }
+  renderWellnessGoalTiles();
+  onLocaleChange(renderWellnessGoalTiles);
 
   const grid = document.getElementById("product-grid");
   const bestsellersSection = grid.closest("section");
@@ -263,6 +336,16 @@
   }
   await renderCategoryRows();
   onLocaleChange(renderCategoryRows);
+
+  const specialOffersGrid = document.getElementById("special-offers-grid");
+  const specialOffersSection = document.getElementById("special-offers-section");
+  async function refreshSpecialOffers() {
+    const count = await renderProductRow(specialOffersGrid, { onSaleOnly: true });
+    // Hidden entirely until at least one product has a compare-at (sale) price set.
+    specialOffersSection.classList.toggle("hidden", count === 0);
+  }
+  await refreshSpecialOffers();
+  onLocaleChange(refreshSpecialOffers);
 </script>
 </body>
 </html>

@@ -181,10 +181,12 @@
             <th class="p-4">Total</th>
             <th class="p-4">Shipping Address</th>
             <th class="p-4">Status</th>
+            <th class="p-4">Tracking</th>
+            <th class="p-4"></th>
           </tr>
         </thead>
         <tbody id="order-table-body">
-          <tr><td colspan="6" class="p-8 text-center text-ink-500">Loading…</td></tr>
+          <tr><td colspan="8" class="p-8 text-center text-ink-500">Loading…</td></tr>
         </tbody>
       </table>
     </div>
@@ -237,6 +239,33 @@
         <label class="text-xs eyebrow block mb-1">Free Shipping Threshold (USD)</label>
         <input id="sf-free-shipping" type="number" min="0" step="1" class="input-glass" placeholder="75" />
         <p class="text-xs text-ink-700 mt-1">Orders at or above this amount get a free shipping option at checkout.</p>
+      </div>
+
+      <hr class="hairline-gold" />
+      <div>
+        <label class="text-xs eyebrow block mb-1">PayPal Link (optional)</label>
+        <input id="sf-paypal-link" class="input-glass" placeholder="https://paypal.me/yourbusiness" />
+        <p class="text-xs text-ink-700 mt-1">Optional — leave blank to hide. Paste your PayPal.me link or a PayPal payment link and a "Pay with PayPal" button appears in the cart alongside card checkout. Stripe stays the only checkout that tracks orders/inventory automatically; a PayPal payment here is handled by you directly on PayPal's side.</p>
+      </div>
+
+      <hr class="hairline-gold" />
+      <div>
+        <p class="text-xs eyebrow mb-1">Hero Section</p>
+        <label class="text-xs text-ink-500 block mb-1 mt-2">Layout</label>
+        <select id="sf-hero-layout" class="input-glass">
+          <option value="background">Background — images fill the whole section behind the text</option>
+          <option value="box">Box — text on the left, images auto-scroll in a box on the right</option>
+        </select>
+        <label class="text-xs text-ink-500 block mb-1 mt-3">Hero Images (one URL per line)</label>
+        <textarea id="sf-hero-images" rows="4" class="input-glass" placeholder="https://res.cloudinary.com/.../hero-1.jpg&#10;https://res.cloudinary.com/.../hero-2.jpg"></textarea>
+        <p class="text-xs text-ink-700 mt-1">Leave blank to use the site's default hero photos. Add or remove URLs any time — every image listed here auto-scrolls, no code changes needed.</p>
+      </div>
+
+      <hr class="hairline-gold" />
+      <div>
+        <p class="text-xs eyebrow mb-1">Chatbot Knowledge</p>
+        <textarea id="sf-chatbot-knowledge" rows="5" class="input-glass" placeholder="e.g. We're closed for a holiday Dec 24-26. Our lavender oil is currently out of stock, back in 2 weeks. We now ship to Mexico."></textarea>
+        <p class="text-xs text-ink-700 mt-1">Optional extra info for "Ask Tracy" — anything you type here is added to what the chatbot knows, no code changes needed. Leave blank to use its default knowledge only.</p>
       </div>
 
       <hr class="hairline-gold" />
@@ -374,6 +403,17 @@
         <label class="flex items-center gap-2"><input id="pf-vegan" type="checkbox" /> Vegan</label>
         <label class="flex items-center gap-2"><input id="pf-cruelty-free" type="checkbox" /> Cruelty-Free</label>
         <label class="flex items-center gap-2"><input id="pf-featured" type="checkbox" /> Featured on homepage</label>
+      </div>
+
+      <div class="sm:col-span-2">
+        <label class="text-xs eyebrow block mb-1">Wellness Goals (optional)</label>
+        <div id="pf-goals" class="flex flex-wrap gap-5 text-sm text-ink-300">
+          <label class="flex items-center gap-2"><input type="checkbox" value="better-sleep" /> Better Sleep</label>
+          <label class="flex items-center gap-2"><input type="checkbox" value="stress-relief" /> Stress Relief</label>
+          <label class="flex items-center gap-2"><input type="checkbox" value="glowing-skin" /> Glowing Skin</label>
+          <label class="flex items-center gap-2"><input type="checkbox" value="hair-care" /> Hair Care</label>
+        </div>
+        <p class="text-xs text-ink-700 mt-1">Controls which products show up under the homepage's "Shop by Wellness Goal" tiles.</p>
       </div>
 
       <div class="sm:col-span-2 border-t border-white/5 pt-5 mt-2 flex items-center justify-between gap-4">

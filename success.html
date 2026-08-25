@@ -29,7 +29,10 @@
     <h1 class="heading-serif text-3xl gold-gradient-text mb-3">Thank You For Your Order</h1>
     <p class="text-ink-300 mb-8">Your payment was successful. A confirmation email is on its way — your ritual is on its way too.</p>
     <p id="session-ref" class="text-xs text-ink-700 mb-8"></p>
-    <a href="/shop.html" class="btn-gold">Continue Shopping</a>
+    <div class="flex flex-wrap items-center justify-center gap-4">
+      <a href="/shop.html" class="btn-gold">Continue Shopping</a>
+      <a id="track-order-link" href="/track-order.html" class="btn-outline-gold">Track Your Order</a>
+    </div>
   </div>
 </section>
 <script type="module">
@@ -41,6 +44,10 @@
   const sessionId = new URLSearchParams(window.location.search).get("session_id");
   if (sessionId) {
     document.getElementById("session-ref").textContent = `Reference: ${sessionId}`;
+    // The Stripe Checkout session ID is the same ID the order is saved
+    // under in Firestore (see functions/_lib/webhookHandler.js), so it
+    // doubles as the Order ID for the track-order.html lookup.
+    document.getElementById("track-order-link").href = `/track-order.html?orderId=${encodeURIComponent(sessionId)}`;
   }
 </script>
 </body>

@@ -1019,11 +1019,13 @@ function formatMoney(cents, currency = "usd") {
   }
 }
 
+const ORDER_STATUSES = ["paid", "processing", "shipped", "delivered"];
+
 function renderOrderTable() {
   const tbody = $("order-table-body");
   if (!tbody) return;
   if (!state.orders.length) {
-    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-ink-500">No orders yet.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-ink-500">No orders yet.</td></tr>`;
     return;
   }
   tbody.innerHTML = state.orders
@@ -1032,16 +1034,65 @@ function renderOrderTable() {
       const addrText = addr ? [addr.name, addr.line1, addr.city, addr.state, addr.postalCode, addr.country].filter(Boolean).join(", ") : "";
       const itemsText = (o.lineItems || []).map((li) => `${li.quantity}× ${li.description}`).join(", ");
       return `
-      <tr class="border-b border-white/5 hover:bg-white/[0.02]">
+      <tr class="border-b border-white/5 hover:bg-white/[0.02]" data-order-row="${escapeHtml(o.id)}">
         <td class="p-4 text-ink-500 whitespace-nowrap">${formatDateShort(o.createdAt)}</td>
         <td class="p-4">${escapeHtml(o.customerEmail || "")}</td>
         <td class="p-4 text-ink-500 max-w-xs">${escapeHtml(itemsText)}</td>
         <td class="p-4">${formatMoney(o.amountTotal, o.currency)}</td>
         <td class="p-4 text-ink-500 max-w-xs">${escapeHtml(addrText)}</td>
-        <td class="p-4 text-ink-500 capitalize">${escapeHtml(o.status || "paid")}</td>
+        <td class="p-4">
+          <select class="input-glass !py-1 !px-2 text-xs order-status-select" data-order-status>
+            ${ORDER_STATUSES.map((s) => `<option value="${s}" ${(o.status || "paid") === s ? "selected" : ""}>${s[0].toUpperCase() + s.slice(1)}</option>`).join("")}
+          </select>
+        </td>
+        <td class="p-4">
+          <input class="input-glass !py-1 !px-2 text-xs mb-1" data-order-tracking-number placeholder="Tracking #" value="${escapeHtml(o.trackingNumber || "")}" style="width:9rem;" />
+          <input class="input-glass !py-1 !px-2 text-xs" data-order-carrier placeholder="Carrier (e.g. FedEx)" value="${escapeHtml(o.carrier || "")}" style="width:9rem;" />
+        </td>
+        <td class="p-4">
+          <button type="button" class="btn-outline-gold text-xs whitespace-nowrap" data-order-save>Save</button>
+        </td>
       </tr>`;
     })
     .join("");
+  wireOrderRowSaveButtons(tbody);
+}
+
+function wireOrderRowSaveButtons(tbody) {
+  tbody.querySelectorAll("[data-order-save]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const row = btn.closest("[data-order-row]");
+      const orderId = row.getAttribute("data-order-row");
+      const status = row.querySelector("[data-order-status]").value;
+      const trackingNumber = row.querySelector("[data-order-tracking-number]").value.trim();
+      const carrier = row.querySelector("[data-order-carrier]").value.trim();
+
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = "Saving…";
+      try {
+        const idToken = await state.user.getIdToken();
+        const res = await fetch("/api/update-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+          body: JSON.stringify({ orderId, status, trackingNumber, carrier }),
+        });
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.error || `Server responded ${res.status}`);
+        }
+        const order = state.orders.find((o) => o.id === orderId);
+        if (order) Object.assign(order, { status, trackingNumber, carrier });
+        showBanner("Order updated.");
+      } catch (err) {
+        console.error(err);
+        showBanner(err.message || "Could not update order.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    });
+  });
 }
 
 /* -----------------------------------------------------------------
@@ -1136,6 +1187,10 @@ async function loadSettings() {
   $("sf-social-facebook").value = data.social?.facebook || "";
   $("sf-social-tiktok").value = data.social?.tiktok || "";
   $("sf-social-pinterest").value = data.social?.pinterest || "";
+  $("sf-paypal-link").value = data.paypalLink || "";
+  $("sf-hero-layout").value = data.heroLayout || "background";
+  $("sf-hero-images").value = Array.isArray(data.heroImages) ? data.heroImages.join("\n") : "";
+  $("sf-chatbot-knowledge").value = data.chatbotKnowledge || "";
 
   state.settingsLoaded = true;
   if (statusEl) statusEl.textContent = "";
@@ -1161,6 +1216,10 @@ async function handleSaveSettings(e) {
         tiktok: $("sf-social-tiktok").value.trim(),
         pinterest: $("sf-social-pinterest").value.trim(),
       },
+      paypalLink: $("sf-paypal-link").value.trim(),
+      heroLayout: $("sf-hero-layout").value === "box" ? "box" : "background",
+      heroImages: $("sf-hero-images").value.split("\n").map((s) => s.trim()).filter(Boolean),
+      chatbotKnowledge: $("sf-chatbot-knowledge").value.trim(),
       updatedAt: firestoreMod.serverTimestamp(),
     };
     await firestoreMod.setDoc(firestoreMod.doc(db, "tracy_settings", "site"), data, { merge: true });
@@ -1244,6 +1303,8 @@ function openProductForm(product = null) {
   $("pf-vegan").checked = !!product?.attributes?.vegan;
   $("pf-cruelty-free").checked = !!product?.attributes?.crueltyFree;
   $("pf-featured").checked = !!product?.featured;
+  const goals = product?.goals || [];
+  $("pf-goals").querySelectorAll("input[type=checkbox]").forEach((cb) => { cb.checked = goals.includes(cb.value); });
 
   // The three small per-field "🌐 Translate this field" buttons (and the
   // note explaining them) only make sense once a product already has
@@ -1301,6 +1362,7 @@ async function buildProductPayload() {
     category: $("pf-category").value,
     status: $("pf-status").value,
     featured: $("pf-featured").checked,
+    goals: [...$("pf-goals").querySelectorAll("input[type=checkbox]:checked")].map((cb) => cb.value),
     pricing: {
       currency: "USD",
       basePrice: parseFloat($("pf-price").value || "0"),

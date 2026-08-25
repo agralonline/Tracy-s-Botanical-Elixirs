@@ -108,6 +108,7 @@ export async function handleTranslateAndSave({ body, authorizationHeader }) {
     category: payload.category || "essential-oils",
     status: payload.status || "active",
     featured: !!payload.featured,
+    goals: Array.isArray(payload.goals) ? payload.goals : [],
     pricing: {
       currency: payload.pricing.currency || "USD",
       basePrice: payload.pricing.basePrice,

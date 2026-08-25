@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Track Your Order — Tracy's Botanical Elixirs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230a0f1d' stroke='%23D4AF37' stroke-width='4'/%3E%3Ctext x='50' y='63' font-size='46' text-anchor='middle' fill='%23D4AF37' font-family='Georgia,serif'%3ET%3C/text%3E%3C/svg%3E" />
+<link rel="apple-touch-icon" href="/assets/img/icons/apple-touch-icon.png" />
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#0a0f1d" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: { navy: { 950:"#050b14",900:"#0a0f1d" }, gold: { DEFAULT:"#D4AF37", soft:"#E8C766" }, cyan:{glow:"#34e8e0"}, emerald:{glow:"#2be8a8"} },
+    fontFamily: { display: ["Cormorant Garamond","serif"], sans: ["Inter","Arial","sans-serif"] },
+  } } };
+</script>
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body class="font-sans">
+
+<header class="site-header sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between gap-4">
+    <a href="/index.html" class="flex items-center gap-2 shrink-0"><span class="heading-serif text-lg sm:text-2xl tracking-wide gold-gradient-text">Tracy's<span class="text-ink-100 font-normal"> Botanical Elixirs</span></span></a>
+    <nav class="hidden lg:flex items-center gap-7">
+      <a href="/index.html" class="nav-link" data-i18n="nav_home">Home</a>
+      <a href="/shop.html" class="nav-link" data-i18n="nav_shop">Shop</a>
+      <a href="/about.html" class="nav-link" data-i18n="nav_about">Our Story</a>
+      <a href="/blog.html" class="nav-link" data-i18n="nav_blog">Journal</a>
+      <a href="/faq.html" class="nav-link" data-i18n="nav_faq">FAQ</a>
+      <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
+    </nav>
+    <div class="flex items-center gap-3 md:gap-4">
+      <div id="languageSelector" class="relative"></div>
+      <button id="cart-toggle-btn" type="button" class="relative btn-ghost p-2" aria-label="Cart">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="10" cy="21" r="1.4" fill="currentColor"/><circle cx="18" cy="21" r="1.4" fill="currentColor"/></svg>
+        <span id="cart-count-badge" class="badge-cart-count" style="display:none;">0</span>
+      </button>
+      <button id="mobile-nav-toggle" type="button" class="lg:hidden btn-ghost p-2" aria-label="Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav id="mobile-nav" class="hidden lg:hidden glass-panel mx-4 mb-3 p-4 rounded-xl flex flex-col gap-3">
+    <a href="/index.html" class="nav-link" data-i18n="nav_home">Home</a>
+    <a href="/shop.html" class="nav-link" data-i18n="nav_shop">Shop</a>
+    <a href="/about.html" class="nav-link" data-i18n="nav_about">Our Story</a>
+    <a href="/blog.html" class="nav-link" data-i18n="nav_blog">Journal</a>
+    <a href="/faq.html" class="nav-link" data-i18n="nav_faq">FAQ</a>
+    <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
+  </nav>
+</header>
+
+<section class="max-w-xl mx-auto px-5 md:px-8 py-20">
+  <h1 class="heading-serif text-4xl gold-gradient-text mb-4" data-i18n="track_page_title">Track Your Order</h1>
+  <p class="text-ink-300 mb-8" data-i18n="track_intro">Enter your Order ID (from your confirmation email or the order confirmation page) and the email you used at checkout.</p>
+
+  <form id="track-order-form" class="glass-static rounded-2xl p-8 flex flex-col gap-4">
+    <input required type="text" id="to-order-id" placeholder="Order ID" data-i18n-placeholder="track_order_id_placeholder" class="input-glass" />
+    <input required type="email" id="to-email" placeholder="Email used at checkout" data-i18n-placeholder="track_email_placeholder" class="input-glass" />
+    <button type="submit" id="to-submit-btn" class="btn-gold" data-i18n="track_submit">Track Order</button>
+    <p id="to-error" class="hidden text-xs text-red-400"></p>
+  </form>
+
+  <div id="to-result" class="hidden glass-static rounded-2xl p-8 mt-6">
+    <p class="text-xs eyebrow mb-1" data-i18n="track_status_label">Status</p>
+    <p id="to-status" class="heading-serif text-2xl gold-gradient-text mb-5 capitalize"></p>
+
+    <div id="to-tracking-block" class="hidden mb-5">
+      <p class="text-xs eyebrow mb-1" data-i18n="track_tracking_label">Tracking Number</p>
+      <p id="to-tracking-number" class="text-sm text-ink-100"></p>
+      <p id="to-carrier" class="text-xs text-ink-500 mt-1"></p>
+      <a id="to-tracking-link" href="#" target="_blank" rel="noopener" class="hidden text-xs text-gold-soft hover:underline mt-1 inline-block" data-i18n="track_view_carrier">Track with carrier →</a>
+    </div>
+
+    <p class="text-xs eyebrow mb-2" data-i18n="track_items_label">Items</p>
+    <ul id="to-items" class="text-sm text-ink-300 flex flex-col gap-1 mb-5"></ul>
+
+    <p class="text-xs eyebrow mb-1" data-i18n="track_total_label">Total</p>
+    <p id="to-total" class="text-lg text-gold font-semibold"></p>
+  </div>
+</section>
+
+<footer class="border-t border-white/5 py-12">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 text-center text-ink-700 text-xs">&copy; <span data-current-year>2026</span> Tracy's Botanical Elixirs. <span data-i18n="footer_rights">All rights reserved.</span></div>
+  <div class="flex flex-wrap items-center justify-center gap-2 mt-8">
+    <span class="payment-badge" aria-label="Visa"><svg viewBox="0 0 48 16" height="15" width="45" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><text x="0" y="12.5" font-family="Arial, Helvetica, sans-serif" font-style="italic" font-weight="800" font-size="15" fill="#1A1F71">VISA</text></svg></span>
+    <span class="payment-badge" aria-label="Mastercard"><svg viewBox="0 0 36 22" height="18" width="29.5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="14" cy="11" r="10" fill="#EB001B"/><circle cx="24" cy="11" r="10" fill="#F79E1B"/><path d="M19 3.3a10 10 0 0 1 0 15.4 10 10 0 0 1 0-15.4z" fill="#FF5F00"/></svg></span>
+    <span class="payment-badge" aria-label="Amex"><svg viewBox="0 0 44 16" height="15" width="41.25" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="44" height="16" rx="2.5" fill="#006FCF"/><text x="22" y="11.3" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="7.2" fill="#fff">AMEX</text></svg></span>
+    <span class="payment-badge" aria-label="Apple Pay"><svg viewBox="0 0 50 18" height="15" width="41.7" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9.9 3.9c.55-.66.92-1.58.82-2.5-.8.04-1.77.53-2.34 1.19-.51.58-.96 1.53-.84 2.42.9.07 1.8-.46 2.36-1.11z" fill="#000"/><path d="M10.65 5.03c-1.3-.08-2.4.74-3.02.74-.62 0-1.57-.7-2.6-.68-1.33.02-2.57.78-3.25 1.98-1.39 2.42-.36 6 1 7.97.66.96 1.45 2.03 2.49 1.99 1-.04 1.37-.65 2.58-.65 1.2 0 1.55.65 2.6.63 1.08-.02 1.76-.98 2.42-1.94.76-1.1 1.07-2.17 1.08-2.23-.02-.01-2.08-.8-2.1-3.17-.02-1.98 1.61-2.93 1.69-2.98-.93-1.36-2.36-1.51-2.87-1.55z" fill="#000"/><text x="18" y="13.5" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="11" fill="#000">Pay</text></svg></span>
+    <span class="payment-badge" aria-label="Stripe"><svg viewBox="0 0 60 16" height="14" width="52.5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><text x="0" y="12.5" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-style="italic" font-size="14" fill="#635BFF">stripe</text></svg></span>
+  </div>
+  <p class="text-center text-ink-700 text-xs mt-2"><a href="https://www.agralonline.com" target="_blank" rel="noopener" class="hover:text-gold-soft transition-colors"><span data-i18n="footer_credit">Created and designed by</span> <span class="text-gold-soft">AgralOnline</span></a></p>
+</footer>
+
+<script type="module">
+  import { bootstrapPage } from "/assets/js/main.js";
+  import { formatPrice } from "/assets/js/products.js";
+  import { t } from "/assets/js/i18n.js";
+
+  await bootstrapPage();
+
+  // Convenience: arriving from success.html?orderId=... prefills the field
+  // so a customer who bookmarks/returns to that page doesn't retype it.
+  const prefillOrderId = new URLSearchParams(window.location.search).get("orderId");
+  if (prefillOrderId) document.getElementById("to-order-id").value = prefillOrderId;
+
+  function escapeHtml(str = "") {
+    return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  }
+
+  document.getElementById("track-order-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("to-submit-btn");
+    const errorEl = document.getElementById("to-error");
+    const resultEl = document.getElementById("to-result");
+    errorEl.classList.add("hidden");
+    resultEl.classList.add("hidden");
+    btn.disabled = true;
+    btn.style.opacity = ".6";
+
+    try {
+      const res = await fetch("/api/track-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: document.getElementById("to-order-id").value.trim(),
+          email: document.getElementById("to-email").value.trim(),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || t("track_not_found"));
+
+      document.getElementById("to-status").textContent = data.status || "paid";
+
+      const trackingBlock = document.getElementById("to-tracking-block");
+      if (data.trackingNumber) {
+        trackingBlock.classList.remove("hidden");
+        document.getElementById("to-tracking-number").textContent = data.trackingNumber;
+        document.getElementById("to-carrier").textContent = data.carrier || "";
+        const link = document.getElementById("to-tracking-link");
+        if (data.trackingUrl) {
+          link.href = data.trackingUrl;
+          link.classList.remove("hidden");
+        } else {
+          link.classList.add("hidden");
+        }
+      } else {
+        trackingBlock.classList.add("hidden");
+      }
+
+      document.getElementById("to-items").innerHTML = (data.lineItems || [])
+        .map((li) => `<li>${li.quantity}× ${escapeHtml(li.description)}</li>`)
+        .join("");
+      document.getElementById("to-total").textContent = formatPrice((data.amountTotal || 0) / 100, (data.currency || "usd").toUpperCase());
+
+      resultEl.classList.remove("hidden");
+    } catch (err) {
+      errorEl.textContent = err.message || t("track_not_found");
+      errorEl.classList.remove("hidden");
+    } finally {
+      btn.disabled = false;
+      btn.style.opacity = "";
+    }
+  });
+</script>
+</body>
+</html>

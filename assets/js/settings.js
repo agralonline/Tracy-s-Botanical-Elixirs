@@ -18,6 +18,10 @@ export const DEFAULT_SETTINGS = {
   announcementText: "",
   freeShippingThresholdCents: 7500,
   social: { instagram: "", facebook: "", tiktok: "", pinterest: "" },
+  paypalLink: "",
+  heroLayout: "background", // "background" (full-bleed images behind text) or "box" (left text, right auto-scroll image box)
+  heroImages: [], // falls back to hero-slider.js's bundled HERO_SLIDES when empty
+  chatbotKnowledge: "",
 };
 
 let settingsCache = null;

@@ -26,12 +26,15 @@ export function injectChatbot() {
   const toggle = document.createElement("button");
   toggle.id = "chatbot-toggle";
   toggle.type = "button";
-  toggle.setAttribute("aria-label", "Chat");
-  toggle.style.cssText = `position:fixed;bottom:1.25rem;right:1.25rem;z-index:60;width:52px;height:52px;border-radius:50%;background:${TEAL};border:none;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;color:#0a0f1d;`;
+  toggle.setAttribute("aria-label", "Ask Tracy — chat with us");
+  // A pill (icon + "Ask Tracy" label) rather than an icon-only circle, so the
+  // chat entry point is self-explanatory at a glance instead of relying on
+  // the user to guess what the floating icon does.
+  toggle.style.cssText = `position:fixed;bottom:1.25rem;right:1.25rem;z-index:60;height:48px;padding:0 1.1rem 0 .7rem;border-radius:999px;background:${TEAL};border:none;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.4);display:flex;align-items:center;gap:.5rem;color:#0a0f1d;`;
   // Friendly robot-face mark (per the reference icon) instead of a speech bubble —
   // dark silhouette on the teal button, with the eyes/mouth "punched through"
   // in the button's own color so they read as cutouts rather than a flat glyph.
-  toggle.innerHTML = `<svg width="27" height="27" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  toggle.innerHTML = `<svg width="27" height="27" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
     <line x1="8.5" y1="3.6" x2="8.5" y2="6.2" stroke="#0a0f1d" stroke-width="1.5" stroke-linecap="round"/>
     <line x1="15.5" y1="3.6" x2="15.5" y2="6.2" stroke="#0a0f1d" stroke-width="1.5" stroke-linecap="round"/>
     <circle cx="8.5" cy="2.9" r="1" fill="#0a0f1d"/>
@@ -40,7 +43,7 @@ export function injectChatbot() {
     <circle cx="9" cy="12.3" r="1.6" fill="${TEAL}"/>
     <circle cx="15" cy="12.3" r="1.6" fill="${TEAL}"/>
     <rect x="9.3" y="15.6" width="5.4" height="1.5" rx="0.75" fill="${TEAL}"/>
-  </svg>`;
+  </svg><span style="font-size:.82rem;font-weight:600;white-space:nowrap;">Ask Tracy</span>`;
 
   const panel = document.createElement("div");
   panel.id = "chatbot-panel";
@@ -56,7 +59,7 @@ export function injectChatbot() {
   panel.innerHTML = `
     <div class="glass-panel" style="display:flex;flex-direction:column;height:100%;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border-bottom:1px solid rgba(255,255,255,.08);">
-        <span id="chatbot-title" class="heading-serif" style="font-size:1.1rem;color:var(--gold-soft);">Chat with us</span>
+        <span id="chatbot-title" class="heading-serif" style="font-size:1.1rem;color:var(--gold-soft);">Ask Tracy</span>
         <button id="chatbot-close" type="button" aria-label="Close" style="background:none;border:none;color:var(--ink-500);cursor:pointer;font-size:1.1rem;line-height:1;padding:.25rem;">&times;</button>
       </div>
       <div id="chatbot-messages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem;font-size:.85rem;"></div>
@@ -77,6 +80,20 @@ export function injectChatbot() {
     messagesEl.appendChild(bubble);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     return bubble;
+  }
+
+  // Shown under a bot reply that couldn't fully help — a direct escape
+  // hatch to a real person rather than leaving the customer stuck with the AI.
+  function addHumanHandoffButton() {
+    const messagesEl = document.getElementById("chatbot-messages");
+    const link = document.createElement("a");
+    link.href = "/contact.html";
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = t("chat_talk_human");
+    link.style.cssText = "align-self:flex-start;font-size:.78rem;color:var(--gold-soft);border:1px solid rgba(212,175,55,.35);border-radius:999px;padding:.35rem .8rem;text-decoration:none;";
+    messagesEl.appendChild(link);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
   function applyLabels() {
@@ -153,6 +170,7 @@ export function injectChatbot() {
       const data = await res.json();
       typingBubble.textContent = data.reply;
       history.push({ role: "assistant", content: data.reply });
+      if (data.needsHuman) addHumanHandoffButton();
     } catch (err) {
       typingBubble.textContent = t("chat_unavailable");
       chatUnavailable = true;

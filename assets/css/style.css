@@ -252,6 +252,26 @@ h1, h2, h3, .heading-serif {
   object-position: center;
 }
 
+/* Wellness-goal tiles — circular photos (vs. the square category tiles)
+   so the two browse paths read as visually distinct at a glance. */
+.wellness-goal-media {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(212,175,55,0.35);
+}
+.wellness-goal-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.4s ease;
+}
+.wellness-goal-tile:hover .wellness-goal-media img {
+  transform: scale(1.08);
+}
+
 /* ---------------------------------------------------------------------
    Buttons
    --------------------------------------------------------------------- */
@@ -448,6 +468,16 @@ select.input-glass {
   color: var(--gold-soft);
 }
 
+/* Sale badge — solid, high-contrast gold so it reads clearly against any
+   product photo background (unlike the subtle translucent .chip-gold). */
+.chip-sale {
+  background: linear-gradient(135deg, #f0c14b, #d4af37);
+  border-color: #d4af37;
+  color: #1a1408;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(212,175,55,0.45);
+}
+
 .badge-cart-count {
   position: absolute;
   top: -6px;
@@ -615,6 +645,44 @@ select.input-glass {
   .hero-slider-scrim {
     background: linear-gradient(180deg, rgba(5,11,20,0.5) 0%, rgba(5,11,20,0.85) 58%, rgba(5,11,20,0.96) 100%);
   }
+}
+
+/* Alternate hero layout (admin-selectable in Settings → Hero Section):
+   text on the left, a rounded auto-scrolling image box on the right,
+   instead of images filling the whole section behind the text. */
+.hero-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 4rem 1.25rem;
+}
+@media (min-width: 768px) {
+  .hero-split {
+    grid-template-columns: 1.1fr 1fr;
+    padding: 4.5rem 2rem;
+  }
+}
+.hero-split-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(212,175,55,0.25);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+}
+.hero-split-box .hero-slide {
+  background-size: cover;
+  background-position: center;
+}
+.hero-split-box .hero-slider-dots {
+  bottom: 1rem;
+}
+@media (max-width: 767px) {
+  .hero-split-box { aspect-ratio: 1 / 1; }
 }
 
 .cookie-consent-banner {

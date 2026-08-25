@@ -103,7 +103,7 @@ function sortProducts(products, sortBy) {
 
 function computeBadge(product) {
   if (product.pricing?.compareAtPrice && product.pricing.compareAtPrice > product.pricing.basePrice) {
-    return { key: "badge_sale", cls: "chip" };
+    return { key: "badge_sale", cls: "chip-sale" };
   }
   if (product.rating?.average >= 4.8 && product.rating?.count >= 50) {
     return { key: "badge_bestseller", cls: "chip-gold" };
@@ -168,7 +168,7 @@ function escapeHtml(str = "") {
  * onLocaleChange() subscription to instantly re-localize every card
  * without a full page refresh.
  */
-export async function renderProductGrid(containerEl, { category = null, featuredOnly = false, searchTerm = "", sortBy = "" } = {}) {
+export async function renderProductGrid(containerEl, { category = null, featuredOnly = false, searchTerm = "", sortBy = "", goal = null, onSaleOnly = false } = {}) {
   if (!containerEl) return;
   containerEl.innerHTML = skeletonGridHTML(8);
 
@@ -177,6 +177,8 @@ export async function renderProductGrid(containerEl, { category = null, featured
 
   if (category) filtered = filtered.filter((p) => p.category === category);
   if (featuredOnly) filtered = filtered.filter((p) => p.featured);
+  if (goal) filtered = filtered.filter((p) => Array.isArray(p.goals) && p.goals.includes(goal));
+  if (onSaleOnly) filtered = filtered.filter((p) => p.pricing?.compareAtPrice && p.pricing.compareAtPrice > p.pricing.basePrice);
   if (searchTerm && searchTerm.trim()) {
     const term = searchTerm.trim().toLowerCase();
     filtered = filtered.filter((p) => {
@@ -204,12 +206,14 @@ export async function renderProductGrid(containerEl, { category = null, featured
  * container the `product-row-scroll` CSS class for the swipe-lane styling.
  * Returns the number of products rendered, so callers can hide an empty row.
  */
-export async function renderProductRow(containerEl, { category = null, featuredOnly = false, searchTerm = "", sortBy = "" } = {}) {
+export async function renderProductRow(containerEl, { category = null, featuredOnly = false, searchTerm = "", sortBy = "", goal = null, onSaleOnly = false } = {}) {
   if (!containerEl) return 0;
   const products = await fetchProducts();
   let filtered = products;
   if (category) filtered = filtered.filter((p) => p.category === category);
   if (featuredOnly) filtered = filtered.filter((p) => p.featured);
+  if (goal) filtered = filtered.filter((p) => Array.isArray(p.goals) && p.goals.includes(goal));
+  if (onSaleOnly) filtered = filtered.filter((p) => p.pricing?.compareAtPrice && p.pricing.compareAtPrice > p.pricing.basePrice);
   if (searchTerm && searchTerm.trim()) {
     const term = searchTerm.trim().toLowerCase();
     filtered = filtered.filter((p) => {
@@ -320,6 +324,10 @@ export async function renderProductDetail(containerEl, slug) {
   }
 
   containerEl.innerHTML = `
+    <a href="/shop.html?category=${encodeURIComponent(product.category)}" id="pdp-back-link" class="text-sm text-ink-500 hover:text-gold-soft inline-flex items-center gap-1 mb-6" style="text-decoration:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      <span>${escapeHtml(t("pdp_back_to_category"))} ${escapeHtml(getCategoryLabel(product.category))}</span>
+    </a>
     <div class="grid md:grid-cols-2 gap-10 items-start">
       ${galleryHTML}
       <div class="flex flex-col gap-5">
@@ -357,6 +365,24 @@ export async function renderProductDetail(containerEl, slug) {
   wireAddToCartButtons(containerEl);
   wirePdpGallery(containerEl);
   wirePdpAccordions(containerEl);
+  wirePdpBackLink(containerEl);
+}
+
+// If the visitor actually came from shop/home on this site, going back
+// through browser history returns them to the exact scroll position and
+// filters they had (see shop.html's sessionStorage restore). Otherwise
+// (direct link, new tab, search engine) fall back to a plain navigation
+// to the category — still useful, just without the exact scroll restore.
+function wirePdpBackLink(root) {
+  const link = root.querySelector("#pdp-back-link");
+  if (!link) return;
+  link.addEventListener("click", (e) => {
+    const ref = document.referrer;
+    if (ref && ref.startsWith(window.location.origin) && window.history.length > 1) {
+      e.preventDefault();
+      window.history.back();
+    }
+  });
 }
 
 function wirePdpGallery(root) {

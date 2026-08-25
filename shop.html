@@ -58,8 +58,9 @@
 </header>
 
 <section class="max-w-7xl mx-auto px-5 md:px-8 pt-12 pb-8">
-  <h1 class="heading-serif text-4xl gold-gradient-text mb-6" data-i18n="section_categories">Shop by Category</h1>
-  <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+  <h1 id="shop-page-heading" class="heading-serif text-4xl gold-gradient-text mb-3" data-i18n="section_categories">Shop by Category</h1>
+  <a id="shop-goal-clear" href="/shop.html" class="hidden text-xs text-ink-500 hover:text-gold-soft mb-3 inline-block">&larr; <span data-i18n="category_all">All</span></a>
+  <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between mt-3">
     <div class="flex flex-wrap gap-2" id="category-filters">
       <button type="button" class="chip chip-gold cursor-pointer" data-cat="" data-i18n="category_all">All</button>
     </div>
@@ -103,6 +104,7 @@
     </div>
     <div class="flex flex-col gap-2">
       <a href="/shipping.html" class="nav-link" data-i18n="footer_shipping">Shipping &amp; Returns</a>
+      <a href="/track-order.html" class="nav-link" data-i18n="nav_track_order">Track Order</a>
       <a href="/privacy.html" class="nav-link" data-i18n="footer_privacy">Privacy Policy</a>
       <a href="/terms.html" class="nav-link" data-i18n="footer_terms">Terms of Service</a>
     </div>
@@ -138,9 +140,10 @@
 <script type="module">
   import { bootstrapPage } from "/assets/js/main.js";
   import { renderProductGrid, renderProductRow } from "/assets/js/products.js";
-  import { onLocaleChange } from "/assets/js/i18n.js";
+  import { onLocaleChange, t } from "/assets/js/i18n.js";
   import { fetchCategories, getCategoryLabel } from "/assets/js/categories.js";
   import { fetchSiteSettings, renderSocialLinks } from "/assets/js/settings.js";
+  import { WELLNESS_GOALS } from "/assets/js/wellness-goals.js";
 
   await bootstrapPage();
   fetchSiteSettings().then((s) => renderSocialLinks(document.getElementById("footer-social-links"), s.social));
@@ -150,7 +153,7 @@
   }
 
   const params = new URLSearchParams(window.location.search);
-  const state = { category: params.get("category") || "", search: params.get("q") || "", sortBy: params.get("sort") || "" };
+  const state = { category: params.get("category") || "", search: params.get("q") || "", sortBy: params.get("sort") || "", goal: params.get("goal") || "" };
 
   const grid = document.getElementById("product-grid");
   const sortSelect = document.getElementById("shop-sort");
@@ -181,10 +184,14 @@
   const singleCategorySection = document.getElementById("single-category-section");
   const allRowsEl = document.getElementById("all-category-rows");
 
+  const headingEl = document.getElementById("shop-page-heading");
+  const goalClearLink = document.getElementById("shop-goal-clear");
+
   /**
-   * Three view modes, chosen so browsing stays light (short horizontal
-   * rows) but searching still works the normal way (a flat grid of exactly
-   * what matched):
+   * Four view modes, chosen so browsing stays light (short horizontal
+   * rows) but searching/goal-filtering still work the normal way (a flat
+   * grid of exactly what matched):
+   *   - a wellness goal is active -> flat grid of matches (from the homepage's "Shop by Wellness Goal" tiles)
    *   - a search term is active  -> flat grid of matches (any/all categories)
    *   - no search, one category  -> a single horizontal row for it
    *   - no search, "All"         -> one horizontal row per category
@@ -194,14 +201,27 @@
     searchSection.classList.add("hidden");
     singleCategorySection.classList.add("hidden");
     allRowsEl.classList.add("hidden");
+    goalClearLink.classList.toggle("hidden", !state.goal);
 
-    if (state.search.trim()) {
+    if (state.goal) {
+      const goalDef = WELLNESS_GOALS.find((g) => g.slug === state.goal);
+      headingEl.removeAttribute("data-i18n");
+      headingEl.textContent = goalDef ? t(goalDef.i18nKey) : t("section_wellness_goals");
+      searchSection.classList.remove("hidden");
+      await renderProductGrid(searchGrid, { goal: state.goal, sortBy: state.sortBy });
+    } else if (state.search.trim()) {
+      headingEl.setAttribute("data-i18n", "section_categories");
+      headingEl.textContent = t("section_categories");
       searchSection.classList.remove("hidden");
       await renderProductGrid(searchGrid, { category: state.category || null, searchTerm: state.search, sortBy: state.sortBy });
     } else if (state.category) {
+      headingEl.setAttribute("data-i18n", "section_categories");
+      headingEl.textContent = t("section_categories");
       singleCategorySection.classList.remove("hidden");
       await renderProductRow(grid, { category: state.category, sortBy: state.sortBy });
     } else {
+      headingEl.setAttribute("data-i18n", "section_categories");
+      headingEl.textContent = t("section_categories");
       allRowsEl.classList.remove("hidden");
       await renderAllCategoryRows();
     }
@@ -237,8 +257,10 @@
     document.querySelectorAll('#category-filters .chip[data-cat]:not([data-cat=""])').forEach((btn) => {
       btn.addEventListener("click", () => {
         state.category = btn.getAttribute("data-cat");
+        state.goal = "";
         const url = new URL(window.location);
         if (state.category) url.searchParams.set("category", state.category); else url.searchParams.delete("category");
+        url.searchParams.delete("goal");
         window.history.replaceState({}, "", url);
         refresh();
       });
@@ -263,8 +285,10 @@
 
   document.getElementById("category-filters").querySelector('[data-cat=""]').addEventListener("click", () => {
     state.category = "";
+    state.goal = "";
     const url = new URL(window.location);
     url.searchParams.delete("category");
+    url.searchParams.delete("goal");
     window.history.replaceState({}, "", url);
     refresh();
   });
@@ -274,8 +298,10 @@
     clearTimeout(searchDebounce);
     searchDebounce = setTimeout(() => {
       state.search = e.target.value;
+      state.goal = "";
       const url = new URL(window.location);
       if (state.search) url.searchParams.set("q", state.search); else url.searchParams.delete("q");
+      url.searchParams.delete("goal");
       window.history.replaceState({}, "", url);
       refresh();
     }, 200);

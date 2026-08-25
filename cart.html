@@ -89,6 +89,11 @@
       <button type="submit" id="checkout-submit-btn" class="btn-gold w-full mt-2" data-i18n="checkout_pay_now">Pay Securely</button>
       <p id="checkout-error" class="hidden text-xs text-red-400"></p>
     </form>
+
+    <div id="paypal-checkout-option" class="hidden mt-4 text-center">
+      <p class="text-xs text-ink-500 mb-3">— or —</p>
+      <a id="paypal-checkout-link" href="#" target="_blank" rel="noopener" class="btn-outline-gold w-full inline-block">Pay with PayPal</a>
+    </div>
   </div>
 </section>
 
@@ -111,8 +116,28 @@
   import { getEnrichedCart, getCartTotals, setQuantity, removeItem, startCheckout, onCartChange } from "/assets/js/cart.js";
   import { formatPrice } from "/assets/js/products.js";
   import { getProductText, onLocaleChange, getCurrentLocale, t } from "/assets/js/i18n.js";
+  import { fetchSiteSettings } from "/assets/js/settings.js";
 
   await bootstrapPage();
+
+  // PayPal is optional and admin-configured (Settings → PayPal Link). Shown
+  // only when the admin has actually filled it in; otherwise stays hidden
+  // and Stripe remains the only checkout path.
+  (async () => {
+    try {
+      const settings = await fetchSiteSettings();
+      if (settings?.paypalLink) {
+        const link = document.getElementById("paypal-checkout-link");
+        const option = document.getElementById("paypal-checkout-option");
+        if (link && option) {
+          link.href = settings.paypalLink;
+          option.classList.remove("hidden");
+        }
+      }
+    } catch (err) {
+      console.warn("Could not load PayPal setting:", err.message);
+    }
+  })();
 
   function escapeHtml(str = "") {
     return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");

@@ -10,9 +10,25 @@
  * Requires GEMINI_API_KEY (see .env.example). Returns a friendly
  * 503 (not a crash) when it's missing, so the storefront can show a
  * "chat is temporarily unavailable" message instead of breaking.
+ *
+ * The admin panel (Settings → Chatbot Knowledge) can append extra
+ * free-text knowledge to this prompt without any code change — see
+ * getChatbotKnowledge() below, read fresh from tracy_settings/site on
+ * every request so edits take effect immediately.
+ *
+ * Human handoff: the model is instructed to end its reply with the
+ * literal tag [[HUMAN]] whenever it doesn't know the answer or the
+ * question needs a real person. That tag is stripped out of the reply
+ * text here and surfaced instead as `needsHuman: true` in the JSON
+ * response, which the storefront widget (chatbot.js) uses to show a
+ * "Talk to a Human" button under that message.
  */
 
-const SYSTEM_PROMPT = `You are the friendly storefront assistant for Tracy's Botanical Elixirs, a luxury essential oils and organic skincare brand shipping worldwide from the United States.
+import { getAdminDb } from "./firebaseAdmin.js";
+
+const HUMAN_TAG = "[[HUMAN]]";
+
+const BASE_SYSTEM_PROMPT = `You are the friendly storefront assistant for Tracy's Botanical Elixirs, a luxury essential oils and organic skincare brand shipping worldwide from the United States.
 
 What you know and can help with:
 - Shipping: ships from the US within 1-2 business days; domestic US orders over $75 ship free, otherwise a flat rate is calculated at checkout; international shipping cost/time is calculated at checkout and the customer covers any customs duties.
@@ -24,8 +40,22 @@ What you know and can help with:
 What you must NOT do:
 - Never invent specific order status, tracking numbers, or account details — you have no access to order data. For "where is my order" or account-specific questions, direct the customer to email support@tracyusa.com or use the Contact page (/contact.html), and for returns point them to /return-request.html.
 - Never give medical advice. If asked about using products during pregnancy or for a medical condition, advise consulting a physician and note that a patch test is recommended before first use.
-- Keep answers short (2-4 sentences), warm, and concrete. If you don't know something, say so plainly and point to the Contact page rather than guessing.
-- Always reply in the same language the customer is writing in — the storefront supports 24 languages.`;
+- Keep answers short (2-4 sentences), warm, and concrete.
+- Always reply in the same language the customer is writing in — the storefront supports 24 languages.
+
+Human handoff: if you don't know the answer, the question is order-specific, or the customer seems to want a real person (a complaint, something outside what you know), say so briefly and end your reply with the exact tag ${HUMAN_TAG} on its own line. Never mention the tag itself to the customer — it is only read by the website, not shown to them.`;
+
+/** Reads the admin-editable extra knowledge from tracy_settings/site (Settings → Chatbot Knowledge). Returns "" on any failure so chat still works if Firestore is briefly unavailable. */
+async function getChatbotKnowledge() {
+  try {
+    const snap = await getAdminDb().collection("tracy_settings").doc("site").get();
+    const text = snap.exists ? snap.data()?.chatbotKnowledge : "";
+    return typeof text === "string" ? text.slice(0, 4000).trim() : "";
+  } catch (err) {
+    console.warn("Could not read chatbotKnowledge from tracy_settings/site:", err.message);
+    return "";
+  }
+}
 
 export async function handleChat({ body }) {
   if (!process.env.GEMINI_API_KEY) {
@@ -60,6 +90,11 @@ export async function handleChat({ body }) {
     parts: [{ text: m.content }],
   }));
 
+  const knowledge = await getChatbotKnowledge();
+  const systemPrompt = knowledge
+    ? `${BASE_SYSTEM_PROMPT}\n\nAdditional store-specific information provided by the store owner (treat as authoritative, use it to answer questions):\n${knowledge}`
+    : BASE_SYSTEM_PROMPT;
+
   const model = process.env.GEMINI_CHAT_MODEL || "gemini-3.5-flash-lite";
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -67,7 +102,7 @@ export async function handleChat({ body }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        systemInstruction: { parts: [{ text: systemPrompt }] },
         contents,
         generationConfig: { maxOutputTokens: 400 },
       }),
@@ -82,9 +117,14 @@ export async function handleChat({ body }) {
   }
 
   const data = await res.json();
-  const reply =
+  let reply =
     (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim() ||
     "Sorry, I didn't catch that — could you rephrase?";
 
-  return { statusCode: 200, jsonBody: { reply } };
+  const needsHuman = reply.includes(HUMAN_TAG);
+  if (needsHuman) {
+    reply = reply.split(HUMAN_TAG).join("").trim();
+  }
+
+  return { statusCode: 200, jsonBody: { reply, needsHuman } };
 }

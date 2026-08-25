@@ -35,6 +35,18 @@
   force = true
 
 [[redirects]]
+  from = "/api/update-order"
+  to = "/.netlify/functions/update-order"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/track-order"
+  to = "/.netlify/functions/track-order"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/create-checkout-session"
   to = "/.netlify/functions/create-checkout-session"
   status = 200
