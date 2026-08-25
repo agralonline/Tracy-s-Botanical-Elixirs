@@ -668,7 +668,11 @@ select.input-glass {
 .hero-split-box {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  /* A fixed height (not aspect-ratio) so the box can never grow taller than
+     the viewport on a wide screen — aspect-ratio 4:5 scaled to a wide
+     column made the box (and the whole hero) taller than the screen,
+     cutting itself off before the "fold". */
+  height: clamp(320px, 56vh, 560px);
   border-radius: 1.25rem;
   overflow: hidden;
   border: 1px solid rgba(212,175,55,0.25);
@@ -682,7 +686,7 @@ select.input-glass {
   bottom: 1rem;
 }
 @media (max-width: 767px) {
-  .hero-split-box { aspect-ratio: 1 / 1; }
+  .hero-split-box { height: 320px; }
 }
 
 .cookie-consent-banner {
