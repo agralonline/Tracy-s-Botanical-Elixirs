@@ -8,7 +8,7 @@
  * blocks in each HTML file, after this has finished setting up i18n.
  */
 
-import { initI18n, onLocaleChange, t } from "/assets/js/i18n.js";
+import { initI18n, onLocaleChange, t, getCurrentLocale } from "/assets/js/i18n.js";
 import { initCartUI } from "/assets/js/cart.js";
 import { injectCookieConsent } from "/assets/js/cookie-consent.js";
 import { fetchSiteSettings } from "/assets/js/settings.js";
@@ -39,7 +39,7 @@ function injectAmbientBackground() {
 
 const ANNOUNCEMENT_DISMISS_KEY = "tracy_announcement_dismissed";
 
-/** Admin-configurable announcement bar, shown at the very top of every page. English-only text, like blog posts. */
+/** Admin-configurable announcement bar, shown at the very top of every page. Shows the admin's own 🌐-translated text for the current locale when available, falling back to the English source. */
 async function injectAnnouncementBar() {
   const settings = await fetchSiteSettings();
   if (!settings.announcementEnabled || !settings.announcementText?.trim()) return;
@@ -51,14 +51,21 @@ async function injectAnnouncementBar() {
     /* ignore */
   }
   // Re-show automatically if the admin changes the message, even if an older one was dismissed.
+  // The dismissal identity always tracks the English source text, regardless of which
+  // locale's translation is actually displayed.
   if (dismissedText === settings.announcementText) return;
+
+  const displayText = settings.announcementTranslations?.[getCurrentLocale()] || settings.announcementText;
 
   const bar = document.createElement("div");
   bar.id = "announcement-bar";
   bar.setAttribute("role", "note");
   bar.style.cssText = "position:relative;background:linear-gradient(120deg,var(--gold-dim),var(--gold-soft) 45%,var(--gold) 75%,var(--gold-soft));color:#0a0f1d;font-size:.8rem;font-weight:600;text-align:center;padding:.6rem 2.4rem;letter-spacing:.02em;";
   bar.innerHTML = `<span></span><button type="button" aria-label="Dismiss" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:#0a0f1d;font-size:1rem;line-height:1;cursor:pointer;padding:.25rem;">&times;</button>`;
-  bar.querySelector("span").textContent = settings.announcementText;
+  bar.querySelector("span").textContent = displayText;
+  onLocaleChange(() => {
+    bar.querySelector("span").textContent = settings.announcementTranslations?.[getCurrentLocale()] || settings.announcementText;
+  });
   bar.querySelector("button").addEventListener("click", () => {
     try {
       window.localStorage.setItem(ANNOUNCEMENT_DISMISS_KEY, settings.announcementText);

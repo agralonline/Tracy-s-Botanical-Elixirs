@@ -763,3 +763,26 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
     scroll-snap-align: start;
   }
 }
+
+/* ---------------------------------------------------------------------
+   Category/Bestseller product ROWS (home page + shop "All" view): a
+   Netflix-style horizontal swipe lane, one per category, at EVERY screen
+   size — not just mobile like .product-grid-mobile-scroll above. Keeps
+   the page short instead of one giant vertical wall of every product.
+   --------------------------------------------------------------------- */
+.product-row-scroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 1.25rem;
+  padding: 0.25rem 0.25rem 1rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.product-row-scroll > * {
+  flex: 0 0 240px;
+  scroll-snap-align: start;
+}
+@media (min-width: 640px) {
+  .product-row-scroll > * { flex-basis: 260px; }
+}

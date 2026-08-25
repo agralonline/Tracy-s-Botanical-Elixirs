@@ -19,13 +19,14 @@
 
 import { getFirebaseServices, isFirebaseConfigured } from "/assets/js/firebase-config.js";
 import { CATEGORIES as SEED_CATEGORIES, SEED_PRODUCTS } from "/data/seed-products.js";
-import { SEED_POSTS } from "/assets/js/blog.js";
+import { SEED_POSTS, bodyToHtml } from "/assets/js/blog.js";
+import { SUPPORTED_LOCALES, LOCALE_NAMES } from "/assets/js/i18n.js";
 
 const state = {
   services: null, user: null,
   products: [], editingId: null,
   categories: [], editingCategoryId: null,
-  posts: [], editingPostId: null, postsLoaded: false,
+  posts: [], editingPostId: null, editingPost: null, postsLoaded: false,
   orders: [], ordersLoaded: false,
   requests: [], requestsLoaded: false,
   settingsLoaded: false,
@@ -134,7 +135,30 @@ async function loadProducts() {
     state.products = snap2.docs.map((d) => ({ id: d.id, ...d.data() }));
   }
 
+  // Admin-controlled display order (▲/▼ buttons) wins over recency whenever
+  // it's been explicitly set; never-reordered products keep falling back to
+  // most-recently-updated first, same as before.
+  state.products.sort((a, b) => {
+    const ao = typeof a.order === "number" ? a.order : Infinity;
+    const bo = typeof b.order === "number" ? b.order : Infinity;
+    if (ao !== bo) return ao - bo;
+    return String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
+  });
+
   renderProductTable();
+}
+
+/** Currently displayed (filtered) product list — the ▲/▼ buttons reorder within this view. */
+function getFilteredProducts() {
+  const categoryFilter = $("product-filter-category")?.value || "";
+  const searchTerm = ($("product-filter-search")?.value || "").trim().toLowerCase();
+  return state.products.filter((p) => {
+    if (categoryFilter && p.category !== categoryFilter) return false;
+    if (!searchTerm) return true;
+    const title = (p.translations?.en?.title || "").toLowerCase();
+    const sku = (p.sku || "").toLowerCase();
+    return title.includes(searchTerm) || sku.includes(searchTerm);
+  });
 }
 
 /** Fill in any seed product that doesn't yet exist as a real Firestore doc (matched by slug). */
@@ -157,18 +181,31 @@ async function seedMissingProducts(missing) {
 
 function renderProductTable() {
   const tbody = $("product-table-body");
+  populateProductCategoryFilter();
+  const filtered = getFilteredProducts();
+
   if (!state.products.length) {
-    tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-ink-500">No products yet. Click "New Product" to add your first one.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-ink-500">No products yet. Click "New Product" to add your first one.</td></tr>`;
+    return;
+  }
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-ink-500">No products match this filter/search.</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = state.products
-    .map((p) => {
+  tbody.innerHTML = filtered
+    .map((p, i) => {
       const title = p.translations?.en?.title || "(untitled)";
       const translatedCount = p.translations ? Object.keys(p.translations).length : 0;
-      const img = (p.images && (p.images.find((i) => i.isPrimary) || p.images[0])) || {};
+      const img = (p.images && (p.images.find((i2) => i2.isPrimary) || p.images[0])) || {};
       return `
       <tr class="border-b border-white/5 hover:bg-white/[0.02]">
+        <td class="p-4">
+          <div class="flex flex-col gap-1">
+            <button class="btn-ghost text-xs px-1.5 py-0.5" data-move-product-up="${p.id}" ${i === 0 ? "disabled style='opacity:.3'" : ""} title="Move up">▲</button>
+            <button class="btn-ghost text-xs px-1.5 py-0.5" data-move-product-down="${p.id}" ${i === filtered.length - 1 ? "disabled style='opacity:.3'" : ""} title="Move down">▼</button>
+          </div>
+        </td>
         <td class="p-4 flex items-center gap-3">
           <div class="w-10 h-10 rounded-md overflow-hidden flex-shrink-0" style="background:var(--navy-850)">
             ${img.url ? `<img src="${img.url}" class="w-full h-full object-contain p-1" alt="" />` : ""}
@@ -196,6 +233,61 @@ function renderProductTable() {
   tbody.querySelectorAll("[data-delete]").forEach((btn) => {
     btn.addEventListener("click", () => deleteProduct(btn.getAttribute("data-delete")));
   });
+  tbody.querySelectorAll("[data-move-product-up]").forEach((btn) => {
+    btn.addEventListener("click", () => moveProduct(btn.getAttribute("data-move-product-up"), "up"));
+  });
+  tbody.querySelectorAll("[data-move-product-down]").forEach((btn) => {
+    btn.addEventListener("click", () => moveProduct(btn.getAttribute("data-move-product-down"), "down"));
+  });
+}
+
+/** Fill the Category filter dropdown above the product table from the live category list. */
+function populateProductCategoryFilter() {
+  const select = $("product-filter-category");
+  if (!select) return;
+  const previousValue = select.value;
+  select.innerHTML =
+    `<option value="">All categories</option>` +
+    state.categories.map((c) => `<option value="${escapeHtml(c.slug)}">${escapeHtml(c.name || c.slug)}</option>`).join("");
+  select.value = previousValue;
+}
+
+/** Swap this product with its neighbor WITHIN THE CURRENT FILTERED VIEW and persist order across the full product list — this is how an admin controls which product shows first per category / on the homepage. */
+async function moveProduct(id, direction) {
+  const filtered = getFilteredProducts();
+  const idx = filtered.findIndex((p) => p.id === id);
+  if (idx < 0) return;
+  const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= filtered.length) return;
+
+  // Swap the two products' order values directly (rather than reindexing the
+  // whole list) so reordering inside a category filter doesn't disturb the
+  // relative order of products in other categories.
+  const a = filtered[idx];
+  const b = filtered[swapIdx];
+  const aOrder = typeof a.order === "number" ? a.order : state.products.indexOf(a);
+  const bOrder = typeof b.order === "number" ? b.order : state.products.indexOf(b);
+  a.order = bOrder;
+  b.order = aOrder;
+
+  state.products.sort((x, y) => {
+    const xo = typeof x.order === "number" ? x.order : Infinity;
+    const yo = typeof y.order === "number" ? y.order : Infinity;
+    if (xo !== yo) return xo - yo;
+    return String(y.updatedAt || "").localeCompare(String(x.updatedAt || ""));
+  });
+  renderProductTable();
+
+  const { db, firestoreMod } = state.services;
+  try {
+    await Promise.all([
+      firestoreMod.updateDoc(firestoreMod.doc(db, "tracy_products", a.id), { order: a.order }),
+      firestoreMod.updateDoc(firestoreMod.doc(db, "tracy_products", b.id), { order: b.order }),
+    ]);
+  } catch (err) {
+    console.error(err);
+    showBanner(err.message || "Could not save the new order.", "error");
+  }
 }
 
 function escapeHtml(str = "") {
@@ -204,11 +296,9 @@ function escapeHtml(str = "") {
 
 /* -----------------------------------------------------------------
  * Categories
- * Unlike products, categories are NOT auto-translated — they store a
- * plain English name/description (same policy as Journal posts) and
- * are written straight to Firestore from this admin panel with the
- * client SDK, since there's no translation step that needs the
- * trusted serverless function.
+ * Same translate-and-save pattern as products (see buildCategoryPayload /
+ * postTranslateCategory below) — name + description are auto-translated
+ * into all 24 languages via the trusted serverless function.
  * --------------------------------------------------------------- */
 
 async function loadCategories() {
@@ -225,6 +315,14 @@ async function loadCategories() {
     const snap = await getDocs2(col2(db, "tracy_categories"));
     state.categories = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   }
+  // Admin-controlled display order (set via the ↑/↓ buttons below) wins over
+  // creation order whenever it's been explicitly set; categories that have
+  // never been reordered keep falling back to createdAt order.
+  state.categories.sort((a, b) => {
+    const ao = typeof a.order === "number" ? a.order : Infinity;
+    const bo = typeof b.order === "number" ? b.order : Infinity;
+    return ao - bo;
+  });
 
   // The original 4 categories (Essential Oils, Serums, Skincare, Hair Care)
   // only ever existed as hardcoded fallback data for the storefront — they
@@ -267,13 +365,19 @@ function renderCategoryTable() {
   const tbody = $("category-table-body");
   if (!tbody) return;
   if (!state.categories.length) {
-    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-ink-500">No categories yet. Click "New Category" to add your first one.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-ink-500">No categories yet. Click "New Category" to add your first one.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = state.categories
-    .map((c) => `
+    .map((c, i) => `
       <tr class="border-b border-white/5 hover:bg-white/[0.02]">
+        <td class="p-4">
+          <div class="flex flex-col gap-1">
+            <button class="btn-ghost text-xs px-1.5 py-0.5" data-move-category-up="${c.id}" ${i === 0 ? "disabled style='opacity:.3'" : ""} title="Move up">▲</button>
+            <button class="btn-ghost text-xs px-1.5 py-0.5" data-move-category-down="${c.id}" ${i === state.categories.length - 1 ? "disabled style='opacity:.3'" : ""} title="Move down">▼</button>
+          </div>
+        </td>
         <td class="p-4">
           <div class="w-12 h-12 rounded-md overflow-hidden flex-shrink-0" style="background:var(--navy-850)">
             ${c.image ? `<img src="${escapeHtml(c.image)}" class="w-full h-full object-cover" alt="" />` : ""}
@@ -295,6 +399,34 @@ function renderCategoryTable() {
   tbody.querySelectorAll("[data-delete-category]").forEach((btn) => {
     btn.addEventListener("click", () => deleteCategory(btn.getAttribute("data-delete-category")));
   });
+  tbody.querySelectorAll("[data-move-category-up]").forEach((btn) => {
+    btn.addEventListener("click", () => moveCategory(btn.getAttribute("data-move-category-up"), "up"));
+  });
+  tbody.querySelectorAll("[data-move-category-down]").forEach((btn) => {
+    btn.addEventListener("click", () => moveCategory(btn.getAttribute("data-move-category-down"), "down"));
+  });
+}
+
+/** Swap this category with its neighbor and persist the whole list's display order (the small ▲/▼ buttons in the table — this is how an admin controls which category shows first on the homepage/shop page). */
+async function moveCategory(id, direction) {
+  const idx = state.categories.findIndex((c) => c.id === id);
+  if (idx < 0) return;
+  const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= state.categories.length) return;
+
+  [state.categories[idx], state.categories[swapIdx]] = [state.categories[swapIdx], state.categories[idx]];
+  state.categories.forEach((c, i) => (c.order = i));
+  renderCategoryTable();
+
+  const { db, firestoreMod } = state.services;
+  try {
+    await Promise.all(
+      state.categories.map((c) => firestoreMod.updateDoc(firestoreMod.doc(db, "tracy_categories", c.id), { order: c.order }))
+    );
+  } catch (err) {
+    console.error(err);
+    showBanner(err.message || "Could not save the new order.", "error");
+  }
 }
 
 /** Keep the product form's Category dropdown in sync with the live category list. */
@@ -325,6 +457,10 @@ function openCategoryForm(category = null) {
   $("cf-description").value = category?.description || "";
   $("cf-image-url").value = category?.image || "";
   $("cf-image-file").value = "";
+
+  const isEditing = !!category;
+  document.querySelectorAll(".category-field-translate-btn").forEach((btn) => btn.classList.toggle("hidden", !isEditing));
+  $("category-save-btn").textContent = isEditing ? "Save" : "Translate & Save";
 
   $("category-modal-overlay").classList.remove("hidden");
   $("category-modal-overlay").classList.add("flex");
@@ -360,6 +496,33 @@ async function uploadCategoryImageIfNeeded() {
   return storageMod.getDownloadURL(storageRef);
 }
 
+async function buildCategoryPayload() {
+  const imageUrl = await uploadCategoryImageIfNeeded();
+  return {
+    id: $("cf-id").value || null,
+    slug: $("cf-slug").value.trim() || slugify($("cf-name").value),
+    image: imageUrl || "",
+    sourceText: {
+      name: $("cf-name").value.trim(),
+      description: $("cf-description").value.trim(),
+    },
+  };
+}
+
+async function postTranslateCategory(payload) {
+  const idToken = await state.user.getIdToken();
+  const res = await fetch("/api/translate-category", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}));
+    throw new Error(errBody.error || `Server responded ${res.status}`);
+  }
+  return res.json();
+}
+
 async function handleSaveCategory(e) {
   e.preventDefault();
   const btn = $("category-save-btn");
@@ -369,29 +532,14 @@ async function handleSaveCategory(e) {
   statusEl.textContent = "Uploading image…";
 
   try {
-    const imageUrl = await uploadCategoryImageIfNeeded();
-    const { db, firestoreMod } = state.services;
-    const editingId = $("cf-id").value || null;
-
-    const data = {
-      name: $("cf-name").value.trim(),
-      slug: $("cf-slug").value.trim() || slugify($("cf-name").value),
-      description: $("cf-description").value.trim(),
-      image: imageUrl || "",
-      updatedAt: firestoreMod.serverTimestamp(),
-    };
-
-    statusEl.textContent = "Saving…";
-
-    if (editingId) {
-      await firestoreMod.updateDoc(firestoreMod.doc(db, "tracy_categories", editingId), data);
-    } else {
-      data.createdAt = firestoreMod.serverTimestamp();
-      await firestoreMod.addDoc(firestoreMod.collection(db, "tracy_categories"), data);
-    }
+    const isEditing = !!$("cf-id").value;
+    const payload = await buildCategoryPayload();
+    if (isEditing) payload.translateFields = []; // plain save — leave existing translations untouched
+    statusEl.textContent = isEditing ? "Saving…" : "Translating into 24 languages…";
+    const saved = await postTranslateCategory(payload);
 
     statusEl.textContent = "Saved.";
-    showBanner(`"${data.name}" category saved.`);
+    showBanner(isEditing ? `"${saved.name}" category saved.` : `"${saved.name}" category saved and translated into 24 languages.`);
     await loadCategories();
     setTimeout(() => closeCategoryForm({ skipConfirm: true }), 500);
   } catch (err) {
@@ -401,6 +549,34 @@ async function handleSaveCategory(e) {
   } finally {
     btn.disabled = false;
     btn.style.opacity = "";
+  }
+}
+
+/** Small per-field "🌐 Translate this field" button for the category form — same pattern as products. */
+async function handleCategoryFieldTranslate(field, btn) {
+  const statusEl = $("category-status");
+  const categoryId = $("cf-id").value;
+  if (!categoryId) return;
+
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Translating…";
+  statusEl.textContent = "Translating just this field into 24 languages…";
+
+  try {
+    const payload = await buildCategoryPayload();
+    payload.translateFields = [field];
+    await postTranslateCategory(payload);
+    statusEl.textContent = "Saved.";
+    showBanner(`"${field}" re-translated into 24 languages.`);
+    await loadCategories();
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "";
+    showBanner(err.message || "Translate failed.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
   }
 }
 
@@ -517,6 +693,7 @@ async function deletePost(id) {
 
 function openPostForm(post = null) {
   state.editingPostId = post?.id || null;
+  state.editingPost = post || null;
   $("post-modal-title").textContent = post ? "Edit Post" : "New Post";
   $("post-status-msg").textContent = "";
   $("pof-id").value = post?.id || "";
@@ -524,6 +701,18 @@ function openPostForm(post = null) {
   $("pof-category").value = post?.category || "";
   $("pof-body").value = post?.body || "";
   $("pof-status").value = post?.status || "published";
+  $("pof-slug").value = post?.slug || "";
+  $("pof-seo-title").value = post?.seoTitle || "";
+  $("pof-meta-description").value = post?.metaDescription || "";
+  $("pof-body-preview").classList.add("hidden");
+  $("pof-preview-toggle").textContent = "Preview";
+
+  // Translations only make sense once a post is actually saved (needs an id
+  // to attach translations to) — hidden for a brand-new, not-yet-saved post.
+  $("pof-translations-section").classList.toggle("hidden", !post);
+  if (post) populatePostTranslationLocaleSelect();
+
+  updateSeoScore();
   $("post-modal-overlay").classList.remove("hidden");
   $("post-modal-overlay").classList.add("flex");
   const panel = $("post-modal-panel");
@@ -531,7 +720,52 @@ function openPostForm(post = null) {
 }
 
 function postFormHasUnsavedInput() {
-  return ["pof-title", "pof-category", "pof-body"].some((id) => $(id) && $(id).value.trim());
+  return ["pof-title", "pof-category", "pof-body", "pof-seo-title", "pof-meta-description"].some((id) => $(id) && $(id).value.trim());
+}
+
+/** Simple, real (not a stub) on-page SEO checklist — updates live as the admin types. */
+function computeSeoScore() {
+  const title = $("pof-title").value.trim();
+  const seoTitle = $("pof-seo-title").value.trim() || title;
+  const meta = $("pof-meta-description").value.trim();
+  const body = $("pof-body").value;
+  const slug = $("pof-slug").value.trim();
+
+  let score = 0;
+  const tips = [];
+
+  if (seoTitle.length >= 30 && seoTitle.length <= 60) score += 25;
+  else tips.push(`SEO title should be 30–60 characters (currently ${seoTitle.length}).`);
+
+  if (meta.length >= 120 && meta.length <= 160) score += 25;
+  else tips.push(`Meta description should be 120–160 characters (currently ${meta.length}).`);
+
+  const wordCount = body.trim().split(/\s+/).filter(Boolean).length;
+  if (wordCount >= 300) score += 25;
+  else tips.push(`Body is ${wordCount} words — aim for 300+ words for better SEO.`);
+
+  if (/^\*\*.+?\*\*/m.test(body)) score += 15;
+  else tips.push("Add at least one **bold** lead-in at the start of a paragraph — it becomes a colored sub-heading readers (and search engines) can scan.");
+
+  if (slug && /^[a-z0-9-]+$/.test(slug) && slug.length <= 60) score += 10;
+  else tips.push("Slug should be lowercase letters, numbers, and hyphens only, under 60 characters.");
+
+  return { score, tips };
+}
+
+function updateSeoScore() {
+  const { score, tips } = computeSeoScore();
+  const color = score >= 80 ? "#5fae82" : score >= 50 ? "#E8C766" : "#d16a6a";
+  const label = score >= 80 ? "Good" : score >= 50 ? "Needs work" : "Poor";
+  $("pof-seo-score").innerHTML = `
+    <div class="flex items-center justify-between mb-2">
+      <span class="eyebrow">SEO Score</span>
+      <span style="color:${color};font-weight:600;">${score}/100 · ${label}</span>
+    </div>
+    ${tips.length ? `<ul class="text-ink-500" style="list-style:disc;padding-left:1.1rem;">${tips.map((t) => `<li>${escapeHtml(t)}</li>`).join("")}</ul>` : `<p class="text-ink-500">All checks pass.</p>`}
+  `;
+  $("pof-seo-title-count").textContent = $("pof-seo-title").value.trim() ? `(${$("pof-seo-title").value.trim().length} chars)` : "";
+  $("pof-meta-desc-count").textContent = $("pof-meta-description").value.trim() ? `(${$("pof-meta-description").value.trim().length} chars)` : "";
 }
 
 function closePostForm({ skipConfirm = false } = {}) {
@@ -559,6 +793,9 @@ async function handleSavePost(e) {
       category: $("pof-category").value.trim(),
       body: $("pof-body").value.trim(),
       status: $("pof-status").value,
+      slug: $("pof-slug").value.trim() || slugify($("pof-title").value),
+      seoTitle: $("pof-seo-title").value.trim(),
+      metaDescription: $("pof-meta-description").value.trim(),
       updatedAt: firestoreMod.serverTimestamp(),
     };
 
@@ -581,6 +818,170 @@ async function handleSavePost(e) {
   } finally {
     btn.disabled = false;
     btn.style.opacity = "";
+  }
+}
+
+/* -----------------------------------------------------------------
+ * Blog post Translations — manual, per-language, unlike products/
+ * categories. The admin picks ONE language at a time (never all 24 at
+ * once — a full article is too long/expensive to blanket-translate and
+ * get right), can auto-translate just the short Title/SEO fields for
+ * that language via the server, and pastes their own translation of the
+ * body. Saved into post.translations[locale] directly from the client,
+ * same as categories' plain fields — no server round-trip needed since
+ * nothing here is computed beyond the optional short-field translate.
+ * --------------------------------------------------------------- */
+
+function populatePostTranslationLocaleSelect() {
+  const select = $("pof-tr-locale");
+  select.innerHTML = SUPPORTED_LOCALES.filter((l) => l !== "en")
+    .map((code) => `<option value="${code}">${LOCALE_NAMES[code] || code}</option>`)
+    .join("");
+  loadPostTranslationIntoForm();
+}
+
+/** Fill the Translations sub-form with whatever this post already has saved for the selected language (blank if none yet). */
+function loadPostTranslationIntoForm() {
+  const locale = $("pof-tr-locale").value;
+  const existing = state.editingPost?.translations?.[locale] || {};
+  $("pof-tr-title").value = existing.title || "";
+  $("pof-tr-seo-title").value = existing.seoTitle || "";
+  $("pof-tr-meta-description").value = existing.metaDescription || "";
+  $("pof-tr-body").value = existing.body || "";
+  $("pof-tr-status").textContent = "";
+}
+
+/** 🌐 Auto-translate ONLY the short fields (Title/SEO Title/Meta Description) into the ONE selected language — never the body, which the admin pastes in manually. */
+async function handleBlogFieldAutoTranslate() {
+  const btn = $("pof-tr-autotranslate-btn");
+  const statusEl = $("pof-tr-status");
+  const locale = $("pof-tr-locale").value;
+  const title = $("pof-title").value.trim();
+  if (!title) {
+    showBanner("Write the English Title first.", "error");
+    return;
+  }
+
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Translating…";
+  statusEl.textContent = `Translating into ${LOCALE_NAMES[locale] || locale}…`;
+
+  try {
+    const idToken = await state.user.getIdToken();
+    const res = await fetch("/api/translate-blog-field", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({
+        locale,
+        sourceText: {
+          title,
+          seoTitle: $("pof-seo-title").value.trim() || title,
+          metaDescription: $("pof-meta-description").value.trim(),
+        },
+      }),
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.error || `Server responded ${res.status}`);
+    }
+    const translated = await res.json();
+    $("pof-tr-title").value = translated.title || "";
+    $("pof-tr-seo-title").value = translated.seoTitle || "";
+    $("pof-tr-meta-description").value = translated.metaDescription || "";
+    statusEl.textContent = "Translated — review below, then paste in the body and Save This Language.";
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "";
+    showBanner(err.message || "Translate failed.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
+}
+
+async function handleSavePostTranslation() {
+  const btn = $("pof-tr-save-btn");
+  const statusEl = $("pof-tr-status");
+  const postId = $("pof-id").value;
+  const locale = $("pof-tr-locale").value;
+  if (!postId) return;
+
+  btn.disabled = true;
+  statusEl.textContent = "Saving…";
+  try {
+    const { db, firestoreMod } = state.services;
+    const translationData = {
+      title: $("pof-tr-title").value.trim(),
+      seoTitle: $("pof-tr-seo-title").value.trim(),
+      metaDescription: $("pof-tr-meta-description").value.trim(),
+      body: $("pof-tr-body").value.trim(),
+    };
+    await firestoreMod.updateDoc(firestoreMod.doc(db, "tracy_blogPosts", postId), {
+      [`translations.${locale}`]: translationData,
+      updatedAt: firestoreMod.serverTimestamp(),
+    });
+    // Keep the in-memory copy in sync so switching languages in this same
+    // session shows what was just saved.
+    state.editingPost = state.editingPost || {};
+    state.editingPost.translations = { ...(state.editingPost.translations || {}), [locale]: translationData };
+    statusEl.textContent = "Saved.";
+    showBanner(`${LOCALE_NAMES[locale] || locale} translation saved.`);
+    await loadPosts();
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "";
+    showBanner(err.message || "Saving the translation failed.", "error");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* -----------------------------------------------------------------
+ * Blog export/import — a full JSON backup of every post (all fields,
+ * including translations), downloadable and re-importable. This is the
+ * "so at least you have a backup if anything ever goes wrong" safety net.
+ * --------------------------------------------------------------- */
+
+function handleExportPosts() {
+  const payload = JSON.stringify(state.posts, null, 2);
+  const blob = new Blob([payload], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `tracy-blog-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showBanner(`Exported ${state.posts.length} post(s).`);
+}
+
+async function handleImportPosts(e) {
+  const file = e.target.files?.[0];
+  e.target.value = ""; // allow re-selecting the same file later
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    const posts = JSON.parse(text);
+    if (!Array.isArray(posts)) throw new Error("Backup file must contain a JSON array of posts.");
+
+    const ok = window.confirm(`Import ${posts.length} post(s)? Posts with a matching id will be overwritten; others will be added.`);
+    if (!ok) return;
+
+    const { db, firestoreMod } = state.services;
+    await Promise.all(
+      posts.map(({ id, ...post }) => {
+        if (!id) return Promise.resolve();
+        return firestoreMod.setDoc(firestoreMod.doc(db, "tracy_blogPosts", id), { ...post, updatedAt: firestoreMod.serverTimestamp() }, { merge: true });
+      })
+    );
+    showBanner(`Imported ${posts.length} post(s).`);
+    await loadPosts();
+  } catch (err) {
+    console.error(err);
+    showBanner(err.message || "Import failed — check the file is a valid backup JSON.", "error");
   }
 }
 
@@ -775,6 +1176,41 @@ async function handleSaveSettings(e) {
   }
 }
 
+/** "🌐 Translate this field" for the announcement bar text — translates + saves just that one field into all 24 languages via a server call, independent of the rest of Save Settings. */
+async function handleAnnouncementTranslate() {
+  const btn = $("sf-announcement-translate-btn");
+  const statusEl = $("settings-status");
+  const text = $("sf-announcement-text").value.trim();
+  if (!text) return;
+
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Translating…";
+  statusEl.textContent = "Translating announcement into 24 languages…";
+
+  try {
+    const idToken = await state.user.getIdToken();
+    const res = await fetch("/api/translate-announcement", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.error || `Server responded ${res.status}`);
+    }
+    statusEl.textContent = "Saved.";
+    showBanner("Announcement text translated into 24 languages.");
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "";
+    showBanner(err.message || "Translate failed.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
+}
+
 async function deleteProduct(id) {
   if (!confirm("Delete this product? This cannot be undone.")) return;
   const { db, firestoreMod } = state.services;
@@ -803,6 +1239,7 @@ function openProductForm(product = null) {
   $("pf-ingredients").value = (product?.attributes?.ingredients || []).join(", ");
   $("pf-image-url").value = (product?.images && (product.images.find((i) => i.isPrimary) || product.images[0])?.url) || "";
   $("pf-image-file").value = "";
+  $("pf-image-gallery").value = (product?.images || []).filter((img) => !img.isPrimary).map((img) => img.url).join("\n");
   $("pf-organic").checked = !!product?.attributes?.organic;
   $("pf-vegan").checked = !!product?.attributes?.vegan;
   $("pf-cruelty-free").checked = !!product?.attributes?.crueltyFree;
@@ -827,7 +1264,7 @@ function openProductForm(product = null) {
 
 /** True if any field in the New/Edit Product form has user-entered content. */
 function productFormHasUnsavedInput() {
-  const textFields = ["pf-title", "pf-short", "pf-desc", "pf-sku", "pf-slug", "pf-price", "pf-compare-price", "pf-volume", "pf-quantity", "pf-ingredients", "pf-image-url"];
+  const textFields = ["pf-title", "pf-short", "pf-desc", "pf-sku", "pf-slug", "pf-price", "pf-compare-price", "pf-volume", "pf-quantity", "pf-ingredients", "pf-image-url", "pf-image-gallery"];
   if (textFields.some((id) => $(id) && $(id).value.trim())) return true;
   if ($("pf-image-file")?.files?.length) return true;
   return false;
@@ -869,7 +1306,14 @@ async function buildProductPayload() {
       basePrice: parseFloat($("pf-price").value || "0"),
       compareAtPrice: $("pf-compare-price").value ? parseFloat($("pf-compare-price").value) : null,
     },
-    images: imageUrl ? [{ url: imageUrl, isPrimary: true }] : [],
+    images: [
+      ...(imageUrl ? [{ url: imageUrl, isPrimary: true }] : []),
+      ...$("pf-image-gallery")
+        .value.split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map((url) => ({ url, isPrimary: false })),
+    ],
     attributes: {
       volumeMl: $("pf-volume").value ? Number($("pf-volume").value) : null,
       ingredients: $("pf-ingredients").value.split(",").map((s) => s.trim()).filter(Boolean),
@@ -886,6 +1330,7 @@ async function buildProductPayload() {
       title: $("pf-title").value.trim(),
       shortDescription: $("pf-short").value.trim(),
       description: $("pf-desc").value.trim(),
+      ingredients: $("pf-ingredients").value.trim(),
     },
   };
 }
@@ -905,11 +1350,25 @@ async function postTranslateAndSave(payload) {
 }
 
 /** Main form submit — full Save when editing (translateFields: [], touches nothing translation-wise), full translate on first creation. */
+/** Warn (not block) when the SKU or slug being saved already belongs to a different product — catches accidental duplicate entries before they're written. */
+function findDuplicateProduct({ sku, slug, excludeId }) {
+  return state.products.find(
+    (p) => p.id !== excludeId && ((sku && p.sku?.toLowerCase() === sku.toLowerCase()) || (slug && p.slug === slug))
+  );
+}
+
 async function handleTranslateAndSave(e) {
   e.preventDefault();
   const btn = $("translate-save-btn");
   const statusEl = $("translate-status");
   const isEditing = !!$("pf-id").value;
+
+  const dupe = findDuplicateProduct({ sku: $("pf-sku").value.trim(), slug: $("pf-slug").value.trim(), excludeId: $("pf-id").value || null });
+  if (dupe) {
+    const ok = window.confirm(`A product with this SKU or slug already exists: "${dupe.translations?.en?.title || dupe.sku}". Save anyway?`);
+    if (!ok) return;
+  }
+
   btn.disabled = true;
   btn.style.opacity = ".6";
   statusEl.textContent = "Uploading image…";
@@ -985,9 +1444,11 @@ function wireStaticUI() {
   $("pf-title").addEventListener("blur", () => {
     if (!$("pf-slug").value) $("pf-slug").value = slugify($("pf-title").value);
   });
-  document.querySelectorAll(".field-translate-btn").forEach((btn) => {
+  document.querySelectorAll("#product-form .field-translate-btn").forEach((btn) => {
     btn.addEventListener("click", () => handleFieldTranslate(btn.dataset.field, btn));
   });
+  $("product-filter-category")?.addEventListener("change", renderProductTable);
+  $("product-filter-search")?.addEventListener("input", renderProductTable);
 
   TABS.forEach((name) => {
     $(`tab-${name}-btn`).addEventListener("click", () => switchTab(name));
@@ -999,12 +1460,43 @@ function wireStaticUI() {
   $("cf-name").addEventListener("blur", () => {
     if (!$("cf-slug").value) $("cf-slug").value = slugify($("cf-name").value);
   });
+  document.querySelectorAll(".category-field-translate-btn").forEach((btn) => {
+    btn.addEventListener("click", () => handleCategoryFieldTranslate(btn.dataset.field, btn));
+  });
 
   $("new-post-btn").addEventListener("click", () => openPostForm(null));
   $("post-modal-close").addEventListener("click", () => closePostForm());
   $("post-form").addEventListener("submit", handleSavePost);
+  $("pof-title").addEventListener("blur", () => {
+    if (!$("pof-slug").value) $("pof-slug").value = slugify($("pof-title").value);
+  });
+  ["pof-title", "pof-seo-title", "pof-meta-description", "pof-body", "pof-slug"].forEach((id) => {
+    $(id).addEventListener("input", updateSeoScore);
+  });
+  $("pof-bold-btn").addEventListener("click", () => {
+    const ta = $("pof-body");
+    const { selectionStart: s, selectionEnd: en, value } = ta;
+    if (s === en) return; // nothing selected — nothing to wrap
+    ta.value = value.slice(0, s) + "**" + value.slice(s, en) + "**" + value.slice(en);
+    ta.focus();
+    ta.setSelectionRange(s + 2, en + 2);
+    updateSeoScore();
+  });
+  $("pof-preview-toggle").addEventListener("click", () => {
+    const previewEl = $("pof-body-preview");
+    const isHidden = previewEl.classList.contains("hidden");
+    if (isHidden) previewEl.innerHTML = bodyToHtml($("pof-body").value);
+    previewEl.classList.toggle("hidden", !isHidden);
+    $("pof-preview-toggle").textContent = isHidden ? "Hide Preview" : "Preview";
+  });
+  $("pof-tr-locale").addEventListener("change", loadPostTranslationIntoForm);
+  $("pof-tr-autotranslate-btn").addEventListener("click", handleBlogFieldAutoTranslate);
+  $("pof-tr-save-btn").addEventListener("click", handleSavePostTranslation);
+  $("export-posts-btn").addEventListener("click", handleExportPosts);
+  $("import-posts-input").addEventListener("change", handleImportPosts);
 
   $("settings-form").addEventListener("submit", handleSaveSettings);
+  $("sf-announcement-translate-btn").addEventListener("click", handleAnnouncementTranslate);
 }
 
 wireStaticUI();

@@ -34,7 +34,7 @@ function badRequest(message) {
   return err;
 }
 
-const ALL_TRANSLATABLE_FIELDS = ["title", "shortDescription", "description"];
+const ALL_TRANSLATABLE_FIELDS = ["title", "shortDescription", "description", "ingredients"];
 
 export async function handleTranslateAndSave({ body, authorizationHeader }) {
   const admin = await requireAdmin(authorizationHeader); // throws 401/403 on failure

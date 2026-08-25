@@ -18,7 +18,7 @@
 
 import { getFirebaseServices } from "/assets/js/firebase-config.js";
 import { CATEGORIES as SEED_CATEGORIES } from "/data/seed-products.js";
-import { t } from "/assets/js/i18n.js";
+import { t, getProductText } from "/assets/js/i18n.js";
 
 let categoryCache = null; // Array<Category> | null until first fetch resolves
 
@@ -40,6 +40,9 @@ export async function fetchCategories({ forceRefresh = false } = {}) {
       }
       if (!snap.empty) {
         categoryCache = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        // Respect the admin's ▲/▼ display order (see admin.js) when set;
+        // categories never reordered keep their createdAt order.
+        categoryCache.sort((a, b) => (typeof a.order === "number" ? a.order : Infinity) - (typeof b.order === "number" ? b.order : Infinity));
         return categoryCache;
       }
     } catch (err) {
@@ -65,7 +68,7 @@ export function getCategoryLabel(categoryOrSlug) {
   const category = typeof categoryOrSlug === "string" ? getCategoryBySlug(categoryOrSlug) : categoryOrSlug;
   if (!category) return "";
   if (category.labelKey) return t(category.labelKey);
-  return category.name || category.slug || "";
+  return (category.translations && getProductText(category, "name")) || category.name || category.slug || "";
 }
 
 export function getCategoryImage(categoryOrSlug) {
@@ -75,5 +78,6 @@ export function getCategoryImage(categoryOrSlug) {
 
 export function getCategoryDescription(categoryOrSlug) {
   const category = typeof categoryOrSlug === "string" ? getCategoryBySlug(categoryOrSlug) : categoryOrSlug;
-  return category?.description || "";
+  if (!category) return "";
+  return (category.translations && getProductText(category, "description")) || category.description || "";
 }

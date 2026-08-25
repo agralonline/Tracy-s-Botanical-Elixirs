@@ -1,13 +1,13 @@
 /**
  * TRACY USA — AI chatbot backend
  * ---------------------------------------------------------------------
- * A thin proxy to the Anthropic Messages API (https://docs.claude.com) —
- * kept server-side so the API key never reaches the browser. Answers
- * general shipping/ingredient/return-policy/product questions; does NOT
- * have access to order data, so it's instructed to route order-specific
+ * A thin proxy to the Google Gemini API (https://ai.google.dev) — kept
+ * server-side so the API key never reaches the browser. Answers general
+ * shipping/ingredient/return-policy/product questions; does NOT have
+ * access to order data, so it's instructed to route order-specific
  * questions to the Contact page or the Return/Refund Request form.
  *
- * Requires ANTHROPIC_API_KEY (see .env.example). Returns a friendly
+ * Requires GEMINI_API_KEY (see .env.example). Returns a friendly
  * 503 (not a crash) when it's missing, so the storefront can show a
  * "chat is temporarily unavailable" message instead of breaking.
  */
@@ -28,8 +28,8 @@ What you must NOT do:
 - Always reply in the same language the customer is writing in — the storefront supports 24 languages.`;
 
 export async function handleChat({ body }) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    const err = new Error("Chat is not configured on the server (ANTHROPIC_API_KEY missing).");
+  if (!process.env.GEMINI_API_KEY) {
+    const err = new Error("Chat is not configured on the server (GEMINI_API_KEY missing).");
     err.statusCode = 503;
     throw err;
   }
@@ -53,20 +53,26 @@ export async function handleChat({ body }) {
     throw err;
   }
 
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: process.env.ANTHROPIC_CHAT_MODEL || "claude-3-5-haiku-20241022",
-      max_tokens: 400,
-      system: SYSTEM_PROMPT,
-      messages: trimmed,
-    }),
-  });
+  // Gemini has no "assistant" role — it uses "model" — and takes the system
+  // prompt as a separate systemInstruction rather than a history entry.
+  const contents = trimmed.map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+
+  const model = process.env.GEMINI_CHAT_MODEL || "gemini-3.5-flash-lite";
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents,
+        generationConfig: { maxOutputTokens: 400 },
+      }),
+    }
+  );
 
   if (!res.ok) {
     const errBody = await res.json().catch(() => ({}));
@@ -76,7 +82,9 @@ export async function handleChat({ body }) {
   }
 
   const data = await res.json();
-  const reply = (data.content || []).map((block) => block.text || "").join("").trim() || "Sorry, I didn't catch that — could you rephrase?";
+  const reply =
+    (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim() ||
+    "Sorry, I didn't catch that — could you rephrase?";
 
   return { statusCode: 200, jsonBody: { reply } };
 }

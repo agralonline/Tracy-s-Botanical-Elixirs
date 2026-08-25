@@ -17,6 +17,24 @@
   force = true
 
 [[redirects]]
+  from = "/api/translate-category"
+  to = "/.netlify/functions/translate-category"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/translate-announcement"
+  to = "/.netlify/functions/translate-announcement"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/translate-blog-field"
+  to = "/.netlify/functions/translate-blog-field"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/create-checkout-session"
   to = "/.netlify/functions/create-checkout-session"
   status = 200

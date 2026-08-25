@@ -54,7 +54,7 @@
     </nav>
 
     <div class="flex items-center gap-3 md:gap-4">
-      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs" aria-label="Language"></select>
+      <div id="languageSelector" class="relative"></div>
 
       <button id="cart-toggle-btn" type="button" class="relative btn-ghost p-2" aria-label="Cart">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="10" cy="21" r="1.4" fill="currentColor"/><circle cx="18" cy="21" r="1.4" fill="currentColor"/></svg>
@@ -128,13 +128,16 @@
 </section>
 
 <!-- ================= BESTSELLERS ================= -->
-<section class="max-w-7xl mx-auto px-5 md:px-8 pb-24">
+<section class="max-w-7xl mx-auto px-5 md:px-8 pb-16">
   <div class="flex items-center justify-between mb-10">
     <h2 class="heading-serif text-3xl" data-i18n="section_bestsellers">Bestsellers</h2>
     <a href="/shop.html" class="btn-outline-gold text-xs" data-i18n="hero_cta_shop">Shop Collection</a>
   </div>
-  <div id="product-grid" class="product-grid-mobile-scroll grid sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+  <div id="product-grid" class="product-row-scroll"></div>
 </section>
+
+<!-- ================= PER-CATEGORY ROWS ================= -->
+<div id="category-rows"></div>
 
 <!-- ================= NEWSLETTER ================= -->
 <section class="max-w-4xl mx-auto px-5 md:px-8 pb-24">
@@ -182,7 +185,7 @@
     <span class="payment-badge" aria-label="Stripe"><svg viewBox="0 0 60 16" height="14" width="52.5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><text x="0" y="12.5" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-style="italic" font-size="14" fill="#635BFF">stripe</text></svg></span>
   </div>
   <p class="text-center text-ink-700 text-xs mt-6">&copy; <span data-current-year>2026</span> Tracy's Botanical Elixirs. <span data-i18n="footer_rights">All rights reserved.</span></p>
-  <p class="text-center text-ink-700 text-xs mt-2"><a href="mailto:agralonline@gmail.com" class="hover:text-gold-soft transition-colors"><span data-i18n="footer_credit">Created and designed by</span> <span class="text-gold-soft">AgralOnline</span></a></p>
+  <p class="text-center text-ink-700 text-xs mt-2"><a href="https://www.agralonline.com" target="_blank" rel="noopener" class="hover:text-gold-soft transition-colors"><span data-i18n="footer_credit">Created and designed by</span> <span class="text-gold-soft">AgralOnline</span></a></p>
 </footer>
 
 <!-- ================= CART DRAWER ================= -->
@@ -200,7 +203,7 @@
 
 <script type="module">
   import { bootstrapPage } from "/assets/js/main.js";
-  import { renderProductGrid } from "/assets/js/products.js";
+  import { renderProductRow } from "/assets/js/products.js";
   import { onLocaleChange } from "/assets/js/i18n.js";
   import { initHeroSlider } from "/assets/js/hero-slider.js";
   import { fetchCategories, getCategoryLabel, getCategoryImage } from "/assets/js/categories.js";
@@ -229,8 +232,37 @@
   onLocaleChange(renderCategoryTiles);
 
   const grid = document.getElementById("product-grid");
-  await renderProductGrid(grid, { featuredOnly: true });
-  onLocaleChange(() => renderProductGrid(grid, { featuredOnly: true }));
+  const bestsellersSection = grid.closest("section");
+  async function refreshBestsellers() {
+    const count = await renderProductRow(grid, { featuredOnly: true });
+    // Hide the whole section if no product has "Featured on homepage" checked yet.
+    bestsellersSection.classList.toggle("hidden", count === 0);
+  }
+  await refreshBestsellers();
+  onLocaleChange(refreshBestsellers);
+
+  /** One horizontal-scrolling row per category — lets a visitor browse every category right on the homepage without having to click into it first. */
+  async function renderCategoryRows() {
+    const rowsEl = document.getElementById("category-rows");
+    const categories = await fetchCategories();
+    rowsEl.innerHTML = categories.map((cat) => `
+      <section class="max-w-7xl mx-auto px-5 md:px-8 pb-16" data-category-row="${escapeHtml(cat.slug)}">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="heading-serif text-2xl">${escapeHtml(getCategoryLabel(cat))}</h2>
+          <a href="/shop.html?category=${encodeURIComponent(cat.slug)}" class="btn-outline-gold text-xs" data-i18n="hero_cta_shop">Shop Collection</a>
+        </div>
+        <div class="product-row-scroll" data-category-row-track="${escapeHtml(cat.slug)}"></div>
+      </section>
+    `).join("");
+
+    await Promise.all(categories.map(async (cat) => {
+      const track = rowsEl.querySelector(`[data-category-row-track="${cat.slug}"]`);
+      const count = await renderProductRow(track, { category: cat.slug });
+      if (count === 0) track.closest("[data-category-row]").classList.add("hidden");
+    }));
+  }
+  await renderCategoryRows();
+  onLocaleChange(renderCategoryRows);
 </script>
 </body>
 </html>

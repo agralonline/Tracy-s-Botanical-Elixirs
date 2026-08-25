@@ -28,6 +28,23 @@ export const SUPPORTED_LOCALES = [
 
 export const RTL_LOCALES = ["ar"];
 
+export const LOCALE_NAMES = {
+  en: "English", es: "Español", pt: "Português", fr: "Français", de: "Deutsch",
+  it: "Italiano", nl: "Nederlands", sv: "Svenska", el: "Ελληνικά", pl: "Polski",
+  ro: "Română", cs: "Čeština", hu: "Magyar", uk: "Українська", ru: "Русский",
+  bg: "Български", sk: "Slovenčina", lt: "Lietuvių", ar: "العربية", tr: "Türkçe",
+  "zh-CN": "简体中文", "zh-TW": "繁體中文", ja: "日本語", ko: "한국어",
+};
+
+// Short badge shown next to the globe icon in the header picker — a plain
+// language name is too long to sit next to an icon at header size.
+const LOCALE_SHORT = {
+  en: "EN", es: "ES", pt: "PT", fr: "FR", de: "DE", it: "IT", nl: "NL",
+  sv: "SV", el: "EL", pl: "PL", ro: "RO", cs: "CS", hu: "HU", uk: "UK",
+  ru: "RU", bg: "BG", sk: "SK", lt: "LT", ar: "AR", tr: "TR",
+  "zh-CN": "中文", "zh-TW": "繁中", ja: "JA", ko: "KO",
+};
+
 const LOCALE_STORAGE_KEY = "tracy_locale";
 const LOCALES_BASE_PATH = "/locales";
 
@@ -156,8 +173,10 @@ export async function setLocale(code) {
   applyDocumentDirection(code);
   applyDomTranslations(document);
 
-  const selector = document.getElementById("languageSelector");
-  if (selector && selector.value !== code) selector.value = code;
+  // Header uses the globe-icon picker (see initGlobeLanguageSelector below);
+  // the footer keeps a plain <select>. Both need to reflect the active locale
+  // no matter which one (or a saved preference) triggered this change.
+  updateGlobeSelectorLabel();
   const footerSelector = document.getElementById("languageSelectorFooter");
   if (footerSelector && footerSelector.value !== code) footerSelector.value = code;
 
@@ -172,17 +191,9 @@ export async function setLocale(code) {
   document.dispatchEvent(new CustomEvent("tracy:localechange", { detail: { locale: code } }));
 }
 
-/** Populate a <select id="languageSelector"> with all 24 locales and wire instant switching. */
+/** Populate a plain <select> (used for the footer picker) with all 24 locales and wire instant switching. */
 export function initLanguageSelector(selectEl) {
   if (!selectEl) return;
-  const LOCALE_NAMES = {
-    en: "English", es: "Español", pt: "Português", fr: "Français", de: "Deutsch",
-    it: "Italiano", nl: "Nederlands", sv: "Svenska", el: "Ελληνικά", pl: "Polski",
-    ro: "Română", cs: "Čeština", hu: "Magyar", uk: "Українська", ru: "Русский",
-    bg: "Български", sk: "Slovenčina", lt: "Lietuvių", ar: "العربية", tr: "Türkçe",
-    "zh-CN": "简体中文", "zh-TW": "繁體中文", ja: "日本語", ko: "한국어",
-  };
-
   selectEl.innerHTML = "";
   for (const code of SUPPORTED_LOCALES) {
     const opt = document.createElement("option");
@@ -197,12 +208,81 @@ export function initLanguageSelector(selectEl) {
   });
 }
 
+/**
+ * Build the header's globe-icon language picker inside `containerEl` (a
+ * plain <div id="languageSelector">): a small 🌐 + current-locale badge
+ * button that opens a scrollable dropdown panel of all 24 languages —
+ * replaces the old plain <select> in the header for a lighter-weight look,
+ * while the footer keeps the simple <select> (see initLanguageSelector).
+ */
+export function initGlobeLanguageSelector(containerEl) {
+  if (!containerEl || containerEl.dataset.globeWired) return;
+  containerEl.dataset.globeWired = "true";
+
+  containerEl.innerHTML = `
+    <button type="button" id="globe-lang-btn" class="btn-ghost flex items-center gap-1.5 !px-2.5 !py-2" aria-haspopup="listbox" aria-expanded="false" aria-label="Language">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 4 6 4 9s-1.5 6.4-4 9c-2.5-2.6-4-6-4-9s1.5-6.4 4-9z"/></svg>
+      <span id="globe-lang-code" class="text-xs font-medium"></span>
+    </button>
+    <div id="globe-lang-panel" class="hidden glass-panel rounded-xl absolute right-0 top-full mt-2 z-50 overflow-y-auto" style="width:220px;max-height:320px;padding:.5rem;"></div>
+  `;
+
+  const btn = containerEl.querySelector("#globe-lang-btn");
+  const panel = containerEl.querySelector("#globe-lang-panel");
+  const codeEl = containerEl.querySelector("#globe-lang-code");
+
+  panel.innerHTML = SUPPORTED_LOCALES.map(
+    (code) => `<button type="button" data-locale-option="${code}" class="w-full text-left text-sm px-3 py-2 rounded-lg hover:bg-white/[0.06] transition-colors flex items-center justify-between">
+      <span>${LOCALE_NAMES[code] || code}</span><span class="text-ink-700 text-xs">${LOCALE_SHORT[code] || code}</span>
+    </button>`
+  ).join("");
+
+  function isOpen() {
+    return !panel.classList.contains("hidden");
+  }
+  function openPanel() {
+    panel.classList.remove("hidden");
+    btn.setAttribute("aria-expanded", "true");
+  }
+  function closePanel() {
+    panel.classList.add("hidden");
+    btn.setAttribute("aria-expanded", "false");
+  }
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    isOpen() ? closePanel() : openPanel();
+  });
+  panel.querySelectorAll("[data-locale-option]").forEach((opt) => {
+    opt.addEventListener("click", () => {
+      setLocale(opt.getAttribute("data-locale-option"));
+      closePanel();
+    });
+  });
+  document.addEventListener("click", (e) => {
+    if (!isOpen()) return;
+    if (containerEl.contains(e.target)) return;
+    closePanel();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && isOpen()) closePanel();
+  });
+
+  codeEl.textContent = LOCALE_SHORT[currentLocale] || currentLocale.toUpperCase();
+}
+
+/** Keeps the header globe button's short-code badge in sync with the active locale, however it changed (this picker, the footer select, or a saved preference on load). */
+function updateGlobeSelectorLabel() {
+  const codeEl = document.getElementById("globe-lang-code");
+  if (codeEl) codeEl.textContent = LOCALE_SHORT[currentLocale] || currentLocale.toUpperCase();
+}
+
 /** Call once on page load. Detects the best locale, loads it, wires the selector if present. */
 export async function initI18n() {
   const initial = detectInitialLocale();
   await setLocale(initial);
   const selector = document.getElementById("languageSelector");
-  if (selector) initLanguageSelector(selector);
+  if (selector) initGlobeLanguageSelector(selector);
   const footerSelector = document.getElementById("languageSelectorFooter");
   if (footerSelector) initLanguageSelector(footerSelector);
   document.querySelectorAll("[data-current-year]").forEach((el) => {

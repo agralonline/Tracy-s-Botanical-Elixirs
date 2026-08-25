@@ -37,7 +37,7 @@
       <a href="/contact.html" class="nav-link" data-i18n="nav_contact">Contact</a>
     </nav>
     <div class="flex items-center gap-3 md:gap-4">
-      <select id="languageSelector" class="input-glass !py-2 !px-3 text-xs" aria-label="Language"></select>
+      <div id="languageSelector" class="relative"></div>
       <button id="cart-toggle-btn" type="button" class="relative btn-ghost p-2" aria-label="Cart">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="10" cy="21" r="1.4" fill="currentColor"/><circle cx="18" cy="21" r="1.4" fill="currentColor"/></svg>
         <span id="cart-count-badge" class="badge-cart-count" style="display:none;">0</span>
@@ -75,9 +75,18 @@
   </div>
 </section>
 
-<section class="max-w-7xl mx-auto px-5 md:px-8 pb-24">
-  <div id="product-grid" class="product-grid-mobile-scroll grid sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+<!-- Searching (any category): a normal flat grid of matching results. -->
+<section id="search-results-section" class="max-w-7xl mx-auto px-5 md:px-8 pb-24 hidden">
+  <div id="search-results-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
 </section>
+
+<!-- Not searching, single category selected: one horizontal-scrolling row for that category. -->
+<section id="single-category-section" class="max-w-7xl mx-auto px-5 md:px-8 pb-24 hidden">
+  <div id="product-grid" class="product-row-scroll"></div>
+</section>
+
+<!-- Not searching, "All" selected: one horizontal-scrolling row per category, same pattern as the homepage. -->
+<div id="all-category-rows" class="pb-8"></div>
 
 <footer class="border-t border-white/5 py-12">
   <div class="max-w-7xl mx-auto px-5 md:px-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm">
@@ -104,14 +113,14 @@
     </div>
   </div>
   <div class="flex flex-wrap items-center justify-center gap-2 mt-8">
-    <span class="payment-badge">Visa</span>
-    <span class="payment-badge">Mastercard</span>
-    <span class="payment-badge">Amex</span>
-    <span class="payment-badge">Apple Pay</span>
-    <span class="payment-badge">Stripe</span>
+    <span class="payment-badge" aria-label="Visa"><svg viewBox="0 0 48 16" height="15" width="45" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><text x="0" y="12.5" font-family="Arial, Helvetica, sans-serif" font-style="italic" font-weight="800" font-size="15" fill="#1A1F71">VISA</text></svg></span>
+    <span class="payment-badge" aria-label="Mastercard"><svg viewBox="0 0 36 22" height="18" width="29.5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="14" cy="11" r="10" fill="#EB001B"/><circle cx="24" cy="11" r="10" fill="#F79E1B"/><path d="M19 3.3a10 10 0 0 1 0 15.4 10 10 0 0 1 0-15.4z" fill="#FF5F00"/></svg></span>
+    <span class="payment-badge" aria-label="Amex"><svg viewBox="0 0 44 16" height="15" width="41.25" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="44" height="16" rx="2.5" fill="#006FCF"/><text x="22" y="11.3" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="7.2" fill="#fff">AMEX</text></svg></span>
+    <span class="payment-badge" aria-label="Apple Pay"><svg viewBox="0 0 50 18" height="15" width="41.7" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9.9 3.9c.55-.66.92-1.58.82-2.5-.8.04-1.77.53-2.34 1.19-.51.58-.96 1.53-.84 2.42.9.07 1.8-.46 2.36-1.11z" fill="#000"/><path d="M10.65 5.03c-1.3-.08-2.4.74-3.02.74-.62 0-1.57-.7-2.6-.68-1.33.02-2.57.78-3.25 1.98-1.39 2.42-.36 6 1 7.97.66.96 1.45 2.03 2.49 1.99 1-.04 1.37-.65 2.58-.65 1.2 0 1.55.65 2.6.63 1.08-.02 1.76-.98 2.42-1.94.76-1.1 1.07-2.17 1.08-2.23-.02-.01-2.08-.8-2.1-3.17-.02-1.98 1.61-2.93 1.69-2.98-.93-1.36-2.36-1.51-2.87-1.55z" fill="#000"/><text x="18" y="13.5" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="11" fill="#000">Pay</text></svg></span>
+    <span class="payment-badge" aria-label="Stripe"><svg viewBox="0 0 60 16" height="14" width="52.5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><text x="0" y="12.5" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-style="italic" font-size="14" fill="#635BFF">stripe</text></svg></span>
   </div>
   <p class="text-center text-ink-700 text-xs mt-6">&copy; <span data-current-year>2026</span> Tracy's Botanical Elixirs. <span data-i18n="footer_rights">All rights reserved.</span></p>
-  <p class="text-center text-ink-700 text-xs mt-2"><a href="mailto:agralonline@gmail.com" class="hover:text-gold-soft transition-colors"><span data-i18n="footer_credit">Created and designed by</span> <span class="text-gold-soft">AgralOnline</span></a></p>
+  <p class="text-center text-ink-700 text-xs mt-2"><a href="https://www.agralonline.com" target="_blank" rel="noopener" class="hover:text-gold-soft transition-colors"><span data-i18n="footer_credit">Created and designed by</span> <span class="text-gold-soft">AgralOnline</span></a></p>
 </footer>
 
 <div id="cart-overlay" class="fixed inset-0 bg-black/60 z-40"></div>
@@ -128,7 +137,7 @@
 
 <script type="module">
   import { bootstrapPage } from "/assets/js/main.js";
-  import { renderProductGrid } from "/assets/js/products.js";
+  import { renderProductGrid, renderProductRow } from "/assets/js/products.js";
   import { onLocaleChange } from "/assets/js/i18n.js";
   import { fetchCategories, getCategoryLabel } from "/assets/js/categories.js";
   import { fetchSiteSettings, renderSocialLinks } from "/assets/js/settings.js";
@@ -141,11 +150,24 @@
   }
 
   const params = new URLSearchParams(window.location.search);
-  const state = { category: params.get("category") || "", search: "", sortBy: params.get("sort") || "" };
+  const state = { category: params.get("category") || "", search: params.get("q") || "", sortBy: params.get("sort") || "" };
 
   const grid = document.getElementById("product-grid");
   const sortSelect = document.getElementById("shop-sort");
   if (sortSelect) sortSelect.value = state.sortBy;
+  const searchInput = document.getElementById("shop-search");
+  if (searchInput) searchInput.value = state.search;
+
+  // Remember exactly where the user was scrolled to (per filter/search/sort
+  // combo, since that's what the URL — and therefore this saved key —
+  // captures) so tapping "Back" from a product detail page drops them back
+  // in the same spot instead of at the top of a freshly re-rendered grid.
+  const SCROLL_KEY_PREFIX = "tracy_shop_scroll:";
+  window.addEventListener("pagehide", () => {
+    try {
+      sessionStorage.setItem(SCROLL_KEY_PREFIX + window.location.search, String(window.scrollY));
+    } catch (e) { /* ignore */ }
+  });
 
   function highlightActiveCategory() {
     document.querySelectorAll("#category-filters .chip").forEach((btn) => {
@@ -154,9 +176,61 @@
     });
   }
 
+  const searchSection = document.getElementById("search-results-section");
+  const searchGrid = document.getElementById("search-results-grid");
+  const singleCategorySection = document.getElementById("single-category-section");
+  const allRowsEl = document.getElementById("all-category-rows");
+
+  /**
+   * Three view modes, chosen so browsing stays light (short horizontal
+   * rows) but searching still works the normal way (a flat grid of exactly
+   * what matched):
+   *   - a search term is active  -> flat grid of matches (any/all categories)
+   *   - no search, one category  -> a single horizontal row for it
+   *   - no search, "All"         -> one horizontal row per category
+   */
   async function refresh() {
     highlightActiveCategory();
-    await renderProductGrid(grid, { category: state.category || null, searchTerm: state.search, sortBy: state.sortBy });
+    searchSection.classList.add("hidden");
+    singleCategorySection.classList.add("hidden");
+    allRowsEl.classList.add("hidden");
+
+    if (state.search.trim()) {
+      searchSection.classList.remove("hidden");
+      await renderProductGrid(searchGrid, { category: state.category || null, searchTerm: state.search, sortBy: state.sortBy });
+    } else if (state.category) {
+      singleCategorySection.classList.remove("hidden");
+      await renderProductRow(grid, { category: state.category, sortBy: state.sortBy });
+    } else {
+      allRowsEl.classList.remove("hidden");
+      await renderAllCategoryRows();
+    }
+  }
+
+  /** "All" view: one horizontal row per category, same pattern as the homepage. */
+  async function renderAllCategoryRows() {
+    const categories = await fetchCategories();
+    allRowsEl.innerHTML = categories.map((cat) => `
+      <section class="max-w-7xl mx-auto px-5 md:px-8 pb-16" data-category-row="${escapeHtml(cat.slug)}">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="heading-serif text-2xl">${escapeHtml(getCategoryLabel(cat))}</h2>
+          <button type="button" class="btn-outline-gold text-xs" data-open-category="${escapeHtml(cat.slug)}">View All</button>
+        </div>
+        <div class="product-row-scroll" data-category-row-track="${escapeHtml(cat.slug)}"></div>
+      </section>
+    `).join("");
+
+    allRowsEl.querySelectorAll("[data-open-category]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelector(`#category-filters .chip[data-cat="${btn.getAttribute("data-open-category")}"]`)?.click();
+      });
+    });
+
+    await Promise.all(categories.map(async (cat) => {
+      const track = allRowsEl.querySelector(`[data-category-row-track="${cat.slug}"]`);
+      const count = await renderProductRow(track, { category: cat.slug, sortBy: state.sortBy });
+      if (count === 0) track.closest("[data-category-row]").classList.add("hidden");
+    }));
   }
 
   function wireCategoryFilterClicks() {
@@ -200,6 +274,9 @@
     clearTimeout(searchDebounce);
     searchDebounce = setTimeout(() => {
       state.search = e.target.value;
+      const url = new URL(window.location);
+      if (state.search) url.searchParams.set("q", state.search); else url.searchParams.delete("q");
+      window.history.replaceState({}, "", url);
       refresh();
     }, 200);
   });
@@ -214,6 +291,17 @@
 
   await refresh();
   onLocaleChange(refresh);
+
+  // Restore the saved scroll position for this exact filter/search/sort
+  // combo, if we have one (i.e. the user is arriving via the Back button
+  // from a product detail page rather than a fresh visit).
+  try {
+    const savedScroll = sessionStorage.getItem(SCROLL_KEY_PREFIX + window.location.search);
+    if (savedScroll) {
+      window.scrollTo(0, Number(savedScroll));
+      sessionStorage.removeItem(SCROLL_KEY_PREFIX + window.location.search);
+    }
+  } catch (e) { /* ignore */ }
 </script>
 </body>
 </html>

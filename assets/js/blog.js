@@ -7,11 +7,27 @@
  *      the Journal page still looks complete before an admin has
  *      written anything through the admin panel's Blog tab.
  *
- * English-only by design — same policy as before, just now editable
- * from the admin panel instead of hand-edited into blog.html.
+ * Written in English by default, same as before, but now with an OPTIONAL
+ * per-language `translations` map an admin can fill in from a post's
+ * Translations panel (title/seoTitle/metaDescription can be auto-translated
+ * there; the body is always pasted in manually — see admin.js). getLocalizedPost()
+ * below resolves the right version for whichever locale is active, falling
+ * back to the English fields when a post has no translation for it yet.
  */
 
 import { getFirebaseServices } from "/assets/js/firebase-config.js";
+import { getCurrentLocale, onLocaleChange } from "/assets/js/i18n.js";
+
+/** Resolve a post's title/body for the current locale, falling back to English when no translation exists yet for it. */
+function getLocalizedPost(post) {
+  const locale = getCurrentLocale();
+  const tr = post.translations?.[locale];
+  return {
+    ...post,
+    title: tr?.title || post.title,
+    body: tr?.body || post.body,
+  };
+}
 
 export const SEED_POSTS = [
   {
@@ -166,17 +182,46 @@ function escapeHtml(str = "") {
   return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
-/** Convert admin-authored plain text (blank-line paragraphs, **bold**) into safe HTML. */
+// Topic sub-headings inside a single article (see bodyToHtml below) each get
+// one of these colors, cycling by paragraph position — matches the
+// pre-launch reference design's "yellow lines" idea, but with a different
+// color per topic instead of one repeated highlight color, so a long
+// article is easier to visually scan for its different sections.
+const HEADING_COLORS = ["#d16a6a", "#5fae82", "#6a93d1", "#a687d1", "#6ecbe0", "#e0b16e"];
+
+/**
+ * Convert admin-authored plain text (blank-line paragraphs, **bold**) into
+ * safe HTML. A paragraph that STARTS with a **bold** lead-in (the pattern
+ * every seed post already uses, e.g. "**Retinol is for texture...** It's
+ * a...") is rendered as its own colored sub-heading line above the rest of
+ * that paragraph, cycling through HEADING_COLORS — any other **bold** stays
+ * a plain inline gold highlight, same as before.
+ */
 export function bodyToHtml(body = "") {
   return body
     .split(/\n\s*\n/)
     .map((para) => para.trim())
     .filter(Boolean)
-    .map((para) => {
+    .map((para, i) => {
+      const leadIn = para.match(/^\*\*(.+?)\*\*\s*([\s\S]*)$/);
+      if (leadIn) {
+        const color = HEADING_COLORS[i % HEADING_COLORS.length];
+        const heading = escapeHtml(leadIn[1]);
+        const rest = escapeHtml(leadIn[2]).replace(/\*\*(.+?)\*\*/g, '<strong class="text-gold-soft">$1</strong>');
+        return `<p class="leading-relaxed mb-4"><strong class="block mb-1" style="color:${color};font-size:1.05em;">${heading}</strong><span class="text-ink-300">${rest}</span></p>`;
+      }
       const escaped = escapeHtml(para).replace(/\*\*(.+?)\*\*/g, '<strong class="text-gold-soft">$1</strong>');
       return `<p class="text-ink-300 leading-relaxed mb-4">${escaped}</p>`;
     })
     .join("");
+}
+
+/** Short plain-text preview of a post's first paragraph, for the collapsed card (see "Read More" below) — same on mobile and desktop. */
+function excerptFromBody(body = "", maxLen = 170) {
+  const firstPara = (body.split(/\n\s*\n/)[0] || "").trim();
+  const plain = firstPara.replace(/\*\*(.+?)\*\*/g, "$1");
+  if (plain.length <= maxLen) return plain;
+  return plain.slice(0, maxLen).replace(/\s+\S*$/, "") + "…";
 }
 
 // Each card in the carousel gets one of these accent colors, cycling in
@@ -187,12 +232,24 @@ const ACCENT_COLORS = ["#d16a6a", "#5fae82", "#6a93d1", "#a687d1", "#6ecbe0"];
 /** Render the Journal as a horizontally-scrolling row of cards into `containerEl`. */
 export async function renderBlogList(containerEl) {
   if (!containerEl) return;
-  const posts = await fetchBlogPosts();
 
-  if (!posts.length) {
+  // Re-render in place when the visitor switches language, so any post that
+  // has a saved translation for the new locale swaps in instantly — wired
+  // once per container (the dataset flag guards against piling up duplicate
+  // subscriptions if renderBlogList is ever called more than once).
+  if (!containerEl.dataset.localeWired) {
+    containerEl.dataset.localeWired = "true";
+    onLocaleChange(() => renderBlogList(containerEl));
+  }
+
+  const rawPosts = await fetchBlogPosts();
+
+  if (!rawPosts.length) {
     containerEl.innerHTML = `<p class="text-center text-ink-500 py-16">No posts yet.</p>`;
     return;
   }
+
+  const posts = rawPosts.map(getLocalizedPost);
 
   const cards = posts
     .map((post, i) => {
@@ -201,7 +258,9 @@ export async function renderBlogList(containerEl) {
     <article class="blog-card glass" style="--accent:${accent};">
       ${post.category ? `<p class="eyebrow mb-2" style="color:${accent};">${escapeHtml(post.category)}</p>` : ""}
       <h2 class="heading-serif text-2xl mb-3" style="color:${accent};">${escapeHtml(post.title)}</h2>
-      ${bodyToHtml(post.body)}
+      <p class="text-ink-300 leading-relaxed mb-4" data-post-excerpt>${escapeHtml(excerptFromBody(post.body))}</p>
+      <div class="hidden" data-post-full>${bodyToHtml(post.body)}</div>
+      <button type="button" class="btn-outline-gold text-xs" data-post-toggle>Read More</button>
       <p class="text-xs text-ink-700 mt-6">Tracy's Botanical Elixirs Editorial${post.publishedAt ? ` · Published ${formatPostDate(post.publishedAt)}` : ""}</p>
     </article>`;
     })
@@ -231,4 +290,18 @@ export async function renderBlogList(containerEl) {
     track.addEventListener("scroll", updateHint);
     updateHint();
   }
+
+  // "Read More" / "Show Less" — same behavior on mobile and desktop, since
+  // it's the same markup either way, just a taller card once expanded.
+  containerEl.querySelectorAll("[data-post-toggle]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const card = btn.closest(".blog-card");
+      const excerptEl = card.querySelector("[data-post-excerpt]");
+      const fullEl = card.querySelector("[data-post-full]");
+      const expanded = !fullEl.classList.contains("hidden");
+      excerptEl.classList.toggle("hidden", !expanded);
+      fullEl.classList.toggle("hidden", expanded);
+      btn.textContent = expanded ? "Read More" : "Show Less";
+    });
+  });
 }

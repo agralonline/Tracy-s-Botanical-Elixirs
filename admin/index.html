@@ -74,10 +74,16 @@
       <button id="new-product-btn" type="button" class="btn-gold">+ New Product</button>
     </div>
 
+    <div class="flex flex-wrap gap-3 mb-5">
+      <select id="product-filter-category" class="input-glass !w-auto text-xs"><option value="">All categories</option></select>
+      <input id="product-filter-search" class="input-glass !w-auto flex-1 min-w-[180px] text-xs" placeholder="Search by title or SKU…" />
+    </div>
+
     <div class="glass-static rounded-2xl overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
           <tr class="text-left text-ink-500 border-b border-white/5">
+            <th class="p-4">Order</th>
             <th class="p-4">Product</th>
             <th class="p-4">SKU</th>
             <th class="p-4">Category</th>
@@ -88,7 +94,7 @@
           </tr>
         </thead>
         <tbody id="product-table-body">
-          <tr><td colspan="7" class="p-8 text-center text-ink-500">Loading…</td></tr>
+          <tr><td colspan="8" class="p-8 text-center text-ink-500">Loading…</td></tr>
         </tbody>
       </table>
     </div>
@@ -99,7 +105,7 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
       <div>
         <h1 class="heading-serif text-3xl gold-gradient-text">Categories</h1>
-        <p class="text-ink-500 text-sm">Categories are shown in English only across every language, the same as Journal posts — name and description are not auto-translated.</p>
+        <p class="text-ink-500 text-sm">Write English copy once — Translate &amp; Save generates all 24 languages automatically.</p>
       </div>
       <button id="new-category-btn" type="button" class="btn-gold">+ New Category</button>
     </div>
@@ -108,6 +114,7 @@
       <table class="w-full text-sm">
         <thead>
           <tr class="text-left text-ink-500 border-b border-white/5">
+            <th class="p-4">Order</th>
             <th class="p-4">Image</th>
             <th class="p-4">Name</th>
             <th class="p-4">Slug</th>
@@ -116,7 +123,7 @@
           </tr>
         </thead>
         <tbody id="category-table-body">
-          <tr><td colspan="5" class="p-8 text-center text-ink-500">Loading…</td></tr>
+          <tr><td colspan="6" class="p-8 text-center text-ink-500">Loading…</td></tr>
         </tbody>
       </table>
     </div>
@@ -127,9 +134,16 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
       <div>
         <h1 class="heading-serif text-3xl gold-gradient-text">Journal / Blog</h1>
-        <p class="text-ink-500 text-sm">Published in English only, same as before — write once, no translation step.</p>
+        <p class="text-ink-500 text-sm">Written in English; add per-language versions from a post's Translations panel.</p>
       </div>
-      <button id="new-post-btn" type="button" class="btn-gold">+ New Post</button>
+      <div class="flex gap-3 flex-wrap">
+        <button id="export-posts-btn" type="button" class="btn-outline-gold text-xs">Export All (backup)</button>
+        <label class="btn-outline-gold text-xs cursor-pointer" style="display:inline-flex;align-items:center;">
+          Import Backup
+          <input id="import-posts-input" type="file" accept="application/json" class="hidden" />
+        </label>
+        <button id="new-post-btn" type="button" class="btn-gold">+ New Post</button>
+      </div>
     </div>
 
     <div class="glass-static rounded-2xl overflow-x-auto">
@@ -212,7 +226,11 @@
     <form id="settings-form" class="glass-static rounded-2xl p-8 flex flex-col gap-5">
       <div>
         <label class="flex items-center gap-2 text-sm text-ink-300"><input id="sf-announcement-enabled" type="checkbox" /> Show announcement bar</label>
-        <input id="sf-announcement-text" class="input-glass mt-2" placeholder="e.g. Free shipping on US orders over $75" />
+        <div class="flex items-center justify-between mt-2 mb-1">
+          <span></span>
+          <button type="button" id="sf-announcement-translate-btn" class="field-translate-btn" title="Translate this text into all 24 languages">🌐 Translate this field</button>
+        </div>
+        <input id="sf-announcement-text" class="input-glass" placeholder="e.g. Free shipping on US orders over $75" />
       </div>
 
       <div>
@@ -331,16 +349,24 @@
       </div>
 
       <div class="sm:col-span-2">
-        <label class="text-xs eyebrow block mb-1">Ingredients (comma-separated)</label>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs eyebrow">Ingredients (comma-separated)</label>
+          <button type="button" class="field-translate-btn hidden" data-field="ingredients" title="Re-translate just this field into all 24 languages">🌐 Translate this field</button>
+        </div>
         <input id="pf-ingredients" class="input-glass" placeholder="Lavandula angustifolia (Lavender) Oil" />
-        <p class="text-xs text-ink-700 mt-1">No translate button here on purpose — ingredient names (INCI/botanical Latin names like "Lavandula angustifolia") are shown the same way on cosmetic labels worldwide, in every language, so they're saved once in English and never translated.</p>
       </div>
 
       <div class="sm:col-span-2">
-        <label class="text-xs eyebrow block mb-1">Product Image</label>
+        <label class="text-xs eyebrow block mb-1">Main Product Image</label>
         <input id="pf-image-file" type="file" accept="image/*,.svg" class="input-glass" />
         <input id="pf-image-url" class="input-glass mt-2" placeholder="Or paste an image URL directly" />
         <p class="text-xs text-ink-700 mt-1">Uploads go to Firebase Storage when configured; otherwise paste a hosted image URL.</p>
+      </div>
+
+      <div class="sm:col-span-2">
+        <label class="text-xs eyebrow block mb-1">Additional Gallery Images (optional, one URL per line)</label>
+        <textarea id="pf-image-gallery" rows="3" class="input-glass" placeholder="https://.../angle-2.jpg&#10;https://.../angle-3.jpg"></textarea>
+        <p class="text-xs text-ink-700 mt-1">Shown as a thumbnail strip on the product page, in addition to the main image above. Paste hosted image URLs (e.g. from Cloudinary) — one per line.</p>
       </div>
 
       <div class="sm:col-span-2 flex flex-wrap gap-5 text-sm text-ink-300">
@@ -372,7 +398,10 @@
       <input type="hidden" id="cf-id" />
 
       <div>
-        <label class="text-xs eyebrow block mb-1">Name</label>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs eyebrow">Name</label>
+          <button type="button" class="field-translate-btn category-field-translate-btn hidden" data-field="name" title="Re-translate just this field into all 24 languages">🌐 Translate this field</button>
+        </div>
         <input id="cf-name" required class="input-glass" placeholder="Body Oils" />
       </div>
 
@@ -382,7 +411,10 @@
       </div>
 
       <div>
-        <label class="text-xs eyebrow block mb-1">Description</label>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs eyebrow">Description</label>
+          <button type="button" class="field-translate-btn category-field-translate-btn hidden" data-field="description" title="Re-translate just this field into all 24 languages">🌐 Translate this field</button>
+        </div>
         <textarea id="cf-description" rows="3" class="input-glass" placeholder="A short line shown under the category name"></textarea>
       </div>
 
@@ -425,9 +457,16 @@
       </div>
 
       <div>
-        <label class="text-xs eyebrow block mb-1">Body</label>
-        <textarea id="pof-body" required rows="10" class="input-glass" placeholder="Separate paragraphs with a blank line. Wrap text in **double asterisks** for bold."></textarea>
-        <p class="text-xs text-ink-700 mt-1">Blank line = new paragraph. **text** = bold.</p>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs eyebrow">Body</label>
+          <div class="flex gap-1">
+            <button type="button" id="pof-bold-btn" class="btn-ghost text-xs px-2 py-1" title="Wrap the selected text in ** ** (bold / colored sub-heading if at the start of a paragraph)"><strong>B</strong></button>
+            <button type="button" id="pof-preview-toggle" class="btn-ghost text-xs px-2 py-1">Preview</button>
+          </div>
+        </div>
+        <textarea id="pof-body" required rows="10" class="input-glass" placeholder="Separate paragraphs with a blank line. Wrap text in **double asterisks** for bold — a **bold lead-in** at the start of a paragraph renders as a colored sub-heading on the live site."></textarea>
+        <div id="pof-body-preview" class="hidden glass-static rounded-lg p-4 mt-2" style="max-height:260px;overflow-y:auto;"></div>
+        <p class="text-xs text-ink-700 mt-1">Blank line = new paragraph. A paragraph that starts with **bold** becomes a colored sub-heading; **bold** anywhere else is just highlighted.</p>
       </div>
 
       <div>
@@ -436,6 +475,54 @@
           <option value="published">Published</option>
           <option value="draft">Draft</option>
         </select>
+      </div>
+
+      <hr class="hairline-gold" />
+      <p class="text-xs eyebrow">SEO</p>
+
+      <div>
+        <label class="text-xs eyebrow block mb-1">URL Slug</label>
+        <input id="pof-slug" class="input-glass" placeholder="5-ways-to-use-lavender-oil" />
+      </div>
+      <div>
+        <label class="text-xs eyebrow block mb-1">SEO Title <span class="text-ink-700" id="pof-seo-title-count"></span></label>
+        <input id="pof-seo-title" class="input-glass" placeholder="Defaults to the Title above if left blank" />
+      </div>
+      <div>
+        <label class="text-xs eyebrow block mb-1">Meta Description <span class="text-ink-700" id="pof-meta-desc-count"></span></label>
+        <textarea id="pof-meta-description" rows="2" class="input-glass" placeholder="A 1-2 sentence summary shown in Google search results"></textarea>
+      </div>
+      <div id="pof-seo-score" class="glass-static rounded-lg p-4 text-xs"></div>
+
+      <div id="pof-translations-section" class="hidden">
+        <hr class="hairline-gold mb-4" />
+        <p class="text-xs eyebrow mb-3">Translations (manual — the Journal isn't auto-translated like products)</p>
+        <div class="flex flex-col gap-3 glass-static rounded-lg p-4">
+          <div class="flex items-center gap-3">
+            <select id="pof-tr-locale" class="input-glass !w-auto text-xs"></select>
+            <button type="button" id="pof-tr-autotranslate-btn" class="field-translate-btn" title="Auto-translate just Title/SEO Title/Meta Description into the selected language — the body must be pasted in manually">🌐 Translate title/SEO fields</button>
+          </div>
+          <div>
+            <label class="text-xs text-ink-500 block mb-1">Title (this language)</label>
+            <input id="pof-tr-title" class="input-glass" />
+          </div>
+          <div>
+            <label class="text-xs text-ink-500 block mb-1">SEO Title (this language)</label>
+            <input id="pof-tr-seo-title" class="input-glass" />
+          </div>
+          <div>
+            <label class="text-xs text-ink-500 block mb-1">Meta Description (this language)</label>
+            <textarea id="pof-tr-meta-description" rows="2" class="input-glass"></textarea>
+          </div>
+          <div>
+            <label class="text-xs text-ink-500 block mb-1">Body (this language — paste your own translation, not auto-translated)</label>
+            <textarea id="pof-tr-body" rows="8" class="input-glass"></textarea>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <p id="pof-tr-status" class="text-xs text-ink-500 flex-1"></p>
+            <button type="button" id="pof-tr-save-btn" class="btn-outline-gold text-xs whitespace-nowrap">Save This Language</button>
+          </div>
+        </div>
       </div>
 
       <div class="border-t border-white/5 pt-5 mt-2 flex items-center justify-between gap-4">

@@ -5,7 +5,7 @@
  * main.js's bootstrapPage(). Talks to POST /api/chat (see
  * functions/_lib/chatHandler.js), which proxies the Anthropic API
  * server-side. If the server reports chat isn't configured yet
- * (ANTHROPIC_API_KEY missing), the widget still opens but shows a
+ * (GEMINI_API_KEY missing), the widget still opens but shows a
  * friendly "temporarily unavailable" message instead of erroring.
  */
 
