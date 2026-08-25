@@ -1190,6 +1190,10 @@ async function loadSettings() {
   $("sf-paypal-link").value = data.paypalLink || "";
   $("sf-hero-layout").value = data.heroLayout || "background";
   $("sf-hero-images").value = Array.isArray(data.heroImages) ? data.heroImages.join("\n") : "";
+  $("sf-goal-image-better-sleep").value = data.goalImages?.["better-sleep"] || "";
+  $("sf-goal-image-stress-relief").value = data.goalImages?.["stress-relief"] || "";
+  $("sf-goal-image-glowing-skin").value = data.goalImages?.["glowing-skin"] || "";
+  $("sf-goal-image-hair-care").value = data.goalImages?.["hair-care"] || "";
   $("sf-chatbot-knowledge").value = data.chatbotKnowledge || "";
 
   state.settingsLoaded = true;
@@ -1219,6 +1223,12 @@ async function handleSaveSettings(e) {
       paypalLink: $("sf-paypal-link").value.trim(),
       heroLayout: $("sf-hero-layout").value === "box" ? "box" : "background",
       heroImages: $("sf-hero-images").value.split("\n").map((s) => s.trim()).filter(Boolean),
+      goalImages: {
+        "better-sleep": $("sf-goal-image-better-sleep").value.trim(),
+        "stress-relief": $("sf-goal-image-stress-relief").value.trim(),
+        "glowing-skin": $("sf-goal-image-glowing-skin").value.trim(),
+        "hair-care": $("sf-goal-image-hair-care").value.trim(),
+      },
       chatbotKnowledge: $("sf-chatbot-knowledge").value.trim(),
       updatedAt: firestoreMod.serverTimestamp(),
     };

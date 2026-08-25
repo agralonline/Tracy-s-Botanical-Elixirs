@@ -291,17 +291,18 @@
   await renderCategoryTiles();
   onLocaleChange(renderCategoryTiles);
 
-  function renderWellnessGoalTiles() {
+  async function renderWellnessGoalTiles() {
     const tilesEl = document.getElementById("wellness-goal-tiles");
     if (!tilesEl) return;
+    const settings = await fetchSiteSettings();
     tilesEl.innerHTML = WELLNESS_GOALS.map((goal) => `
       <a href="/shop.html?goal=${encodeURIComponent(goal.slug)}" class="wellness-goal-tile flex flex-col items-center gap-3 text-center">
-        <div class="wellness-goal-media"><img src="${goal.image}" alt="${escapeHtml(t(goal.i18nKey))}" /></div>
+        <div class="wellness-goal-media"><img src="${settings.goalImages?.[goal.slug] || goal.image}" alt="${escapeHtml(t(goal.i18nKey))}" /></div>
         <span class="heading-serif text-sm" data-i18n="${goal.i18nKey}">${escapeHtml(t(goal.i18nKey))}</span>
       </a>
     `).join("");
   }
-  renderWellnessGoalTiles();
+  await renderWellnessGoalTiles();
   onLocaleChange(renderWellnessGoalTiles);
 
   const grid = document.getElementById("product-grid");

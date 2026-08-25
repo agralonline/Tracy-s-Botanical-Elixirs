@@ -21,6 +21,7 @@ export const DEFAULT_SETTINGS = {
   paypalLink: "",
   heroLayout: "background", // "background" (full-bleed images behind text) or "box" (left text, right auto-scroll image box)
   heroImages: [], // falls back to hero-slider.js's bundled HERO_SLIDES when empty
+  goalImages: {}, // { "better-sleep": url, ... } — falls back to wellness-goals.js's bundled defaults per-slug when a slug is missing/blank
   chatbotKnowledge: "",
 };
 
