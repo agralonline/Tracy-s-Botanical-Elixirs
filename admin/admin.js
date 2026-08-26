@@ -115,9 +115,21 @@ async function loadProducts() {
     state.products = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch (err) {
     // Missing index or empty collection on a fresh project — fall back to unordered fetch.
-    const { collection: col2, getDocs: getDocs2 } = firestoreMod;
-    const snap = await getDocs2(col2(db, "tracy_products"));
-    state.products = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    try {
+      const { collection: col2, getDocs: getDocs2 } = firestoreMod;
+      const snap = await getDocs2(col2(db, "tracy_products"));
+      state.products = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    } catch (err2) {
+      // Both attempts failed (e.g. Firestore genuinely unreachable) — don't let this
+      // throw uncaught, which would silently abort the rest of init() (loadProducts
+      // is always called right after loadCategories) and leave the admin staring at
+      // a permanent "Loading…" row with no explanation. Show a real error instead.
+      console.error("Failed to load products:", err2);
+      state.products = state.products || [];
+      showBanner("Could not load products from Firestore. Check your connection and reload the page.", "error");
+      tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-ink-500">Failed to load products.</td></tr>`;
+      return;
+    }
   }
 
   // The storefront reads Firestore first and only falls back to the bundled
@@ -311,9 +323,20 @@ async function loadCategories() {
     const snap = await getDocs(query(collection(db, "tracy_categories"), orderBy("createdAt", "asc")));
     state.categories = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch (err) {
-    const { collection: col2, getDocs: getDocs2 } = firestoreMod;
-    const snap = await getDocs2(col2(db, "tracy_categories"));
-    state.categories = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    try {
+      const { collection: col2, getDocs: getDocs2 } = firestoreMod;
+      const snap = await getDocs2(col2(db, "tracy_categories"));
+      state.categories = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    } catch (err2) {
+      // Same reasoning as loadProducts()'s fallback: never let this throw uncaught,
+      // since the caller does `await loadCategories(); await loadProducts();` right
+      // after — an uncaught error here would silently skip loadProducts() too.
+      console.error("Failed to load categories:", err2);
+      state.categories = state.categories || [];
+      showBanner("Could not load categories from Firestore. Check your connection and reload the page.", "error");
+      if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-ink-500">Failed to load categories.</td></tr>`;
+      return;
+    }
   }
   // Admin-controlled display order (set via the ↑/↓ buttons below) wins over
   // creation order whenever it's been explicitly set; categories that have

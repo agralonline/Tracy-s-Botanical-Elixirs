@@ -152,14 +152,39 @@ function applyDocumentDirection(code) {
   document.documentElement.setAttribute("lang", code === "zh-CN" || code === "zh-TW" ? code : code.split("-")[0]);
 }
 
-/** Load, persist, and apply a locale. Re-renders all tagged DOM + notifies subscribers. */
+/**
+ * Load, persist, and apply a locale. Re-renders all tagged DOM + notifies subscribers.
+ *
+ * NEVER throws — this runs as `await initI18n()` at the very top of every
+ * page's bootstrap, before mobile nav, hero, product grids, etc. are wired
+ * up. If it threw, that single failure would silently abort ALL of that
+ * downstream setup on every page (this actually happened in production:
+ * a locale file that failed to deploy correctly took down the entire
+ * storefront, not just the language switcher). So: try the requested
+ * locale, fall back to English, and if even English's fetch fails (e.g.
+ * /locales isn't reachable at all), fall back to an empty dict — t()
+ * already degrades gracefully to showing the raw key name when a key is
+ * missing, so the page stays usable (just untranslated) instead of dead.
+ */
 export async function setLocale(code) {
   if (!SUPPORTED_LOCALES.includes(code)) code = "en";
-  const dict = await fetchLocaleDict(code).catch(async (err) => {
-    console.error(err);
-    if (code !== "en") return fetchLocaleDict("en");
-    throw err;
-  });
+  let dict;
+  try {
+    dict = await fetchLocaleDict(code);
+  } catch (err) {
+    console.error(`Failed to load locale "${code}":`, err);
+    if (code !== "en") {
+      try {
+        dict = await fetchLocaleDict("en");
+        code = "en";
+      } catch (err2) {
+        console.error("English fallback locale also failed to load — continuing without translations.", err2);
+        dict = {};
+      }
+    } else {
+      dict = {};
+    }
+  }
 
   currentLocale = code;
   currentDict = dict;
