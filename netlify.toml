@@ -65,14 +65,28 @@
   force = true
 
 [[headers]]
+  # IMPORTANT: this project has no build step and no filename hashing, so
+  # every JS file always has the SAME URL (e.g. /assets/js/products.js)
+  # across every deploy. A long/immutable cache here means a visitor's
+  # browser can keep serving a stale, pre-deploy copy of these files for
+  # up to a year, ignoring every subsequent deploy — this is exactly what
+  # caused a real production incident (a stale assets/js/products.js
+  # missing a newer export broke the entire storefront for anyone who'd
+  # visited before, with no way to recover short of a manual hard-refresh
+  # / cache clear). `must-revalidate` forces the browser to check back
+  # with Netlify on every load; a matching ETag still returns a fast 304
+  # with no re-download, so this costs virtually nothing while
+  # guaranteeing every deploy actually reaches every visitor immediately.
+  # If filename-hashed asset builds are ever introduced, this can safely
+  # go back to a long immutable cache.
   for = "/assets/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/locales/*"
   [headers.values]
-    Cache-Control = "public, max-age=3600"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/admin/*"
