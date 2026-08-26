@@ -117,7 +117,10 @@ async function fulfillOrder(stripe, session) {
   const existing = await orderRef.get();
   if (existing.exists) return; // idempotent — Stripe may retry webhook delivery
 
-  const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 100 });
+  const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+    limit: 100,
+    expand: ["data.price.product"],
+  });
 
   const order = {
     id: session.id,
@@ -154,9 +157,27 @@ async function fulfillOrder(stripe, session) {
 
   // Best-effort inventory decrement, matched via the productIds we stashed
   // in session metadata at checkout-session creation time.
+  //
+  // Matching is done via each line item's underlying Stripe Product
+  // metadata.productId (set at checkout-session creation in
+  // checkoutHandler.js's price_data.product_data.metadata) — NOT by
+  // comparing product titles, because Stripe Checkout renders the line
+  // item description in the customer's own checkout locale (any of the
+  // site's 24 languages), so a title comparison against the English
+  // Firestore title would silently fail for every non-English purchase.
+  // Falls back to positional matching (line items are created in the
+  // same order as the cart's `items` array) for the rare case a product
+  // uses an admin-preset Stripe priceId, whose Product metadata this
+  // codebase doesn't control.
   const productIds = (session.metadata?.productIds || "").split(",").filter(Boolean);
+
+  function findLineItemFor(productId, index) {
+    const byMetadata = lineItems.data.find((li) => li.price?.product?.metadata?.productId === productId);
+    return byMetadata || lineItems.data[index] || null;
+  }
+
   await Promise.all(
-    productIds.map(async (productId) => {
+    productIds.map(async (productId, index) => {
       const productRef = db.collection("tracy_products").doc(productId);
       try {
         await db.runTransaction(async (tx) => {
@@ -164,7 +185,7 @@ async function fulfillOrder(stripe, session) {
           if (!snap.exists) return;
           const data = snap.data();
           if (!data.inventory?.trackInventory) return;
-          const matchingLine = lineItems.data.find((li) => li.description === data.translations?.en?.title);
+          const matchingLine = findLineItemFor(productId, index);
           const qty = matchingLine?.quantity || 1;
           const nextQty = Math.max(0, (data.inventory.quantity || 0) - qty);
           tx.update(productRef, { "inventory.quantity": nextQty });

@@ -42,11 +42,18 @@ export async function fetchProducts({ forceRefresh = false } = {}) {
   if (services) {
     try {
       const { db, firestoreMod } = services;
-      const { collection, getDocs, query, where } = firestoreMod;
-      const q = query(collection(db, "tracy_products"), where("status", "==", "active"));
+      const { collection, getDocs, query } = firestoreMod;
+      // Fetch the whole collection (not status=="active" only) so we can
+      // tell "no real products exist yet" (→ fall back to seed data) apart
+      // from "real products exist but none are active" (→ show an empty
+      // storefront, not the bundled placeholders — otherwise an admin who
+      // accidentally leaves every product in "draft" sees the seed demo
+      // products and can't tell anything is wrong).
+      const q = query(collection(db, "tracy_products"));
       const snap = await getDocs(q);
       if (!snap.empty) {
-        productCache = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        productCache = all.filter((p) => p.status === "active");
         // Respect the admin's ▲/▼ display order (see admin.js) when set;
         // products never reordered fall back to most-recently-updated first.
         productCache.sort((a, b) => {
