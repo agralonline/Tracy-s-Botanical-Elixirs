@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Cookie consent banner
+ * THE BOTANICAL APOTHECARY — Cookie consent banner
  * ---------------------------------------------------------------------
  * Simple GDPR-friendly baseline: shown once until the visitor accepts,
  * remembered in localStorage. Shared by both bootstrapPage() (full pages)

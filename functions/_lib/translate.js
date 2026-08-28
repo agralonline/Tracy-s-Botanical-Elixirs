@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Translation provider adapter
+ * THE BOTANICAL APOTHECARY — Translation provider adapter
  * ---------------------------------------------------------------------
  * Real, functional REST calls to either Google Cloud Translation API v2
  * (default) or DeepL, selected via the TRANSLATION_PROVIDER env var.

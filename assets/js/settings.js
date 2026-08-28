@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Site settings (storefront-facing)
+ * THE BOTANICAL APOTHECARY — Site settings (storefront-facing)
  * ---------------------------------------------------------------------
  * A single Firestore doc (tracy_settings/site) holding admin-editable,
  * non-catalog site configuration: the announcement bar, footer social

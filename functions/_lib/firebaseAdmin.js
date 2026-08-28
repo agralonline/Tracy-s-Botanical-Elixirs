@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Firebase Admin bootstrap (server-side only)
+ * THE BOTANICAL APOTHECARY — Firebase Admin bootstrap (server-side only)
  * ---------------------------------------------------------------------
  * Used exclusively by serverless functions (never shipped to the
  * browser). Initializes firebase-admin once per cold start using a

@@ -1,5 +1,5 @@
 /**
- * TRACY USA — "Translate & Save" core handler
+ * THE BOTANICAL APOTHECARY — "Translate & Save" core handler
  * ---------------------------------------------------------------------
  * Platform-agnostic: takes a parsed request body + raw Authorization
  * header, returns { statusCode, jsonBody }. The thin platform wrappers

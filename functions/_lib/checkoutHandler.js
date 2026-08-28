@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Stripe Checkout session creation
+ * THE BOTANICAL APOTHECARY — Stripe Checkout session creation
  * ---------------------------------------------------------------------
  * Uses Stripe Checkout in "direct" mode — Stripe's standard per-
  * transaction fee (no separate monthly platform fee), fully compatible

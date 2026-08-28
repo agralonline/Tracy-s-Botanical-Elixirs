@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Admin panel
+ * THE BOTANICAL APOTHECARY — Admin panel
  * ---------------------------------------------------------------------
  * Auth-gated single-page admin for managing products. The core workflow:
  *   1. Admin signs in with Firebase Auth (email/password).

@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Shopping cart
+ * THE BOTANICAL APOTHECARY — Shopping cart
  * ---------------------------------------------------------------------
  * Cart state lives entirely in localStorage (key: "tracy_cart") as a
  * simple array of { productId, quantity }. This module owns all cart

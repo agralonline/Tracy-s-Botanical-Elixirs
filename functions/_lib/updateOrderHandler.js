@@ -1,5 +1,5 @@
 /**
- * TRACY USA — "Update Order" core handler
+ * THE BOTANICAL APOTHECARY — "Update Order" core handler
  * ---------------------------------------------------------------------
  * tracy_orders is never client-writable (see firestore.rules — only the
  * Stripe webhook, via the Admin SDK, may write it) so the admin panel's

@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Stripe webhook handler
+ * THE BOTANICAL APOTHECARY — Stripe webhook handler
  * ---------------------------------------------------------------------
  * Verifies the Stripe signature on the RAW request body (critical —
  * platform wrappers must NOT JSON-parse the body before calling this),
@@ -59,7 +59,7 @@ function formatMoney(cents, currency) {
  * Requires two env vars to actually send:
  *   RESEND_API_KEY     — from the Resend dashboard
  *   ORDER_EMAIL_FROM   — a "From" address on a domain verified in Resend,
- *                         e.g. "Tracy's Botanical Elixirs <orders@tracyusa.com>"
+ *                         e.g. "The Botanical Apothecary <orders@yourdomain.com>"
  *
  * Silently skipped (order still saves fine) if either is missing — order
  * confirmation email is a nice-to-have on top of Stripe's own payment
@@ -83,7 +83,7 @@ async function sendOrderConfirmationEmail(order) {
       <table style="width:100%;border-collapse:collapse;margin:16px 0;">${itemsHtml}</table>
       <p style="font-weight:bold;">Total: ${formatMoney(order.amountTotal, order.currency)}</p>
       ${order.shippingAddress ? `<p style="color:#555;">Shipping to:<br/>${[order.shippingAddress.name, order.shippingAddress.line1, order.shippingAddress.line2, `${order.shippingAddress.city || ""} ${order.shippingAddress.state || ""} ${order.shippingAddress.postalCode || ""}`, order.shippingAddress.country].filter(Boolean).map(escapeHtmlEmail).join("<br/>")}</p>` : ""}
-      <p style="color:#999;font-size:12px;margin-top:24px;">Tracy's Botanical Elixirs</p>
+      <p style="color:#999;font-size:12px;margin-top:24px;">The Botanical Apothecary</p>
     </div>`;
 
   try {
@@ -93,7 +93,7 @@ async function sendOrderConfirmationEmail(order) {
       body: JSON.stringify({
         from: process.env.ORDER_EMAIL_FROM,
         to: order.customerEmail,
-        subject: "Your Tracy's Botanical Elixirs order is confirmed",
+        subject: "Your The Botanical Apothecary order is confirmed",
         html,
       }),
     });

@@ -1,5 +1,5 @@
 /**
- * TRACY USA — "Translate Blog Post Short Fields" core handler
+ * THE BOTANICAL APOTHECARY — "Translate Blog Post Short Fields" core handler
  * ---------------------------------------------------------------------
  * Translates just Title/SEO Title/Meta Description into ONE selected
  * locale (never all 24, and never the body — a full article is too long

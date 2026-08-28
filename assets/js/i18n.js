@@ -1,5 +1,5 @@
 /**
- * TRACY USA — i18n engine
+ * THE BOTANICAL APOTHECARY — i18n engine
  * ---------------------------------------------------------------------
  * Handles the 24-locale language switcher: loads /locales/<code>.json,
  * caches it, persists the chosen locale to localStorage, flips the

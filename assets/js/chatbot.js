@@ -1,5 +1,5 @@
 /**
- * TRACY USA — AI chatbot widget (storefront)
+ * THE BOTANICAL APOTHECARY — AI chatbot widget (storefront)
  * ---------------------------------------------------------------------
  * A small floating chat button + panel, injected on every page from
  * main.js's bootstrapPage(). Talks to POST /api/chat (see
@@ -26,8 +26,8 @@ export function injectChatbot() {
   const toggle = document.createElement("button");
   toggle.id = "chatbot-toggle";
   toggle.type = "button";
-  toggle.setAttribute("aria-label", "Ask Tracy — chat with us");
-  // A pill (icon + "Ask Tracy" label) rather than an icon-only circle, so the
+  toggle.setAttribute("aria-label", "Ask the Apothecary — chat with us");
+  // A pill (icon + "Ask the Apothecary" label) rather than an icon-only circle, so the
   // chat entry point is self-explanatory at a glance instead of relying on
   // the user to guess what the floating icon does.
   toggle.style.cssText = `position:fixed;bottom:1.25rem;right:1.25rem;z-index:60;height:48px;padding:0 1.1rem 0 .7rem;border-radius:999px;background:${TEAL};border:none;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.4);display:flex;align-items:center;gap:.5rem;color:#0a0f1d;`;
@@ -43,7 +43,7 @@ export function injectChatbot() {
     <circle cx="9" cy="12.3" r="1.6" fill="${TEAL}"/>
     <circle cx="15" cy="12.3" r="1.6" fill="${TEAL}"/>
     <rect x="9.3" y="15.6" width="5.4" height="1.5" rx="0.75" fill="${TEAL}"/>
-  </svg><span style="font-size:.82rem;font-weight:600;white-space:nowrap;">Ask Tracy</span>`;
+  </svg><span style="font-size:.82rem;font-weight:600;white-space:nowrap;">Ask the Apothecary</span>`;
 
   const panel = document.createElement("div");
   panel.id = "chatbot-panel";
@@ -59,7 +59,7 @@ export function injectChatbot() {
   panel.innerHTML = `
     <div class="glass-panel" style="display:flex;flex-direction:column;height:100%;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border-bottom:1px solid rgba(255,255,255,.08);">
-        <span id="chatbot-title" class="heading-serif" style="font-size:1.1rem;color:var(--gold-soft);">Ask Tracy</span>
+        <span id="chatbot-title" class="heading-serif" style="font-size:1.1rem;color:var(--gold-soft);">Ask the Apothecary</span>
         <button id="chatbot-close" type="button" aria-label="Close" style="background:none;border:none;color:var(--ink-500);cursor:pointer;font-size:1.1rem;line-height:1;padding:.25rem;">&times;</button>
       </div>
       <div id="chatbot-messages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem;font-size:.85rem;"></div>

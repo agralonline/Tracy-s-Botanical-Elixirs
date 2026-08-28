@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Journal / Blog (storefront-facing)
+ * THE BOTANICAL APOTHECARY — Journal / Blog (storefront-facing)
  * ---------------------------------------------------------------------
  * Data source priority (same pattern as products.js / categories.js):
  *   1. Firestore `tracy_blogPosts` collection (status == "published").
@@ -87,7 +87,7 @@ export const SEED_POSTS = [
     status: "published",
     publishedAt: "2026-08-05T00:00:00.000Z",
     body:
-      "Vegan skincare and cruelty-free skincare get used interchangeably online, but they mean different things. Cruelty-free means a product (and its ingredients) were never tested on animals. Vegan means the formula itself contains no animal-derived ingredients — no beeswax, no lanolin, no carmine, no collagen sourced from animals. A product can be one without being the other. Every formula across Tracy's Botanical Elixirs is both, which is a deliberate formulation choice, not a marketing label.\n\n" +
+      "Vegan skincare and cruelty-free skincare get used interchangeably online, but they mean different things. Cruelty-free means a product (and its ingredients) were never tested on animals. Vegan means the formula itself contains no animal-derived ingredients — no beeswax, no lanolin, no carmine, no collagen sourced from animals. A product can be one without being the other. Every formula across The Botanical Apothecary is both, which is a deliberate formulation choice, not a marketing label.\n\n" +
       "**Start with a gentle cleanse and a purpose-built serum, not a ten-step routine.** The biggest myth in clean beauty is that more steps means more results. A simple, effective routine is a cleanser, a targeted serum, and a moisturizer suited to your skin's actual needs — plus SPF every morning, no exceptions. Our Daylight Defense Day Cream carries a mineral SPF 30 specifically so that step isn't a separate bottle to remember.\n\n" +
       "**Choose your actives around what you need,** not what's trending — see our full breakdown of vitamin C vs. retinol vs. niacinamide serums if you're unsure where to start. Vegan formulations of these actives work identically to their non-vegan counterparts; the difference is purely in the inactive, supporting ingredients (emulsifiers, waxes, preservative systems), where plant-derived alternatives now perform on par with animal-derived ones.\n\n" +
       "**Read the ingredient list, not just the front label.** \"Natural\" and \"clean\" aren't regulated terms in the US the way \"organic\" is. Look for plant-derived emulsifiers (cetearyl alcohol, glyceryl stearate), plant waxes (candelilla, carnauba, or jojoba wax instead of beeswax), and a clear absence of animal-derived collagen, keratin, or squalene (as opposed to plant-derived squalane, which is vegan and appears in many of our formulas). Our Botanical Lip Balm Duo, for example, uses candelilla wax specifically to keep the formula fully vegan without sacrificing the balm-like texture beeswax normally provides.\n\n" +
@@ -261,7 +261,7 @@ export async function renderBlogList(containerEl) {
       <p class="text-ink-300 leading-relaxed mb-4" data-post-excerpt>${escapeHtml(excerptFromBody(post.body))}</p>
       <div class="hidden" data-post-full>${bodyToHtml(post.body)}</div>
       <button type="button" class="btn-outline-gold text-xs" data-post-toggle>Read More</button>
-      <p class="text-xs text-ink-700 mt-6">Tracy's Botanical Elixirs Editorial${post.publishedAt ? ` · Published ${formatPostDate(post.publishedAt)}` : ""}</p>
+      <p class="text-xs text-ink-700 mt-6">The Botanical Apothecary Editorial${post.publishedAt ? ` · Published ${formatPostDate(post.publishedAt)}` : ""}</p>
     </article>`;
     })
     .join("");

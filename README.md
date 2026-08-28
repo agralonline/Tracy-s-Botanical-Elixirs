@@ -1,4 +1,4 @@
-# Tracy's Botanical Elixirs — Luxury Essential Oils & Organic Skincare
+# The Botanical Apothecary — Luxury Essential Oils & Organic Skincare
 
 A production-ready, multi-language (24 locales) e-commerce storefront with
 a "Dark Luxury" glassmorphism design system, an admin panel with one-click

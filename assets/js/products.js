@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Product catalog: fetch, cache, filter, and render.
+ * THE BOTANICAL APOTHECARY — Product catalog: fetch, cache, filter, and render.
  * ---------------------------------------------------------------------
  * Data source priority:
  *   1. Firestore `products` collection (status == "active"), if Firebase

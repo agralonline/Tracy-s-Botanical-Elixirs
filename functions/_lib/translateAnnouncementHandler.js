@@ -1,5 +1,5 @@
 /**
- * TRACY USA — "Translate Announcement Bar" core handler
+ * THE BOTANICAL APOTHECARY — "Translate Announcement Bar" core handler
  * ---------------------------------------------------------------------
  * Translates the single `announcementText` field on the tracy_settings/site
  * doc into all 24 locales and merges the result into `announcementTranslations`

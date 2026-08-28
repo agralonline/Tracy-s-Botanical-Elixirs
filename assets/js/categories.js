@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Category catalog: fetch, cache, and label lookup.
+ * THE BOTANICAL APOTHECARY — Category catalog: fetch, cache, and label lookup.
  * ---------------------------------------------------------------------
  * Data source priority (same pattern as products.js):
  *   1. Firestore `tracy_categories` collection, if Firebase is configured.

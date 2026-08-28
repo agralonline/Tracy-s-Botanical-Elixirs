@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Firebase bootstrap
+ * THE BOTANICAL APOTHECARY — Firebase bootstrap
  * ---------------------------------------------------------------------
  * Loads the Firebase v10 modular SDK straight from Google's CDN (no
  * bundler required) and initializes Firestore + Auth + Storage.

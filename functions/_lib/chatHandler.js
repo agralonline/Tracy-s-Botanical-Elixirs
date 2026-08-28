@@ -1,5 +1,5 @@
 /**
- * TRACY USA — AI chatbot backend
+ * THE BOTANICAL APOTHECARY — AI chatbot backend
  * ---------------------------------------------------------------------
  * A thin proxy to the Google Gemini API (https://ai.google.dev) — kept
  * server-side so the API key never reaches the browser. Answers general
@@ -28,7 +28,7 @@ import { getAdminDb } from "./firebaseAdmin.js";
 
 const HUMAN_TAG = "[[HUMAN]]";
 
-const BASE_SYSTEM_PROMPT = `You are the friendly storefront assistant for Tracy's Botanical Elixirs, a luxury essential oils and organic skincare brand shipping worldwide from the United States.
+const BASE_SYSTEM_PROMPT = `You are the friendly storefront assistant for The Botanical Apothecary, a luxury essential oils and organic skincare brand shipping worldwide from the United States.
 
 What you know and can help with:
 - Shipping: ships from the US within 1-2 business days; domestic US orders over $75 ship free, otherwise a flat rate is calculated at checkout; international shipping cost/time is calculated at checkout and the customer covers any customs duties.

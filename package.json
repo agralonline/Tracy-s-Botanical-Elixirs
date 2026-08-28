@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Tracy's Botanical Elixirs — luxury essential oils & organic skincare storefront. Static frontend + Firebase Firestore + Stripe Checkout, deployed via Netlify.",
+  "description": "The Botanical Apothecary — luxury essential oils & organic skincare storefront. Static frontend + Firebase Firestore + Stripe Checkout, deployed via Netlify.",
   "scripts": {
     "dev": "npx serve . -l 5173",
     "seed": "node scripts/seed-firestore.js"

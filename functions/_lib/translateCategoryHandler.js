@@ -1,5 +1,5 @@
 /**
- * TRACY USA — "Translate & Save Category" core handler
+ * THE BOTANICAL APOTHECARY — "Translate & Save Category" core handler
  * ---------------------------------------------------------------------
  * Same pattern as translateAndSaveHandler.js, but for the `tracy_categories`
  * collection (just `name` + `description`, no pricing/inventory/images).

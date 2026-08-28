@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Page bootstrap
+ * THE BOTANICAL APOTHECARY — Page bootstrap
  * ---------------------------------------------------------------------
  * Shared init logic included (as a module) on every storefront page:
  * language system, cart UI, mobile nav, newsletter form, and the

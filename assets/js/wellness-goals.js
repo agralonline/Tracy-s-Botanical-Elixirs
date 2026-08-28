@@ -1,5 +1,5 @@
 /**
- * TRACY USA — "Shop by Wellness Goal" tiles
+ * THE BOTANICAL APOTHECARY — "Shop by Wellness Goal" tiles
  * ---------------------------------------------------------------------
  * An alternate way to browse the catalog by intent/use-case ("Better
  * Sleep", "Stress Relief"...) rather than only by product category —

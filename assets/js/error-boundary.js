@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Visible error banner (diagnostic tool)
+ * THE BOTANICAL APOTHECARY — Visible error banner (diagnostic tool)
  * ---------------------------------------------------------------------
  * Loaded as a plain classic <script> (NOT type="module") at the very top
  * of <head> on every page — deliberately before anything else, so it

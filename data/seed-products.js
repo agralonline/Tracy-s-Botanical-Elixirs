@@ -1,5 +1,5 @@
 /**
- * TRACY USA — Seed Product Data
+ * THE BOTANICAL APOTHECARY — Seed Product Data
  * ---------------------------------------------------------------------
  * These 4 built-in placeholder products ship with the site so the
  * storefront looks complete on first load, before an admin has created

@@ -1,5 +1,5 @@
 /**
- * TRACY USA — "Track Order" core handler (public, no login required)
+ * THE BOTANICAL APOTHECARY — "Track Order" core handler (public, no login required)
  * ---------------------------------------------------------------------
  * A customer looks up their order with Order ID + the email used at
  * checkout — no account system needed. Only a small, safe subset of the
